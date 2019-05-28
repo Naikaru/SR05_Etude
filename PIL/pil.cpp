@@ -9,38 +9,13 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     main = new QVBoxLayout();
     nseq = 0;
     init = false;
-    // Top bar with 5 buttons: Envoyer - Quitter - Fin SC - Instantané - Charger configuration
+    // Top bar with 2 buttons: Envoyer - Quitter
     button_area = new QHBoxLayout();
     quit = new QPushButton("Quitter",this);
     send = new QPushButton("Envoyer",this);
-    //askSc = new QPushButton("Demande SC",this);
-    endSc = new QPushButton("Fin SC",this);
-    snapshot = new QPushButton("Instantané", this);
-    load_snapshot = new QPushButton("Charger configuration", this);
 
     button_area->addWidget(send);
     button_area->addWidget(quit);
-    //button_area->addWidget(askSc);
-    button_area->addWidget(endSc);
-    button_area->addWidget(snapshot);
-    button_area->addWidget(load_snapshot);
-
-    compteurNbDebutSC = 0;
-
-    section_critique_area = new QGridLayout();
-    section_critique_box =new QGroupBox(tr("Section Critique"));
-    section_critique_box->setStyleSheet("QGroupBox{font-weight: bold;}");
-    shared_variable_label = new QLabel("Texte partagé",this);
-    shared_variable = new CustomLineEdit(this);
-    section_critique_area->addWidget(shared_variable_label,0,0);
-    section_critique_area->addWidget(shared_variable,0,1);
-    indicateurSC = new QLabel("SC");
-    indicateurSC->setStyleSheet("QLabel {color : red;font-weight: bold; }");
-    section_critique_area->addWidget(indicateurSC,0,2);
-    section_critique_box->setLayout(section_critique_area);
-    shared_variable->setReadOnly(true);
-    var = "";
-    varChanged = false;
 
     // 2nd part, reception, display the received message
     reception_area = new QGridLayout();
@@ -110,35 +85,22 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     // Build window
     setLayout(main);
     main->addLayout(button_area);
-    main->addWidget(section_critique_box);
     main->addWidget(reception_box);
     main->addWidget(parse_box);
     main->addWidget(send_box);
 
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
-    // mutex = new QMutex();
-
-    // writing_thread = nullptr;
-    // reading_thread = nullptr;
-
     initialization(argc,argv);
-
     setWindowTitle(QString("BAS ")+ QString::number(ident) );
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
     connect(send, SIGNAL(clicked()), this, SLOT(sendMessage())); // Send message
-    connect(endSc, SIGNAL(clicked()), this, SLOT(sendEndSC())); // Send message
-    connect(endSc, SIGNAL(clicked()), this, SLOT(disableSectionCritique())); // Send message
-    connect(snapshot, SIGNAL(clicked()), this, SLOT(sendSnasphotRequest()));
-    connect(load_snapshot, SIGNAL(clicked()), this, SLOT(loadSnapshot()));
-
     connect(parse, SIGNAL(clicked()), this, SLOT(parseMessage())); // parse message
     connect(mnemonic, SIGNAL(returnPressed()), this, SLOT(parseMessage())); // parse message
     // Slot for notifier (reading)
     connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
-    connect(shared_variable,SIGNAL(returnPressed()), this, SLOT(sendUpdateSC()));
 }
 
 
@@ -214,36 +176,6 @@ void Pil::initialization(int argc, char* argv[])
     }
 }
 
-void Pil::enableSectionCritique(){
-    ++compteurNbDebutSC;
-    sectionCritique = true;
-    indicateurSC->setStyleSheet("QLabel {color : green;font-weight: bold; }");
-    shared_variable->setReadOnly(false);
-}
-
-void Pil::disableSectionCritique(){
-    sectionCritique = false;
-    indicateurSC->setStyleSheet("QLabel {color : red;font-weight: bold; }");
-    shared_variable->setReadOnly(true);
-}
-
-void Pil::sendUpdateSC(){
-//    WritingThread* writing_thread = new WritingThread();
-//    QString payload("");
-//    payload += updateSC + " "+ shared_variable->text();
-//    writing_thread->setParam(this, payload,"-1"); // dest = him self
-//    writing_thread->start();
-//    writing_thread->wait();
-//    delete writing_thread;
-//    writing_thread = nullptr;
-}
-
-
-void Pil::enableSnapshot(){
-    snapshot->setEnabled(true);
-}
-
-
 // --------------- SLOTS
 
 // Click to send the message
@@ -252,87 +184,6 @@ void Pil::sendMessage() {
     // sending message to NET
     std::cout << getFormatedMessage().toStdString() << std::endl;
 }
-/*
-void Pil::sendMessage() {
-    writing_thread = new WritingThread();
-    writing_thread->setParam(this);
-    writing_thread->start();
-    writing_thread->wait();
-    delete writing_thread;
-    writing_thread = nullptr;
-}
-*/
-
-// When attempting to modify shared var
-void Pil::sendAskSC() {
-//    WritingThread* writing_thread = new WritingThread();
-//    writing_thread->setParam(this, demandSC,QString::number(ident)); // dest = him self
-//    writing_thread->start();
-//    writing_thread->wait();
-//    delete writing_thread;
-//    writing_thread = nullptr;
-}
-
-// Click to send to other app that SC is over on this BAS
-void Pil::sendEndSC() {
-//    WritingThread* writing_thread = new WritingThread();
-//    writing_thread->setParam(this, endSC,QString::number(ident));
-//    writing_thread->start();
-//    writing_thread->wait();
-//    delete writing_thread;
-//    writing_thread = nullptr;
-}
-
-void Pil::sendSnasphotRequest(){
-//    snapshot->setEnabled(false);
-//    WritingThread* writing_thread = new WritingThread();
-//    QString payloadToSend = snapshotRequest + QString::fromStdString("|") + shared_variable->text();
-//    writing_thread->setParam(this, payloadToSend, QString::number(ident));
-//    writing_thread->start();
-//    writing_thread->wait();
-//    delete writing_thread;
-//    writing_thread = nullptr;
-}
-
-void Pil::sendSnapshotLoading(QString fileName) {
-//    WritingThread* writing_thread = new WritingThread();
-//    QString payloadToSend = snapshotLoading + QString::fromStdString("|") + QString::fromStdString(fileName.toStdString().substr(fileName.lastIndexOf("/") + 1, fileName.size()));
-//    writing_thread->setParam(this, payloadToSend, QString::number(ident));
-//    writing_thread->start();
-//    writing_thread->wait();
-//    delete writing_thread;
-//    writing_thread = nullptr;
-}
-
-void Pil::loadSnapshot(){
-    try {
-        QString fileName = QFileDialog::getOpenFileName(this,
-                        tr("Charger le fichier"), "",
-                        tr("Adresse du fichier (*.txt)")
-                    );
-        std::regex extensionTxt("(.*)(.txt)");
-        if (!std::regex_match(fileName.toStdString(), extensionTxt)) {
-            std::cerr << "Le fichier à charger n'est pas au bon format, il doit être au format .txt" << std::endl;
-            return;
-        }
-
-        sendSnapshotLoading(fileName);
-
-    } catch (...) {}
-}
-
-void Pil::updateSectionCritique(QString message){
-    QString tmp (parseMessage(payloadMnemo, message));
-    this->var = tmp.split("@updateSC ",QString::SkipEmptyParts)[0];
-    varChanged = true;
-}
-
-void Pil::updateLoadStateSnapshot(QString message){
-    this->var = message;
-    varChanged = true;
-}
-
-
 
 // Slot to read from stdin, signal received because a message arrived on stdin
 void Pil::readStdin() {
@@ -343,40 +194,16 @@ void Pil::readStdin() {
     do {
         std::getline(std::cin, message);
         if (parseMessage(appnetMnemo, QString::fromStdString(message)) == "") {
-
-            if (parseMessage(payloadMnemo, QString::fromStdString(message)) == beginSC ){
-               enableSectionCritique();
+            /* if (parseMessage(payloadMnemo, QString::fromStdString(message)) == action ){
+               fonction();
             }
-            //mise à jour section critique
-            else if(parseMessage(payloadMnemo, QString::fromStdString(message)).startsWith(updateSC)) {
-               //pour ne pas recevoir notre propre demande de mise à jour (sécurité)
-               if(parseMessage(senderMnemo, QString::fromStdString(message)).toUInt() != ident){
-                   updateSectionCritique(QString::fromStdString(message));
-               }
-            }
-            // si reception message état pour snapshot
-            else if (parseMessage(payloadMnemo, QString::fromStdString(message)).startsWith(snapshotState)
-            // si reception message all snapshot, on envoie l'état de la variable partagée au NET
-                   || parseMessage(payloadMnemo, QString::fromStdString(message)).startsWith(snapshotStateRequest)){
-
-            }
-            else if (parseMessage(payloadMnemo, QString::fromStdString(message)) == snapshotEnd){
-               enableSnapshot();
-            }
-            else if (parseMessage(payloadMnemo, QString::fromStdString(message)).startsWith(snapshotStateToLoad)) {
-               // format payload: @state_load_snapshot|variable|(ident,hlgLamp)|(hlgVecto)
-               QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
-               QStringList value = payload.split("|");
-               updateLoadStateSnapshot(value[1]);
-            }
-            else {
-               // Recepted message is for a BAS app
-               reception_fullmessage->setText(QString::fromStdString(message));
-               reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
-               reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
-               reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
-               reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
-            }
+            */
+           // Recepted message is for a BAS app
+           reception_fullmessage->setText(QString::fromStdString(message));
+           reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
+           reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
+           reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
+           reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
         }
 
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
@@ -388,91 +215,9 @@ void Pil::readStdin() {
     notifier->setEnabled(true);
 }
 
-/*
-void Pil::readStdin() {
-
-    reading_thread = new ReadingThread();
-    reading_thread->setParam(this);
-    reading_thread->start();
-    reading_thread->wait();
-    if (varChanged){
-        shared_variable->setText(var);
-        varChanged = false;
-    }
-    delete reading_thread;
-    reading_thread = nullptr;
-}
-*/
-
 // Slot to parse the message according to a specific mnemonic
 void Pil::parseMessage() {
     QString message = reception_fullmessage->text();
     QString mnemo = mnemonic->text();
     parse_value->setText(parseMessage(mnemo,message));
 }
-
-/*
-// Function called during writing_thread->start()
-void WritingThread::run() {
-    if (interf->mutex->try_lock_for(std::chrono::milliseconds(interf->timeout_mutex_ms)) ) {
-        interf->info_nseq->setText(QString::number(++interf->nseq));
-        // sending message to NET
-        std::cout << interf->getFormatedMessage(payload,dest).toStdString() << std::endl;
-        interf->mutex->unlock();
-    }
-}
-
-
-// Function called during reading_thread->start()
-void ReadingThread::run() {
-    // ask for mutex: wait until mutex available or mutex timeout
-    if (interf->mutex->try_lock_for(std::chrono::milliseconds(interf->timeout_mutex_ms)) ) {
-        //std::cerr << "ReadingThead : "<< std::endl;
-        std::string message;
-        while(!std::cin.eof()) {
-            std::getline(std::cin, message);
-            std::cerr << "Reiceved : " << message << std::endl;
-            // Message intercepted only if it contains non empty appnet value
-            if (interf->parseMessage(interf->appnetMnemo, QString::fromStdString(message)) == "")
-            {
-               if (interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)) == interf->beginSC ){
-                   interf->enableSectionCritique();
-               }
-               //mise à jour section critique
-               else if(interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)).startsWith(interf->updateSC))
-               {
-                   //pour ne pas recevoir notre propre demande de mise à jour (sécurité)
-                   if(interf->parseMessage(interf->senderMnemo, QString::fromStdString(message)).toUInt() != interf->ident){
-                       interf->updateSectionCritique(QString::fromStdString(message));
-                   }
-               }
-               // si reception message état pour snapshot
-               else if (interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)).startsWith(interf->snapshotState)
-               // si reception message all snapshot, on envoie l'état de la variable partagée au NET
-                       || interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)).startsWith(interf->snapshotStateRequest)){
-
-               }
-               else if (interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)) == interf->snapshotEnd){
-                   interf->enableSnapshot();
-               }
-               else if (interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)).startsWith(interf->snapshotStateToLoad)) {
-                   // format payload: @state_load_snapshot|variable|(ident,hlgLamp)|(hlgVecto)
-                   QString payload = interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message));
-                   QStringList value = payload.split("|");
-                   interf->updateLoadStateSnapshot(value[1]);
-               }
-               else {
-                   // Recepted message is for a BAS app
-                   interf->reception_fullmessage->setText(QString::fromStdString(message));
-                   interf->reception_message_received->setText(interf->parseMessage(interf->payloadMnemo, QString::fromStdString(message)));
-                   interf->reception_nseq->setText(interf->parseMessage(interf->nseqMnemo, QString::fromStdString(message)));
-                   interf->reception_sender->setText(interf->parseMessage(interf->senderMnemo, QString::fromStdString(message)));
-                   interf->reception_dest->setText(interf->parseMessage(interf->destMnemo, QString::fromStdString(message)));
-               }
-            }
-        }
-    }
-    interf->mutex->unlock();
-    // thread release the mutex
-}
-*/
