@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
 //    Pil pil(argc, argv);
 //    pil.show();
 
-    Map m;
+    MapSimu m;
     m.show();
     for(int i = 0; i<20;i++)
         m.initRobot(i,i,0,0);
