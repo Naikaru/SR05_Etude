@@ -6,7 +6,13 @@ QMAKE=LFLAGS = -std=c++11
 QT += testlib
 
 HEADERS += \
-    robotmanager.h
+    map.h \
+    robot.h \
+    messagemanager.h \
+    position.h
 
 SOURCES += \
-    robotmanager.cpp
+    map.cpp \
+    robot.cpp \
+    messagemanager.cpp \
+    position.cpp

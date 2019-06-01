@@ -7,8 +7,10 @@ TARGET = PIL
 INCLUDEPATH += .
 
 # Input
-HEADERS += pil.h
-SOURCES += main.cpp pil.cpp
+HEADERS += pil.h \
+    map.h
+SOURCES += main.cpp pil.cpp \
+    map.cpp
 
 
 QT += core gui widgets
