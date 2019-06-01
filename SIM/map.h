@@ -1,6 +1,9 @@
 #ifndef MAP_H
 #define MAP_H
 
+
+#define _USE_MATH_DEFINES
+
 #include <QtWidgets>
 #include <algorithm>
 #include <unistd.h>
@@ -11,6 +14,7 @@
 #include <fstream>
 #include "robot.h"
 #include "position.h"
+#include "math.h"
 
 
 
@@ -73,22 +77,45 @@ class Map
         }
 
         int turn(unsigned int id, int d){
-
+            robots[id].setPosition(robots[id].getPosition + d);
+            return d;
         }
 
         void init(unsigned int id, int x, int y, int heading){
+            Robot& robotToChange = robots[id];
+            robotToChange.setPosition(Position(x,y));
+            robotToChange.setHeading(heading);
 
         }
 
-        void curr(unsigned int id){
-
+        Robot curr(unsigned int id){
+            return robots[id];
         }
 
         void join(unsigned int id, int x, int y ){
+            Robot& robotToMove = robots[id];
+            Position currentPosition = robotToMove.getPosition();
 
-        }
+            float teta;
+            float diffX = (float)x - currentPosition.getX();
+            float diffY = (float) y - currentPosition.getY();
+            if(diffX == 0 && diffY == 0)
+                return; //on retourne la position actuelle, on a pas bougé
 
+            if(diffX > 0 && diffY > 0) //1er cadrant
+                teta = teta;
+            if(diffX < 0 && diffY > 0) //2eme cadrant
+                teta = 180 - teta;
+            if(diffX < 0 && diffY < 0) //3eme cadrant
+                teta = 180 + teta;
+            if(diffX > 0 && diffY < 0)//4eme cadrant
+                teta = 360 - teta;
+            if(diffX == 0)
+                teta = 90;
+            if(diffY == 0)
+                teta = 0;
 
+            teta = abs(teta - robotToMove.getHeading());
 
 
 };

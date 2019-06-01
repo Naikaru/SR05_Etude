@@ -9,10 +9,12 @@ HEADERS += \
     map.h \
     robot.h \
     messagemanager.h \
-    position.h
+    position.h \
+    mapgui.h
 
 SOURCES += \
     map.cpp \
     robot.cpp \
     messagemanager.cpp \
-    position.cpp
+    position.cpp \
+    mapgui.cpp
