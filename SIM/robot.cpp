@@ -1,6 +1,6 @@
 #include "robot.h"
 
-Position Robot::getPosition() const
+const Position& Robot::getPosition() const
 {
     return position;
 }

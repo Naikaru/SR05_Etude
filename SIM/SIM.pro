@@ -17,4 +17,5 @@ SOURCES += \
     robot.cpp \
     messagemanager.cpp \
     position.cpp \
-    mapgui.cpp
+    mapgui.cpp \
+    main.cpp

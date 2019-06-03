@@ -9,12 +9,13 @@ class Robot
 
 public:
     Robot();
+    Robot(unsigned int heading, const Position& position) : heading(heading), position(position) {}
 
         int getHeading() const;
         void setHeading(int value);
 
 
-        Position getPosition() const;
+        const Position& getPosition() const;
         void setPosition(const Position &value);
 };
 
