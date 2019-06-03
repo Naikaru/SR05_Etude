@@ -10,6 +10,7 @@ void Robot::setPosition(const Position &value)
     position = value;
 }
 
+
 Robot::Robot() : heading(0), position(Position())
 {
 
@@ -25,4 +26,6 @@ void Robot::setHeading(int value)
 {
     heading = value;
 }
+
+
 

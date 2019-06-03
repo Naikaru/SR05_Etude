@@ -19,3 +19,5 @@ void Position::setX(int value)
 {
     x = value;
 }
+
+

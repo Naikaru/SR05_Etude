@@ -1,6 +1,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include <ostream>
 
 class Position
 {
@@ -15,6 +16,11 @@ public:
 
     int getX() const;
     void setX(int value);
+    friend std::ostream& operator<<(std::ostream& os, const Position& position){
+        os << "X : " << position.getX() << " Y : " << position.getY();
+        return os;
+    }
+
 };
 
 #endif // POSITION_H
