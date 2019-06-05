@@ -27,13 +27,15 @@ enum CellState{
 class Map
 {
 
+protected :
     std::map<int, Robot> robots;
     unsigned int nbRobotMax;
 
+
+private:
+    CellState **grid;
     unsigned int nbRows;
     unsigned int nbCols;
-
-    CellState **grid;
 
 
     public:

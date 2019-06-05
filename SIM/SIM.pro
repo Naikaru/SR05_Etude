@@ -10,14 +10,16 @@ HEADERS += \
     robot.h \
     messagemanager.h \
     position.h \
-    mapgui.h \
-    mathhelper.h
+    mathhelper.h \
+    simgui.h \
+    mapgui.h
 
 SOURCES += \
     map.cpp \
     robot.cpp \
     messagemanager.cpp \
     position.cpp \
-    mapgui.cpp \
     main.cpp \
-    mathhelper.cpp
+    mathhelper.cpp \
+    simgui.cpp \
+    mapgui.cpp

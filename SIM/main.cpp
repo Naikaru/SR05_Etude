@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QDebug>
 #include <ctime>
+#include "mapgui.h"
 
 void printMap(const Map& m){
     bool isRobot;
@@ -59,7 +60,7 @@ void initMap(Map& m){
 
 int main(int argc, char* argv[]) {
 
-//    QApplication app(argc, argv);
+     //QApplication app(argc, argv);
 //    Pil pil(argc, argv);
 //    pil.show();
 
@@ -68,12 +69,13 @@ int main(int argc, char* argv[]) {
     Position droite(5, 0);
     Position basGauche(-20, -20);
     Map m(5, 10, 10);
+   // MapGui mapGui;
     Robot robot(0, origine);
     initMap(m);
 
     robot.setHeading(0);
 
-
+    //mapGui.move(1,2);
     m.addRobot(1, robot);
     printMap(m);
 
