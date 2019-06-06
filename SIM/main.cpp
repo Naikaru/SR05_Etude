@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QDebug>
 #include <ctime>
+#include "simgui.h"
 #include "mapgui.h"
 
 void printMap(const Map& m){
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) {
      //QApplication app(argc, argv);
 //    Pil pil(argc, argv);
 //    pil.show();
-
+/*
     std::srand(std::time(nullptr));
     Position origine(0, 0);
     Position droite(5, 0);
@@ -109,4 +110,11 @@ int main(int argc, char* argv[]) {
     std::cout << "colision en 3 3: " << m.getRobots().at(1) << std::endl;
     printMap(m);
 
+
+    */
+
+    QApplication app(argc, argv);
+    MapGui mapGui(nullptr);
+    mapGui.show();
+    return app.exec();
 }
