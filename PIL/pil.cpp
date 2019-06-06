@@ -92,7 +92,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
-    setWindowTitle(QString("BAS ")+ QString::number(ident) );
+    setWindowTitle(QString("PIL ")+ QString::number(ident) );
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window

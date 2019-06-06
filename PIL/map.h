@@ -66,7 +66,7 @@ class Map : protected QTableWidget
 
 public :
 
-    Map(unsigned int w=300,unsigned int h=300,unsigned int c=20,unsigned int l=20,QWidget* parent = NULL):
+    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50,QWidget* parent = NULL):
             width(w),height(h),nbC(c),nbL(l),QTableWidget(parent)
     {
         init();
@@ -88,7 +88,7 @@ public :
      * le robot avance dans sa la direction de sa tête, si d est < 0 il recule
      * déplacement uniquement suivant une grille, pas de déplacement diagonaux
      */
-    virtual Pos move(int id,int d);
+    void move(int id,int d);
 
     /*
      * Surcharge de show pour afficher la map pour des tests
@@ -107,42 +107,6 @@ public :
         if(angle >0)
             robots[id].heading = (robots[id].heading +angle)%360;
     }
-};
-
-
-
-/*
- * La map Simu est une map particulière.
- * ELle sera contenue dans la classe simulation et elle vérifiera si les
- * mouvement comme les move sont possibles.
- * Elle retournera la position réellement atteinte par le robot
- */
-
-
-
-class MapSimu : public Map
-{
-    //rest à définir la class simu
-    //friend class Simu;
-
-public :
-
-
-    MapSimu(unsigned int w=300,unsigned int h=300,unsigned int c=20,unsigned int l=20,QWidget* parent = NULL): Map(w,h,c,l,parent)
-    {
-        generateWorld();
-    }
-
-    /*
-     * La méthode move doit être surchargé
-     */
-    virtual Pos move(int id,int d);
-
-
-    /*
-     * Cette méthode crée le monde dans
-     */
-    void generateWorld();
 };
 
 

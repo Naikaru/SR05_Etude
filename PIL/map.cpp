@@ -60,7 +60,7 @@ void Map::initRobot(int id,int x, int y,int heading)
 }
 
 //déplacement uniquement suivant une grille
-Pos Map::move(int id,int d)
+void Map::move(int id,int d)
 {
     if(robots[id].heading == 180 || robots[id].heading == 0 )   //déplacement suivant une ligne
     {
@@ -76,24 +76,7 @@ Pos Map::move(int id,int d)
     }
     item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
 
-    return Pos();
-}
-
-
-
-//############################# MAP SIMU #############################
-
-
-
-void MapSimu::generateWorld()
-{
-
     return;
-}
-
-
-Pos MapSimu::move(int id,int d){
-    return Pos();
 }
 
 
