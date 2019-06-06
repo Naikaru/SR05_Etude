@@ -43,7 +43,7 @@ private:
     Position getPositionFromCoordinates(const Position &coordinates) const;
         //ctor
         Map();
-        Map(unsigned int nbRobotMax, unsigned int nbRows, unsigned int nbCols);
+        Map(unsigned int nbRobotMax, unsigned int nbCols, unsigned int nbRows);
         //getter and setter
         const std::map<int, Robot>& getRobots() const;
         bool addRobot(int id, const Robot& newRobot);
@@ -56,6 +56,9 @@ private:
         void setGrid(CellState **value);
         unsigned int getNbRobotMax() const;
         void setNbRobotMax(unsigned int value);
+
+        void initMap();
+        void printMap();
 
 
         //getter & setter map

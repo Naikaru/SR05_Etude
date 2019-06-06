@@ -59,7 +59,7 @@ void Map::setNbRobotMax(unsigned int value)
 }
 
 void Map::changeState(unsigned int i, unsigned int j, CellState newState){
-    if( i >= nbRows || j >= nbCols){
+    if( i >= nbCols || j >= nbRows){
         throw new QString("Out of Bounds");
     }
     grid[i][j] = newState;
@@ -67,8 +67,8 @@ void Map::changeState(unsigned int i, unsigned int j, CellState newState){
 
 CellState Map::getState(unsigned int i, unsigned int j) const
 {
-    if( i >= nbRows || j >= nbCols){
-            throw new QString("Out of Bounds");
+    if( i >= nbCols || j >= nbRows){
+        throw new QString("Out of Bounds");
     }
     return grid[i][j];
 }
@@ -101,6 +101,7 @@ int Map::move(unsigned int id, int d){
         destination.setX(x);
         destination.setY(y);
 
+
         Position gridCoordinates = getCoordinatesFromPosition(destination);
         if(this->getState(gridCoordinates.getX(), gridCoordinates.getY()) == empty)
         {
@@ -113,6 +114,8 @@ int Map::move(unsigned int id, int d){
             break;
         }
     }
+    qDebug() << "Postition " << cellTraveled.back().getX() << cellTraveled.back().getY();
+
     robot.setPosition(cellTraveled.back());
     return distanceTraveled;
 }
@@ -168,7 +171,7 @@ const Robot& Map::join(unsigned int id, int x, int y){
 
     angleToJoin = MathHelper::fromRadToDeg((float)atan(abs(diffY)/(float)abs(diffX)));
     //if(diffX > 0 && diffY > 0) //1er cadrant
-        //angleToJoin = angleToJoin; nothing to do
+    //angleToJoin = angleToJoin; nothing to do
 
     if(diffX < 0 && diffY > 0) //2eme cadrant
         angleToJoin = 180 - angleToJoin;
@@ -207,11 +210,11 @@ const Robot& Map::join(unsigned int id, int x, int y){
 Position Map::getCoordinatesFromPosition(const Position& position) const
 {
 
-    int x = position.getX() + nbRows / 2;
-    int y = position.getY() + nbCols / 2;
-    if(nbRows%2 == 0)
-        x -= 1;
+    int x = position.getX() + nbCols / 2;
+    int y = position.getY() + nbRows / 2;
     if(nbCols%2 == 0)
+        x -= 1;
+    if(nbRows%2 == 0)
         y -=1;
 
     return Position(x, y);
@@ -221,11 +224,11 @@ Position Map::getCoordinatesFromPosition(const Position& position) const
 Position Map::getPositionFromCoordinates(const Position& coordinates) const
 {
 
-    int x = coordinates.getX() - nbRows / 2;
-    int y = coordinates.getY() -nbCols / 2;
-    if(nbRows%2 == 0)
-        x += 1;
+    int x = coordinates.getX() - nbCols / 2;
+    int y = coordinates.getY() -nbRows / 2;
     if(nbCols%2 == 0)
+        x += 1;
+    if(nbRows%2 == 0)
         y +=1;
 
     return Position(x, y);
@@ -237,11 +240,11 @@ Map::Map()
 
 }
 
-Map::Map(unsigned int nbRobotMax, unsigned int nbRows, unsigned int nbCols) : nbRobotMax(nbRobotMax), nbRows(nbRows), nbCols(nbCols)
+Map::Map(unsigned int nbRobotMax, unsigned int nbCols, unsigned int nbRows) : nbRobotMax(nbRobotMax), nbCols(nbCols), nbRows(nbRows)
 {
-    grid = new CellState*[nbRows];
-    for(unsigned int i = 0; i < nbRows; ++i){
-        grid[i] = new CellState[nbCols];
+    grid = new CellState*[nbCols];
+    for(unsigned int i = 0; i < nbCols; ++i){
+        grid[i] = new CellState[nbRows];
     }
 }
 
@@ -250,3 +253,40 @@ const std::map<int, Robot> &Map::getRobots() const
     return this->robots;
 }
 
+void Map::initMap(){
+    for(unsigned int x = 0; x< this->getNbCols(); ++x){
+        for(unsigned int y=0; y < this->getNbRows(); ++y){
+
+            this->changeState(x,y,CellState::empty);
+        }
+    }
+}
+
+void Map::printMap(){
+
+    bool isRobot;
+    Position robotPosition;
+    std::map<int, Robot> robots = this->getRobots();
+    std::cout << "Map : \n";
+    for(unsigned int y = 0; y< this->getNbRows(); ++y){
+        for(unsigned int x=0; x < this->getNbCols(); ++x){
+            isRobot = false;
+
+            for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
+            {
+                robotPosition = this->getCoordinatesFromPosition(it->second.getPosition());
+                if(robotPosition.getX() == x && robotPosition.getY() == y)
+                {
+                    isRobot = true;
+                    std::cout << "R";
+                }
+            }
+            if(isRobot == false)
+            {
+
+                std::cout << ((this->getState(x,y) == CellState::empty) ? "_" : "X");
+            }
+        }
+        std::cout << std::endl;
+    }
+}

@@ -24,10 +24,15 @@ class MapGui : QWidget
 
     unsigned int dimX = 10; //nb de lignes
     unsigned int dimY = 10; //nb de colonne
-    unsigned int width = 300;     //largeur
-    unsigned int height = 300;    //hauteur
-    unsigned int dCell = std::min(width/dimY,height/dimX);     //hauteur et largeur d'une cellule
+    unsigned int maxW = 500;
+    unsigned int maxH = 500;
+    unsigned int width = 400;     //largeur
+    unsigned int height = 400;    //hauteur
+    unsigned int dCell() {return std::min(width/dimX,height/dimY);}     //hauteur et largeur d'une cellule
     bool isRunning = true;
+    static QColor cellEmptyColor;
+    static QColor cellFullColor;
+
 
 
     QColor colorList[3] {Qt::black, Qt::blue, Qt::red};
@@ -36,6 +41,10 @@ class MapGui : QWidget
     QHBoxLayout * l_mapModifier;
     QSpinBox *sb_selectX;
     QSpinBox *sb_selectY;
+    QSpinBox *sb_selectMaxW;
+    QSpinBox *sb_selectMaxH;
+
+
 
     QHBoxLayout * l_addRobot;
     QTableWidget * listRobotColor;
@@ -61,9 +70,13 @@ private slots:
         listRobotId->setFixedSize(listRobotId->columnCount() * 40, 40);
 
     }
-
     void cellActivation(const QModelIndex& index);
+    void cellSelection();
 
+    void synchronizeDimX(int newDim);
+    void synchronizeDimY(int newDim);
+    void synchronizeMaxW(int newMax);
+    void synchronizeMaxH(int newMax);
 
 };
 
