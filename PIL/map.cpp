@@ -7,16 +7,22 @@ Map::Map(unsigned int w,unsigned int h,unsigned int c,unsigned int l,QWidget* pa
     init();
 
     legend = new QGridLayout();
-    QString col[3]={"background-color: white;","background-color: black;","background-color: gray;"};
-    QString labelLegend[3]={"explorée","frontiére","inexplorée"};
+    //QString col[4]={"background-color: white;","background-color: green;","background-color: gray;","background-color: black;"};
+    QString col[4]={"","","",""};
+    col[0] = QString("background-color: ") + QString(EXPLO)+QString(";");
+    col[1] = QString("background-color: ") + QString(FRONT)+QString(";");
+    col[2] = QString("background-color: ") + QString(UNEXP)+QString(";");
+    col[3] = QString("background-color: ") + QString(OBSTA)+QString(";");
 
-    for(int i = 0;i<3;i++){
+    QString labelLegend[4]={"exploré","frontière","inexploré","obstacle"};
+
+    for(int i = 0;i<4;i++){
         QPushButton* b = new QPushButton();
         b->setFixedSize(10,10);
         b->setStyleSheet(col[i]);
         b->setCheckable(false);
-        legend->addWidget(b,i,0);
-        legend->addWidget(new QLabel(labelLegend[i]),i,1);
+        legend->addWidget(b,0,i*2);
+        legend->addWidget(new QLabel(labelLegend[i]),0,i*2+1);
     }
 
     mainLayout = new QVBoxLayout();

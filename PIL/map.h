@@ -10,9 +10,10 @@
 #include <regex>
 #include <fstream>
 
-#define FRONT "black"
+#define FRONT "green"
 #define EXPLO "white"
 #define UNEXP "gray"
+#define OBSTA "black"
 
 typedef struct Pos{
     int x;
