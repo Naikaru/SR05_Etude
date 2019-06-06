@@ -21,6 +21,16 @@ enum Options {
     OP_dest
 };
 
+typedef struct Position {
+    int x;
+    int y;
+} Position;
+
+enum State {
+    free_cell = 0,
+    unknown,
+    obstacle
+};
 
 /*
 class WritingThread;
@@ -42,6 +52,8 @@ class Pil: public QWidget {
         QString appnetMnemo = "appnet";     //the mnemonic to have access to the appnet
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
+
+        QString bufferPayload = "@buffer";
 
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
@@ -85,6 +97,11 @@ class Pil: public QWidget {
 
         bool reading_writing = false;
 
+        const unsigned int MAX_BUFFER = 100;
+
+        Position position;
+        QVector<QPair<Position, State>> buffer;
+
         QString getFormatedMessage(QString payload = "",QString desti="");
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
@@ -98,8 +115,13 @@ class Pil: public QWidget {
         QString parseMessage(QString mnemo, QString message); //return the value linked to a mnemonic, "" if no mnemonic find in the message
         void enableSnapshot();
 
+        QVector<QPair<Position, State>> getBuffer() {return buffer; }
+        void addPositionInBuffer(Position, State);
+        void sendBufferToNet();
+
     protected slots:
         void sendMessage();
+        void sendBuffer(QString);
         void readStdin();
         void parseMessage();
 };

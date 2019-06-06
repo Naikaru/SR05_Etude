@@ -185,6 +185,13 @@ void Pil::sendMessage() {
     std::cout << getFormatedMessage().toStdString() << std::endl;
 }
 
+// Click to send the message
+void Pil::sendBuffer(QString pay) {
+    info_nseq->setText(QString::number(++nseq));
+    // sending message to NET
+    std::cout << getFormatedMessage(pay).toStdString() << std::endl;
+}
+
 // Slot to read from stdin, signal received because a message arrived on stdin
 void Pil::readStdin() {
     notifier->setEnabled(false);
@@ -220,4 +227,24 @@ void Pil::parseMessage() {
     QString message = reception_fullmessage->text();
     QString mnemo = mnemonic->text();
     parse_value->setText(parseMessage(mnemo,message));
+}
+
+void Pil::addPositionInBuffer(Position pos, State e) {
+    if (buffer.length() >= MAX_BUFFER) {
+        buffer.pop_back();
+    }
+    buffer.push_front(QPair<Position, State>(pos, e));
+}
+
+void Pil::sendBufferToNet() {
+    QString payload = bufferPayload;
+    QVector<QPair<Position, State>> buf = getBuffer();
+
+    for (QVector<QPair<Position, State>>::iterator it = buf.begin(); it != buf.end(); it++) {
+        payload += "|(" + QString::number(it->first.x) + ","
+                + QString::number(it->first.y) + "):"
+                + QString::number(it->second);
+    }
+
+    sendBuffer(payload);
 }
