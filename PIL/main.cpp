@@ -25,7 +25,5 @@ int main(int argc, char* argv[]) {
 //    m.move(0,5);
 //    m.turn(0,90);
 //    m.move(0,5);
-
-
     return app.exec();
 }
