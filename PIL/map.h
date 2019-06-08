@@ -10,7 +10,10 @@
 #include <regex>
 #include <fstream>
 
-
+#define FRONT "green"
+#define EXPLO "white"
+#define UNEXP "gray"
+#define OBSTA "black"
 
 typedef struct Pos{
     int x;
@@ -51,8 +54,9 @@ typedef struct Robot
  */
 
 
-class Map : protected QTableWidget
-{
+class Map : public QWidget {
+    Q_OBJECT
+
     friend class pil;
 
     unsigned int nbC;       //nb de colonne
@@ -64,13 +68,13 @@ class Map : protected QTableWidget
     std::vector<QString> colors;    //défini les couleurs que peuvent prendre les robots sur la map
     std::map<int, Robot> robots;    // défini pour chaque robot sa position (x, y) et son angle heading, dans cet ordre
 
+    QTableWidget* map;
+    QGridLayout* legend;
+    QVBoxLayout* mainLayout;
+
 public :
 
-    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50,QWidget* parent = NULL):
-            width(w),height(h),nbC(c),nbL(l),QTableWidget(parent)
-    {
-        init();
-    }
+    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50,QWidget* parent = NULL);
 
     //initialise la map avec les dimensions du constructeur.
     void init();
@@ -90,25 +94,25 @@ public :
      */
     void move(int id,int d);
 
-    /*
-     * Surcharge de show pour afficher la map pour des tests
-     * Necessaire car héritage privé
-     */
-    void show()
-    {
-        QTableWidget::show();
-    }
 
     /*
      * Permet de tourner le robot d'un certain angle
      */
     void turn(int id,int angle)
     {
-        if(angle >0)
-            robots[id].heading = (robots[id].heading +angle)%360;
+        if(angle <0)
+            angle = 360 - angle;
+        robots[id].heading = (robots[id].heading +angle)%360;
     }
-};
 
+private:
+
+    /*
+     * x, y représente une case par laquelle le robot est passé
+     * il faut donc mettre autour les frontières à jour
+     */
+    void setFrontier(int x,int y);
+};
 
 
 

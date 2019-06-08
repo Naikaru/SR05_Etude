@@ -1,6 +1,38 @@
 #include "map.h"
 
 
+Map::Map(unsigned int w,unsigned int h,unsigned int c,unsigned int l,QWidget* parent ): QWidget(parent),width(w),height(h),nbC(c),nbL(l)
+{
+    map = new QTableWidget();
+    init();
+
+    legend = new QGridLayout();
+    //QString col[4]={"background-color: white;","background-color: green;","background-color: gray;","background-color: black;"};
+    QString col[4]={"","","",""};
+    col[0] = QString("background-color: ") + QString(EXPLO)+QString(";");
+    col[1] = QString("background-color: ") + QString(FRONT)+QString(";");
+    col[2] = QString("background-color: ") + QString(UNEXP)+QString(";");
+    col[3] = QString("background-color: ") + QString(OBSTA)+QString(";");
+
+    QString labelLegend[4]={"exploré","frontière","inexploré","obstacle"};
+
+    for(int i = 0;i<4;i++){
+        QPushButton* b = new QPushButton();
+        b->setFixedSize(10,10);
+        b->setStyleSheet(col[i]);
+        b->setCheckable(false);
+        legend->addWidget(b,0,i*2);
+        legend->addWidget(new QLabel(labelLegend[i]),0,i*2+1);
+    }
+
+    mainLayout = new QVBoxLayout();
+    setLayout(mainLayout);
+    mainLayout->addWidget(map);
+    mainLayout->addLayout(legend);
+}
+
+
+
 /*
  * Couleur:
  *  - blanc = zone découverte
@@ -17,27 +49,27 @@ void Map::init()
     //on prend le minimum pour être sur que ça entre
     dCell = std::min(width/nbC,height/nbL);
 
-    setColumnCount(nbC);
-    setRowCount(nbL);
-    setShowGrid(true);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    verticalHeader()->hide();
-    horizontalHeader()->hide();
+    map->setColumnCount(nbC);
+    map->setRowCount(nbL);
+    map->setShowGrid(true);
+    map->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    map->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    map->verticalHeader()->hide();
+    map->horizontalHeader()->hide();
 
     for(unsigned int i=0 ; i<nbL; ++i ){
         for (unsigned int j = 0 ; j<nbC;++j){
             QTableWidgetItem* a = new QTableWidgetItem ("");
             a->setFlags(Qt::NoItemFlags);
             a->setFlags(Qt::ItemIsEnabled);
-            setItem(i,j,a);
-            item(i,j)->setBackgroundColor("gray");
+            map->setItem(i,j,a);
+            map->item(i,j)->setBackgroundColor(UNEXP);
             if(i==0)
-                setColumnWidth(j,(int)(dCell));
+                map->setColumnWidth(j,(int)(dCell));
         }
-        setRowHeight(i,dCell);
+        map->setRowHeight(i,dCell);
     }
-    setFixedSize(width,height);
+    map->setFixedSize(width,height);
 }
 
 
@@ -53,7 +85,8 @@ void Map::initRobot(int id,int x, int y,int heading)
             robots[id].heading = heading;
             robots[id].color = colors.at(colors.size()-1);
             colors.pop_back();
-            item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
+            map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
+            setFrontier(robots[id].x,robots[id].y);
         }
 
     }
@@ -62,22 +95,52 @@ void Map::initRobot(int id,int x, int y,int heading)
 //déplacement uniquement suivant une grille
 void Map::move(int id,int d)
 {
-    if(robots[id].heading == 180 || robots[id].heading == 0 )   //déplacement suivant une ligne
+    if(robots.find(id) != robots.end())
     {
-        for(int i = std::min(robots[id].y+d,robots[id].y); i<std::max(robots[id].y+d,robots[id].y); ++i)
-            item(robots[id].x,i)->setBackgroundColor("white");
-         robots[id].y += d;
-    }
-    else if(robots[id].heading == 90 || robots[id].heading == 270 ) // déplacement suivant une colonne
-    {
-        for(int i = std::min(robots[id].x+d,robots[id].x); i<std::max(robots[id].x+d,robots[id].x); ++i)
-            item(i,robots[id].y)->setBackgroundColor("white");
-        robots[id].x += d;
-    }
-    item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
+        if(robots[id].heading == 180 || robots[id].heading == 0 )   //déplacement suivant une ligne
+        {
+            for(int i = std::min(robots[id].y+d,robots[id].y); i<std::max(robots[id].y+d,robots[id].y); ++i)
+            {
+                map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
+                setFrontier(robots[id].x,i);
+            }
 
+             robots[id].y += d;
+        }
+        else if(robots[id].heading == 90 || robots[id].heading == 270 ) // déplacement suivant une colonne
+        {
+            for(int i = std::min(robots[id].x+d,robots[id].x); i<std::max(robots[id].x+d,robots[id].x); ++i){
+                map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
+                setFrontier(i,robots[id].y);
+            }
+            robots[id].x += d;
+        }
+        map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
+        setFrontier(robots[id].x,robots[id].y);
+    }
     return;
 }
 
 
+//cette méthode met met à jour les frontières autour d'une position
+// par laquelle le robot est censée être passé
+void Map::setFrontier(int x,int y)
+{
+    if(x !=0){
+        if(map->item(x-1,y)->backgroundColor() == QColor(UNEXP))
+            map->item(x-1,y)->setBackgroundColor(FRONT);
+    }
+    if(x != nbL){
+        if(map->item(x+1,y)->backgroundColor() == QColor(UNEXP))
+            map->item(x+1,y)->setBackgroundColor(FRONT);
+    }
+    if(y != 0){
+        if(map->item(x,y-1)->backgroundColor() == QColor(UNEXP))
+            map->item(x,y-1)->setBackgroundColor(FRONT);
+    }
+    if(y != nbC){
+        if(map->item(x,y+1)->backgroundColor() == QColor(UNEXP))
+            map->item(x,y+1)->setBackgroundColor(FRONT);
+    }
+}
 
