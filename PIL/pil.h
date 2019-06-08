@@ -64,7 +64,7 @@ class Pil: public QWidget {
         unsigned int ident; // ident of the site (unique)
 
         unsigned int nbRobot;   //number of robots
-        int xInit;              //initial pos of the robot x and y like in QTableWidget Format
+        int xInit;              //initial pos of the robot
         int yInit;
 
         QVBoxLayout* main; // Window

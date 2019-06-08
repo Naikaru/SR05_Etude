@@ -12,14 +12,6 @@ then
     BAS=$1
     NET=$2
     N=$3
-    #x et y sont dans le même format que le QTableWidget:
-    # ---> y
-    # |
-    # v
-    # x
-
-    X=0
-    Y=25
 
     `find /tmp/ -maxdepth 1 -name 'in*[0-9]' -delete`
     `find /tmp/ -maxdepth 1 -name 'out*[0-9]' -delete`
@@ -32,9 +24,8 @@ then
     do
       mkfifo /tmp/inBas$i /tmp/outBas$i
       mkfifo /tmp/inNet$i /tmp/outNet$i
-      let 'x = 1 * i'
 
-      ./$BAS --ident=$i --nbNode=$N --x=$X --y=$Y < /tmp/inBas$i > /tmp/outBas$i &
+      ./$BAS --ident=$i --nbNode=$N --x=$i --y=$i < /tmp/inBas$i > /tmp/outBas$i &
       ./$NET --ident=$i --nbNode=$N < /tmp/inNet$i > /tmp/outNet$i &
 
       #co BASi -> NETi
