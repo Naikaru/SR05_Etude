@@ -75,6 +75,8 @@ void Map::init()
 
 void Map::initRobot(int id,int x, int y,int heading)
 {
+
+    convert(&x,&y);
     if(robots.find(id) == robots.end())
     {
         if(colors.size()==0){
@@ -99,7 +101,7 @@ void Map::move(int id,int d)
     {
         if(robots[id].heading == 180 || robots[id].heading == 0 )   //déplacement suivant une ligne
         {
-            for(int i = std::min(robots[id].y+d,robots[id].y); i<std::max(robots[id].y+d,robots[id].y); ++i)
+            for(int i = std::min(robots[id].y+d,robots[id].y); i<=std::max(robots[id].y+d,robots[id].y); ++i)
             {
                 map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
                 setFrontier(robots[id].x,i);
@@ -109,11 +111,11 @@ void Map::move(int id,int d)
         }
         else if(robots[id].heading == 90 || robots[id].heading == 270 ) // déplacement suivant une colonne
         {
-            for(int i = std::min(robots[id].x+d,robots[id].x); i<std::max(robots[id].x+d,robots[id].x); ++i){
+            for(int i = std::min(robots[id].x-d,robots[id].x); i<=std::max(robots[id].x-d,robots[id].x); ++i){
                 map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
                 setFrontier(i,robots[id].y);
             }
-            robots[id].x += d;
+            robots[id].x -= d;
         }
         map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
         setFrontier(robots[id].x,robots[id].y);
@@ -126,22 +128,29 @@ void Map::move(int id,int d)
 // par laquelle le robot est censée être passé
 void Map::setFrontier(int x,int y)
 {
-    if(x !=0){
+    if(x >0){
         if(map->item(x-1,y)->backgroundColor() == QColor(UNEXP))
             map->item(x-1,y)->setBackgroundColor(FRONT);
     }
-    if(x != nbL){
+    if(x < nbL-1){
         if(map->item(x+1,y)->backgroundColor() == QColor(UNEXP))
             map->item(x+1,y)->setBackgroundColor(FRONT);
     }
-    if(y != 0){
+    if(y > 0){
         if(map->item(x,y-1)->backgroundColor() == QColor(UNEXP))
             map->item(x,y-1)->setBackgroundColor(FRONT);
     }
-    if(y != nbC){
+    if(y < nbC-1){
         if(map->item(x,y+1)->backgroundColor() == QColor(UNEXP))
             map->item(x,y+1)->setBackgroundColor(FRONT);
     }
+}
+
+void Map::convert(int* x, int* y)
+{
+    int tmp =*y;
+    *y = *x;
+    *x = (nbL-1-tmp);
 }
 
 

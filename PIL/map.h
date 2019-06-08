@@ -114,6 +114,11 @@ private:
      * il faut donc mettre autour les frontières à jour
      */
     void setFrontier(int x,int y);
+    /*
+     *                                                               y ^
+     * Converti les coordonnées pour un affichage comme dans un repère |__> x
+     */
+    void convert(int* x, int* y);
 };
 
 

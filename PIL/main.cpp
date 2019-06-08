@@ -9,13 +9,13 @@ int main(int argc, char* argv[]) {
     Map m;
     m.show();
     for(int i = 0; i<20;i++)
-        m.initRobot(i,i,0,0);
+        m.initRobot(i,i,i,0);
 
-    m.move(0,5);
-    m.turn(0,270);
-    m.move(0,5);
-    m.turn(0,90);
-    m.move(0,5);
+     m.move(0,5);
+     m.turn(0,90);
+     m.move(0,4);
+     m.turn(0,-90);
+     m.move(0,5);
 
     return app.exec();
 }
