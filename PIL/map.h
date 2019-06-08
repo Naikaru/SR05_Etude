@@ -71,6 +71,7 @@ class Map : public QWidget {
     QTableWidget* map;
     QGridLayout* legend;
     QVBoxLayout* mainLayout;
+
 public :
 
     Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50,QWidget* parent = NULL);
@@ -93,16 +94,26 @@ public :
      */
     void move(int id,int d);
 
-    void setFrontier(int x,int y);
+
 
     /*
      * Permet de tourner le robot d'un certain angle
      */
     void turn(int id,int angle)
     {
-        if(angle >0)
-            robots[id].heading = (robots[id].heading +angle)%360;
+        if(angle <0)
+            angle = 360 - angle;
+        robots[id].heading = (robots[id].heading +angle)%360;
     }
+
+
+private:
+
+    /*
+     * x, y représente une case par laquelle le robot est passé
+     * il faut donc mettre autour les frontières à jour
+     */
+    void setFrontier(int x,int y);
 };
 
 

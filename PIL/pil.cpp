@@ -153,6 +153,10 @@ QString Pil::getFormatedMessage(QString payload, QString desti)
 // Retrieve argument
 Options Pil::getOption(QString arg){
     if(arg == "--ident") return OP_ident;
+    else if(arg == "--nbNode") return OP_nbRobot;
+    else if(arg == "--x") return OP_x;
+    else if(arg == "--y") return OP_y;
+    else if(arg == "--remote") return OP_remote;
     else return OP_wrong;
 }
 
@@ -168,6 +172,15 @@ void Pil::initialization(int argc, char* argv[])
                 case OP_ident:
                     ident = arg[1].toInt();
                     info_ident->setText(QString::number(ident));
+                    break;
+                case OP_nbRobot:
+                    nbRobot=arg[1].toInt();
+                    break;
+                case OP_x:
+                    xInit=arg[1].toInt();
+                    break;
+                case OP_y:
+                    yInit=arg[1].toInt();
                     break;
                 default:
                     break;

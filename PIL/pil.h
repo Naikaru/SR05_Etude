@@ -18,7 +18,11 @@
 enum Options {
     OP_wrong = 0,
     OP_ident,
-    OP_dest
+    OP_dest,
+    OP_nbRobot,
+    OP_x,
+    OP_y,
+    OP_remote
 };
 
 
@@ -46,6 +50,10 @@ class Pil: public QWidget {
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
         unsigned int ident; // ident of the site (unique)
+
+        unsigned int nbRobot;   //number of robots
+        int xInit;              //initial pos of the robot x and y like in QTableWidget Format
+        int yInit;
 
         QVBoxLayout* main; // Window
 

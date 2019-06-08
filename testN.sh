@@ -9,24 +9,35 @@ if [ $# -ge 3 ]
 then
     #permet de générer N bas et net
     #le net formant un graphe complet
-    N=$1
+    BAS=$1
     NET=$2
-    BAS=$3
+    N=$3
+    #x et y sont dans le même format que le QTableWidget:
+    # ---> y
+    # |
+    # v
+    # x
+
+    X=0
+    Y=25
 
     `find /tmp/ -maxdepth 1 -name 'in*[0-9]' -delete`
     `find /tmp/ -maxdepth 1 -name 'out*[0-9]' -delete`
 
     let "n = N - 1"
+    #variable qui contiendra chemin de toutes les fifos entrante des nets
     netInFifos=""
-    #crée tous les groupements BAS et NET avec co juste entre BAS et NET
+    #crée tous les groupements BAS et NET avec co juste entre BAS -> NET
     for i in `seq 0 $n`;
     do
       mkfifo /tmp/inBas$i /tmp/outBas$i
       mkfifo /tmp/inNet$i /tmp/outNet$i
+      let 'x = 1 * i'
 
-      ./$BAS --ident=$i < /tmp/inBas$i > /tmp/outBas$i &
+      ./$BAS --ident=$i --nbNode=$N --x=$X --y=$Y < /tmp/inBas$i > /tmp/outBas$i &
       ./$NET --ident=$i --nbNode=$N < /tmp/inNet$i > /tmp/outNet$i &
 
+      #co BASi -> NETi
       cat /tmp/outBas$i > /tmp/inNet$i &
       netInFifos+=/tmp/inNet$i
       netInFifos+=' '
@@ -36,9 +47,10 @@ then
   # on boucle sur tous les net
     for i in `seq 0 $n`;
     do
-      #pour chaque net on connecte sa sortie à son bas
-      #et aux entrées de tous les nets sauf lui même
+      #pour chaque net on connecte sa sortie à son bas : /tmp/inBas$i
+      #et aux entrées de tous les nets sauf lui même : ${netInFifos//$netIn/}
       netIn=/tmp/inNet$i
+      #co NETi -> BASi et NET de 0 à n sauf i
       cat /tmp/outNet$i | tee /tmp/inBas$i ${netInFifos//$netIn/} &
     done
 fi
