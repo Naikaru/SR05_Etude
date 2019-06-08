@@ -9,6 +9,9 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     main = new QVBoxLayout();
     nseq = 0;
     init = false;
+
+    map = new Map();
+
     // Top bar with 2 buttons: Envoyer - Quitter
     button_area = new QHBoxLayout();
     quit = new QPushButton("Quitter",this);
@@ -242,21 +245,24 @@ void Pil::parseMessage() {
     parse_value->setText(parseMessage(mnemo,message));
 }
 
-void Pil::addPositionInBuffer(Position pos, State e) {
+void Pil::addMovementInBuffer(QString movement, QString distance) {
     if (buffer.length() >= MAX_BUFFER) {
         buffer.pop_back();
     }
-    buffer.push_front(QPair<Position, State>(pos, e));
+    // movement = action ("move", "turn")
+        // movement format: move
+    // distance = real distance, expected distance (to see if there is an obstacle)
+        // distance format: 10,10
+    // format final: move:10,10
+    buffer.push_front(QPair<QString, QString>(movement, distance));
 }
 
 void Pil::sendBufferToNet() {
     QString payload = bufferPayload;
-    QVector<QPair<Position, State>> buf = getBuffer();
+    QVector<QPair<QString, QString>> buf = getBuffer();
 
-    for (QVector<QPair<Position, State>>::iterator it = buf.begin(); it != buf.end(); it++) {
-        payload += "|(" + QString::number(it->first.x) + ","
-                + QString::number(it->first.y) + "):"
-                + QString::number(it->second);
+    for (QVector<QPair<QString, QString>>::iterator it = buf.begin(); it != buf.end(); it++) {
+        payload += "|" + it->first + ":" + it->second;
     }
 
     sendBuffer(payload);

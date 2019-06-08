@@ -25,17 +25,6 @@ enum Options {
     OP_remote
 };
 
-typedef struct Position {
-    int x;
-    int y;
-} Position;
-
-enum State {
-    free_cell = 0,
-    unknown,
-    obstacle
-};
-
 /*
 class WritingThread;
 class ReadingThread;
@@ -107,15 +96,14 @@ class Pil: public QWidget {
 
         const unsigned int MAX_BUFFER = 100;
 
-        Position position;
-        QVector<QPair<Position, State>> buffer;
+        QVector<QPair<QString, QString>> buffer;
+        Map* map = nullptr;
+
+        // Functions
 
         QString getFormatedMessage(QString payload = "",QString desti="");
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
-
-        //snapshot
-        void sendSnapshotLoading(QString);
 
     public:
         Pil(int argc, char* argv[]);
@@ -123,8 +111,8 @@ class Pil: public QWidget {
         QString parseMessage(QString mnemo, QString message); //return the value linked to a mnemonic, "" if no mnemonic find in the message
         void enableSnapshot();
 
-        QVector<QPair<Position, State>> getBuffer() {return buffer; }
-        void addPositionInBuffer(Position, State);
+        QVector<QPair<QString, QString>> getBuffer() {return buffer; }
+        void addMovementInBuffer(QString, QString);
         void sendBufferToNet();
 
     protected slots:
