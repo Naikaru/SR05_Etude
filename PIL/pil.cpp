@@ -224,5 +224,7 @@ void Pil::parseMessage() {
 
 // Slot to handle the message from the robot
 void Pil::rmtMessage(Message mess){
+    // TODO : have a correct behaviour
     qDebug()<<"Hey !" + mess.getCompleteMessage();
+
 }

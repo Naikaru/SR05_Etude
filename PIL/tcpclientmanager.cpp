@@ -1,7 +1,7 @@
 #include "tcpclientmanager.h"
 
-TcpClientManager::TcpClientManager(QObject *parent) : QObject(parent),
-    sock(this)
+TcpClientManager::TcpClientManager(QObject *parent, QString app_name) : QObject(parent),
+    sock(this), APP(app_name)
 {
     connect(&sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleErrors(QAbstractSocket::SocketError)));
     connect(&sock, SIGNAL(readyRead()), this, SLOT(handleMessage()));
@@ -18,7 +18,9 @@ void TcpClientManager::send(QString message){
         sock.write(message.toStdString().c_str());
     }
 }
-
+void TcpClientManager::send(Message message){
+    this->send(message.getCompleteMessage());
+}
 
 // Slots
 void TcpClientManager::handleMessage(){
@@ -49,14 +51,14 @@ void TcpClientManager::handleMessage(){
 
                 //Beginning phase 2
                 handshakeState = 2;
-                send(delim+mnemoapp+equal+"PIL");
+                send(delim+mnemoapp+equal+APP);
                 break;
             }
             case 2: {
                 filtre = message.split(" ");
                 qDebug()<<filtre;
                 handshakeState = 3;
-                send(delim+mnemobegair+equal+"PIL");
+                send(delim+mnemobegair+equal+APP);
                 break;
             }
             case 3:

@@ -11,7 +11,7 @@ socket::socket(QHostAddress address, int port = 4646):server()
 }
 
 void socket::send(QString message){
-    if (sock == nullptr){
+    if (sock == nullptr || !sock->isOpen()){
         throw std::runtime_error("No socket to send the message on");
     } else {
         sock->write(message.toStdString().c_str());
