@@ -9,15 +9,19 @@ HEADERS += \
     map.h \
     robot.h \
     position.h \
-    mapgui.h \
     tcpServerManager.h \
-    message.h
+    message.h \
+    mathhelper.h \
+    simgui.h \
+    mapgui.h
 
 SOURCES += \
     map.cpp \
     robot.cpp \
     position.cpp \
-    mapgui.cpp \
     main.cpp \
     tcpServerManager.cpp \
-    message.cpp
+    message.cpp \
+    mathhelper.cpp \
+    simgui.cpp \
+    mapgui.cpp
