@@ -58,12 +58,38 @@ void initMap(Map& m){
 }
 
 
-
 int main(int argc, char* argv[]) {
 
      //QApplication app(argc, argv);
 //    Pil pil(argc, argv);
 //    pil.show();
+
+//    Position origine(0, 0);
+//    Position milieu(5, 5);
+//    Map m(1, 10, 10);
+//    Robot robot(0, milieu);
+    QString message("WHEROBLCH/mnemo~value3/mnemo1~value2");
+    Message manager(message);
+    qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
+    qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
+    qDebug() << manager.getCompleteMessage();
+//    std::cout << "Coordonées : " << robot.getPosition().getX() << "," << robot.getPosition().getY() << std::endl;
+
+//    robot.setHeading(230);
+
+//    std::cout << "Heading : " << robot.getHeading() << std::endl;
+
+//    m.addRobot(1, robot);
+
+//    m.changeState(3,3,full);
+
+//    //std::cout << "X : " << robot.getPosition().getX() << std::endl;
+//    //std::cout << "Y : " << robot.getPosition().getY() << std::endl;
+
+
+//    m.move(1, 4);
+
+//    std::cout << "Coordonées : " << m.getRobots()[1].getPosition().getX() << "," << m.getRobots()[1].getPosition().getY() << std::endl;
 /*
     std::srand(std::time(nullptr));
     Position origine(0, 0);
@@ -109,7 +135,6 @@ int main(int argc, char* argv[]) {
     m.join(1,4,4);
     std::cout << "colision en 3 3: " << m.getRobots().at(1) << std::endl;
     printMap(m);
-
 
     */
 
