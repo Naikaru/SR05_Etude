@@ -11,32 +11,6 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     //general layout
     l_mapGui = new QVBoxLayout;
 
-    /*
-    grid = new QTableWidget(dimY, dimX, this);
-    grid->setColumnCount(dimX);
-    grid->setRowCount(dimY);
-    grid->setShowGrid(true);
-    grid->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    for(unsigned int i=0 ; i<dimY; ++i ){
-        for (unsigned int j = 0 ; j<dimX;++j){
-            QTableWidgetItem* cellItem = new QTableWidgetItem ("");
-            cellItem->setFlags(Qt::NoItemFlags);
-            cellItem->setFlags(Qt::ItemIsEnabled);
-            grid->setItem(i,j,cellItem);
-            grid->item(i,j)->setBackgroundColor("white");
-            if(i==0)
-                grid->setColumnWidth(j,(int)(dimX));
-        }
-        grid->setRowHeight(i,dimY);
-    }
-    grid->setFixedSize(40 * dimY,40 * dimX);
-    grid->horizontalHeader()->setVisible(false);
-    grid->verticalHeader()->setVisible(false);
-    grid->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    grid->horizontalHeader()->hide();
-    grid->verticalHeader()->hide();
-    */
     grid = new QTableWidget(dimY, dimX, this);
     grid->setEditTriggers(QAbstractItemView::NoEditTriggers);
     grid->setFixedSize(width, height);
@@ -91,36 +65,119 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     l_mapGui->addLayout(l_mapModifier);
 
-    listRobotColor = new QTableWidget(1, 1, this);
+    listRobotColor = new QTableWidget(1, 0, this);
     l_mapGui->addWidget(listRobotColor);
     listRobotColor->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    listRobotColor->setFixedSize(1*40, 40);
+    listRobotColor->setFixedSize(0*20, 0*20);
     listRobotColor->horizontalHeader()->setVisible(false);
     listRobotColor->verticalHeader()->setVisible(false);
     listRobotColor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listRobotColor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    listRobotColor->horizontalHeader()->setDefaultSectionSize(dCell());
-    listRobotColor->verticalHeader()->setDefaultSectionSize(dCell());
+    listRobotColor->horizontalHeader()->setDefaultSectionSize(20);
+    listRobotColor->verticalHeader()->setDefaultSectionSize(20);
 
-    listRobotId = new QTableWidget(1, 1, this);
-    l_mapGui->addWidget(listRobotId);
-    listRobotId->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    listRobotId->setFixedSize(1*40, 40);
-    listRobotId->horizontalHeader()->setVisible(false);
-    listRobotId->verticalHeader()->setVisible(false);
-    listRobotId->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    listRobotId->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    listRobotId->horizontalHeader()->setDefaultSectionSize(40);
-    listRobotId->verticalHeader()->setDefaultSectionSize(40);
+
 
     b_addRobot = new QPushButton("AddNewRobot", this);
 
-    QObject::connect(b_addRobot, SIGNAL(clicked()), this, SLOT(addRobot()));
+    QObject::connect(b_addRobot, SIGNAL(clicked()), this, SLOT(initRobot()));
 
     l_mapGui->addWidget(b_addRobot);
 
+    t_display = new QTextEdit(this);
+    t_display->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    t_display->setFocusPolicy(Qt::NoFocus);
+    t_display->setFixedSize(500, 50);
+    l_mapGui->addWidget(t_display);
+
     this->setLayout(l_mapGui);
 
+
+}
+
+void MapGui::addMessageInDisplay(const QString &msg)
+{
+    t_display->append(QDateTime::currentDateTime().time().toString() + QString(": ") + msg);
+}
+
+void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &newPosition)
+{
+
+}
+
+int MapGui::move(int id, int d)
+{
+    if(map.getRobots().find(id) == map.getRobots().end())
+    {
+        addMessageInDisplay(QString("Move : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        return 0;
+    }
+
+    Position robotBeforeMove = map.getRobots().at(id).getPosition();
+    int distanceTravelled = map.move(id, d);
+    Position newPosition = map.getRobots().at(id).getPosition();
+    updateRobotOnGrid(robotBeforeMove, newPosition);
+    return distanceTravelled;
+}
+
+int MapGui::turn(unsigned int id, int angle)
+{
+    if(map.getRobots().find(id) == map.getRobots().end())
+    {
+        addMessageInDisplay(QString("Turn : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        return 0;
+    }
+    return map.turn(id, angle);
+}
+
+const Robot &MapGui::curr(unsigned int id)
+{
+    if(map.getRobots().find(id) == map.getRobots().end())
+    {
+        addMessageInDisplay(QString("Curr : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        throw QString("Id non reconnu");
+    }
+    return map.curr(id);
+}
+
+const Robot &MapGui::join(unsigned int id, int x, int y)
+{
+    if(map.getRobots().find(id) == map.getRobots().end())
+    {
+        addMessageInDisplay(QString("Join : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        throw QString("Id non reconnu");
+    }
+
+    Position robotBeforeMove = map.getRobots().at(id).getPosition();
+    map.join(id, x, y);
+    Position newPosition = map.getRobots().at(id).getPosition();
+    updateRobotOnGrid(robotBeforeMove, newPosition);
+    return map.getRobots().at(id);
+}
+
+
+
+void MapGui::initRobot()
+{
+    int x = 1, y = 2, heading = 3, id = 1;
+    if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
+        if(map.addRobot(id, Robot(heading, Position(x, y)))){ //robot was added
+
+            listRobotColor->insertColumn(listRobotColor->columnCount());
+            listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
+            listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextColor("white");
+            //listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextAlignment(Qt::AlignCenter);
+            listRobotColor->item(0, listRobotColor->columnCount() - 1)->setBackgroundColor(this->colorList[listRobotColor->columnCount() - 1]);
+            listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
+
+        } else{
+            addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") );
+
+        }
+    }else{
+        addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
+        map.init(id, x, y, heading);
+    }
 
 }
 
