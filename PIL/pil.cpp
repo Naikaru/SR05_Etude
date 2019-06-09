@@ -221,3 +221,8 @@ void Pil::parseMessage() {
     QString mnemo = mnemonic->text();
     parse_value->setText(parseMessage(mnemo,message));
 }
+
+// Slot to handle the message from the robot
+void Pil::rmtMessage(Message mess){
+    qDebug()<<"Hey !" + mess.getCompleteMessage();
+}

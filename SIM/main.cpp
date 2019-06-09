@@ -1,5 +1,6 @@
 #include "map.h"
-#include "messagemanager.h"
+#include "message.h"
+#include "tcpServerManager.h"
 #include "position.h"
 #include "robot.h"
 #include <iostream>
@@ -21,6 +22,10 @@ int main(int argc, char* argv[]) {
     qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
     qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
     qDebug() << manager.getCompleteMessage();
+    QApplication app(argc, argv);
+    socket sockServ(QHostAddress("127.0.0.1"), 4646);
+    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
+    return app.exec();
 //    std::cout << "Coordonées : " << robot.getPosition().getX() << "," << robot.getPosition().getY() << std::endl;
 
 //    robot.setHeading(230);
