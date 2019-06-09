@@ -57,7 +57,7 @@ typedef struct Robot
 class Map : public QWidget {
     Q_OBJECT
 
-    friend class pil;
+    friend class Pil;
 
     unsigned int nbC;       //nb de colonne
     unsigned int nbL;       //nb de ligne
@@ -105,6 +105,9 @@ public :
         robots[id].heading = (robots[id].heading +angle)%360;
     }
 
+    unsigned int get_nbL() { return nbL; }
+    unsigned int get_nbC() { return nbC; }
+    unsigned int get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
 private:
 
     /*

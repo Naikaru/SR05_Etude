@@ -50,7 +50,7 @@ class Pil: public QWidget {
 
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
-        unsigned int ident; // ident of the site (unique)
+        unsigned int ident; // ident of the robot (unique)
 
         unsigned int nbRobot;   //number of robots
         int xInit;              //initial pos of the robot
@@ -97,7 +97,11 @@ class Pil: public QWidget {
         const unsigned int MAX_BUFFER = 100;
 
         QVector<QPair<QString, QString>> buffer;
+        // sequence of instructions
         Map* map = nullptr;
+        // local map of the environment
+        QVector<QPair<unsigned int, unsigned int>> frontiers;
+        // list of frontiers coords
 
         // Functions
 

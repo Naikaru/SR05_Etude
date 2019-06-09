@@ -1,4 +1,5 @@
 #include "pil.h"
+#include "astar.h"
 
 
 // ###################### Constructor #########################
@@ -266,4 +267,31 @@ void Pil::sendBufferToNet() {
     }
 
     sendBuffer(payload);
+}
+
+QPair<unsigned, unsigned> Pil::chooseFrontier(){
+    bool first = true;
+    unsigned int minDist;
+    QPair<unsigned int, unsigned int> chosenFrontier;
+    for(QVector<QPair<unsigned int, unsigned int>>::iterator it=frontiers.begin(); it!=frontiers.end(); ++it) {
+        std::list<Cellule*> closedList;
+        Cellule begin(map->robots[ident].x, map->robots[ident].y);
+        Cellule frontier(it->first, it->second);
+        frontier.m_cost = 0;
+        frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, it->first, it->second);
+        frontier.m_xp = -1;
+        frontier.m_yp = -1;
+
+        // Liste containing element of the path
+        Cellule* path = aStar(closedList, map, &begin, &frontier);
+        if(first) {
+            minDist = closedList.size();
+            first = false;
+        } else {
+            if (closedList.size() < minDist) {
+                chosenFrontier = QPair(it->first, it->second);
+                minDist = closedList.size();
+            }
+        }
+    }
 }
