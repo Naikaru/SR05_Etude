@@ -15,6 +15,7 @@
 #include "robot.h"
 #include "position.h"
 #include "math.h"
+#include "mathhelper.h"
 
 
 
@@ -26,23 +27,25 @@ enum CellState{
 class Map
 {
 
+protected :
     std::map<int, Robot> robots;
     unsigned int nbRobotMax;
 
+
+private:
+    CellState **grid;
     unsigned int nbRows;
     unsigned int nbCols;
 
-    CellState **grid;
-
-    Position getCoordinatesFromPosition(const Position &position);
 
     public:
-
+    Position getCoordinatesFromPosition(const Position &position) const;
+    Position getPositionFromCoordinates(const Position &coordinates) const;
         //ctor
         Map();
-        Map(unsigned int nbRobotMax, unsigned int nbRows, unsigned int nbCols);
+        Map(unsigned int nbRobotMax, unsigned int nbCols, unsigned int nbRows);
         //getter and setter
-        std::map<int, Robot> getRobots() const;
+        const std::map<int, Robot>& getRobots() const;
         bool addRobot(int id, const Robot& newRobot);
 
         unsigned int getNbRows() const;
@@ -54,10 +57,13 @@ class Map
         unsigned int getNbRobotMax() const;
         void setNbRobotMax(unsigned int value);
 
+        void initMap();
+        void printMap();
+
 
         //getter & setter map
         void changeState(unsigned int i, unsigned int j, CellState newState);
-        CellState getState(unsigned int i, unsigned int j);
+        CellState getState(unsigned int i, unsigned int j) const;
 
 
 
@@ -65,13 +71,14 @@ class Map
         //Robot movements
         int move(unsigned int id, int d );
 
-        int turn(unsigned int id, int d);
+        int turn(unsigned int id, int angle);
 
         void init(unsigned int id, int x, int y, int heading);
 
-        Robot curr(unsigned int id);
+        const Robot& curr(unsigned int id) const;
 
-        void join(unsigned int id, int x, int y );
+        const Robot &join(unsigned int id, int x, int y );
+
 };
 
 #endif // MAP_H

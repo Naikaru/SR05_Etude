@@ -59,103 +59,177 @@ void Map::setNbRobotMax(unsigned int value)
 }
 
 void Map::changeState(unsigned int i, unsigned int j, CellState newState){
-    if( i >= nbRows || j >= nbCols){
+    if( i >= nbCols || j >= nbRows){
         throw new QString("Out of Bounds");
     }
     grid[i][j] = newState;
 }
 
-CellState Map::getState(unsigned int i, unsigned int j)
+CellState Map::getState(unsigned int i, unsigned int j) const
 {
-    if( i >= nbRows || j >= nbCols){
-            throw new QString("Out of Bounds");
+    if( i >= nbCols || j >= nbRows){
+        throw new QString("Out of Bounds");
     }
     return grid[i][j];
 }
 
 int Map::move(unsigned int id, int d){
 
+    qDebug() << "Move : going forward : " << d;
     unsigned int distanceTraveled = 0;
-    //Position obstacle;
+
     Robot& robot = robots[id];
     Position position = robot.getPosition();
     std::vector<Position> cellTraveled;
     cellTraveled.push_back(position);
-    for(unsigned int i = 1; i <=d; ++i){
+
+    //manage negative distances :
+    if(d < 0)
+    {
+        turn(id, 180);
+
+        //manage if did not turn
+        d = - d;
+    }
+    double angleInRad = MathHelper::fromDegToRad(robot.getHeading());
+    for(unsigned int i = 1; i <= d; ++i){
         Position destination;
-        int x = position.getX() + floor(i*cos(robot.getHeading()) + 0.5);
-        int y = position.getY() + floor(i*sin(robot.getHeading()) + 0.5);
+
+        int x = position.getX() + i * cos(angleInRad);
+        int y = position.getY() + i * sin(angleInRad);
+        qDebug() << "distance " << i << "x : " << x << "y : " << y;
         destination.setX(x);
         destination.setY(y);
-        std::cout << "(" << destination.getX() << "," << destination.getY() << ")" << std::endl;
 
-        if(this->getState(destination.getX(), destination.getY()) == empty)
+
+        Position gridCoordinates = getCoordinatesFromPosition(destination);
+        if(this->getState(gridCoordinates.getX(), gridCoordinates.getY()) == empty)
         {
+            distanceTraveled++;
             cellTraveled.push_back(destination);
         } else {
             //obstacle = destination;
             distanceTraveled = i - 1;
+            qDebug() << "obstacle rencontré en " << i;
             break;
         }
     }
+    qDebug() << "Postition " << cellTraveled.back().getX() << cellTraveled.back().getY();
+
     robot.setPosition(cellTraveled.back());
-    std::cout << "last case (" << robot.getPosition().getX() << "," << robot.getPosition().getY() << ")" << std::endl;
     return distanceTraveled;
 }
 
-int Map::turn(unsigned int id, int d){
-    robots[id].setHeading(robots[id].getHeading() + d);
-    return d;
+/*
+ * This method allows the user to turn the robot, adding an angle to it original heading
+ * return the updated robot's heading
+ */
+
+int Map::turn(unsigned int id, int angle){
+    if(abs(angle > 360))
+    {
+        throw QString("Angle value is greater than 360");
+    }
+    int newAngle = robots[id].getHeading() + angle;
+    newAngle = (newAngle < 0) ? 360 + newAngle : newAngle%360;
+
+    robots[id].setHeading(newAngle);
+    return angle;
 }
+
+/*
+ *This method initialize the position and heading of a robot
+ *
+ */
 
 void Map::init(unsigned int id, int x, int y, int heading){
     Robot& robotToChange = robots[id];
     robotToChange.setPosition(Position(x,y));
     robotToChange.setHeading(heading);
-
 }
 
-Robot Map::curr(unsigned int id){
-    return robots[id];
+/*
+ * Return the current position and heading of a robot
+ */
+const Robot& Map::curr(unsigned int id) const{
+    return robots.at(id);
 }
 
-void Map::join(unsigned int id, int x, int y){
+/*
+ * Make the robot travel to the given position
+ */
+
+const Robot& Map::join(unsigned int id, int x, int y){
     Robot& robotToMove = robots[id];
     Position currentPosition = robotToMove.getPosition();
-
-    float teta;
+    qDebug() << "Trying to get to " << x << "," << y << " from " << currentPosition.getX() << "," << currentPosition.getY();
+    float angleToJoin;
     float diffX = (float)x - currentPosition.getX();
     float diffY = (float) y - currentPosition.getY();
     if(diffX == 0 && diffY == 0)
-        return; //on retourne la position actuelle, on a pas bougé
+        return robotToMove; //on retourne la position actuelle, on a pas bougé
 
-    if(diffX > 0 && diffY > 0) //1er cadrant
-        teta = teta;
+    angleToJoin = MathHelper::fromRadToDeg((float)atan(abs(diffY)/(float)abs(diffX)));
+    //if(diffX > 0 && diffY > 0) //1er cadrant
+    //angleToJoin = angleToJoin; nothing to do
+
     if(diffX < 0 && diffY > 0) //2eme cadrant
-        teta = 180 - teta;
+        angleToJoin = 180 - angleToJoin;
     if(diffX < 0 && diffY < 0) //3eme cadrant
-        teta = 180 + teta;
-    if(diffX > 0 && diffY < 0)//4eme cadrant
-        teta = 360 - teta;
+        angleToJoin = 180 + angleToJoin;
+    if(diffX > 0 && diffY < 0) //4eme cadrant
+        angleToJoin = 360 - angleToJoin;
     if(diffX == 0)
-        teta = 90;
+        angleToJoin = 90;
     if(diffY == 0)
-        teta = 0;
+        angleToJoin = 0;
 
-    teta = abs(teta - robotToMove.getHeading());
+    //we now have to make the robot turn to the given angle
+    qDebug() << "Trying to get to angle : " << angleToJoin << "from angle " << robotToMove.getHeading();
+    float turningAngle = angleToJoin - robotToMove.getHeading();
+    if(abs(turningAngle) > 180)
+        turningAngle = (turningAngle > 0) ? turningAngle - 360 : turningAngle + 360;
+    turningAngle = MathHelper::roundToNearestInt(turningAngle);
+    qDebug() << "Calling turn with angle = " << turningAngle;
 
+    int updatedHeading = turn(id, turningAngle);
+    qDebug() << "New angle is : " << robotToMove.getHeading();
+    if(updatedHeading != turningAngle){ //the angle could not be reached
+        return robotToMove;
+    }
+
+    int distanceToTravel = ceil(sqrt(pow(diffX,2) + pow(diffY,2))); //théorème de pythagore round to highest
+    qDebug() << "exact distance : " << sqrt(pow(diffX,2) + pow(diffY,2));
+    qDebug() << "Calling move with : " << distanceToTravel;
+    move(id, distanceToTravel);
+
+    return robotToMove;
 
 }
 
-Position Map::getCoordinatesFromPosition(const Position& position)
+Position Map::getCoordinatesFromPosition(const Position& position) const
 {
 
-    int x = position.getX() / 2;
-    int y = position.getY() / 2;
-    if(nbRows%2 == 0 && position.getX() < 0)
+    int x = position.getX() + nbCols / 2;
+    int y = position.getY() + nbRows / 2;
+    if(nbCols%2 == 0)
         x -= 1;
-    if(nbCols%2 == 0 && position.getY() < 0)
+    if(nbRows%2 == 0)
         y -=1;
+
+    return Position(x, y);
+
+}
+
+Position Map::getPositionFromCoordinates(const Position& coordinates) const
+{
+
+    int x = coordinates.getX() - nbCols / 2;
+    int y = coordinates.getY() -nbRows / 2;
+    if(nbCols%2 == 0)
+        x += 1;
+    if(nbRows%2 == 0)
+        y +=1;
 
     return Position(x, y);
 
@@ -166,16 +240,53 @@ Map::Map()
 
 }
 
-Map::Map(unsigned int nbRobotMax, unsigned int nbRows, unsigned int nbCols) : nbRobotMax(nbRobotMax), nbRows(nbRows), nbCols(nbCols)
+Map::Map(unsigned int nbRobotMax, unsigned int nbCols, unsigned int nbRows) : nbRobotMax(nbRobotMax), nbCols(nbCols), nbRows(nbRows)
 {
-    grid = new CellState*[nbRows];
-    for(unsigned int i = 0; i < nbRows; ++i){
-        grid[i] = new CellState[nbCols];
+    grid = new CellState*[nbCols];
+    for(unsigned int i = 0; i < nbCols; ++i){
+        grid[i] = new CellState[nbRows];
     }
 }
 
-std::map<int, Robot> Map::getRobots() const
+const std::map<int, Robot> &Map::getRobots() const
 {
     return this->robots;
 }
 
+void Map::initMap(){
+    for(unsigned int x = 0; x< this->getNbCols(); ++x){
+        for(unsigned int y=0; y < this->getNbRows(); ++y){
+
+            this->changeState(x,y,CellState::empty);
+        }
+    }
+}
+
+void Map::printMap(){
+
+    bool isRobot;
+    Position robotPosition;
+    std::map<int, Robot> robots = this->getRobots();
+    std::cout << "Map : \n";
+    for(unsigned int y = 0; y< this->getNbRows(); ++y){
+        for(unsigned int x=0; x < this->getNbCols(); ++x){
+            isRobot = false;
+
+            for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
+            {
+                robotPosition = this->getCoordinatesFromPosition(it->second.getPosition());
+                if(robotPosition.getX() == x && robotPosition.getY() == y)
+                {
+                    isRobot = true;
+                    std::cout << "R";
+                }
+            }
+            if(isRobot == false)
+            {
+
+                std::cout << ((this->getState(x,y) == CellState::empty) ? "_" : "X");
+            }
+        }
+        std::cout << std::endl;
+    }
+}
