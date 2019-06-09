@@ -5,9 +5,9 @@ int estimation_heuristique(unsigned int x1, unsigned int y1, unsigned int x2, un
     return (fabs(x1 - x2) + fabs(y1 - y2));
 }
 
-Cellule::Cellule(int x, int y): m_x(x), m_y(y) {}
+Cellule::Cellule(unsigned int x, unsigned int y): m_x(x), m_y(y) {}
 
-Cellule::Cellule(int x, int y, int cost, Cellule *pred, Cellule *last):
+Cellule::Cellule(unsigned int x, unsigned int y, unsigned int cost, Cellule *pred, Cellule *last):
     m_x(x),
     m_y(y),
     m_xp(pred->m_x),
@@ -25,12 +25,12 @@ void add_cell(std::list<Cellule*>& alist, Cellule* cell){
     if (alist.empty() == true){ // cell devient la tete de liste comme seul element
         alist.push_back(cell);
     }
-    else if (cell->m_heuristique <= alist.front()->m_heuristique){ // insertion en tete
+    else if (cell->get_heuristique() <= alist.front()->get_heuristique()){ // insertion en tete
         alist.push_front(cell);
     }
     else{
-        std::list<Cellule*> it = alist.begin();
-        while(it != alist.end() && cell->m_heuristique <= *it->m_heuristique) {
+        std::list<Cellule*>::iterator it = alist.begin();
+        while(it != alist.end() && cell->get_heuristique() <= (*it)->get_heuristique()) {
             ++it;
         }
         alist.insert(it, cell);
@@ -39,16 +39,16 @@ void add_cell(std::list<Cellule*>& alist, Cellule* cell){
 
 void remove_cell(std::list<Cellule*>& alist, Cellule* cell){
     for(std::list<Cellule*>::iterator it=alist.begin(); it!=alist.end(); ++it){
-        if((*it)->m_x == cell->m_x && (*it)->m_y == cell->m_y){
+        if((*it)->get_x() == cell->get_x() && (*it)->get_y() == cell->get_y()){
             alist.erase(it);
         }
     }
     delete cell;
 }
 
-Cellule* lookfor_cell(std::list<Cellule*>& alist, int x, int y){
+Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y){
     for(std::list<Cellule*>::iterator it=alist.begin(); it!=alist.end(); ++it){
-        if((*it)->m_x == x && (*it)->m_y == y){
+        if((*it)->get_x() == x && (*it)->get_y() == y){
             return *it;
         }
     }
@@ -110,7 +110,7 @@ Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellul
         closedList.push_front(cell);
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'
-        if((cell->m_x == begin->m_x) && (cell->m_y == begin->m_y)){
+        if((cell->get_x() == begin->get_x()) && (cell->get_y() == begin->get_y())){
             return cell;
             // Pareil que begin mais avec xp et yp mis à jour
         }
