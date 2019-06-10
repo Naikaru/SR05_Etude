@@ -10,6 +10,8 @@
 #include <QSpinBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QCheckBox>
 class MapGui : QWidget
 {
 
@@ -29,7 +31,7 @@ class MapGui : QWidget
     unsigned int width = 400;     //largeur
     unsigned int height = 400;    //hauteur
     unsigned int dCell() {return std::min(width/dimX,height/dimY);}     //hauteur et largeur d'une cellule
-    bool isRunning = true;
+    bool isRunning = false;
     static QColor cellEmptyColor;
     static QColor cellFullColor;
 
@@ -38,11 +40,14 @@ class MapGui : QWidget
     QColor colorList[3] {Qt::black, Qt::blue, Qt::red};
     std::map<int, QColor> robotColors;
 
+    QPushButton * bt_run;
+
     QHBoxLayout * l_mapModifier;
     QSpinBox *sb_selectX;
     QSpinBox *sb_selectY;
     QSpinBox *sb_selectMaxW;
     QSpinBox *sb_selectMaxH;
+    QCheckBox * cb_selection;
 
 
 
@@ -58,7 +63,13 @@ public:
     {
         QWidget::show();
     }
+
+
+    void setWalls();
+
 private slots:
+
+    void run();
 
     void addRobot(){
 

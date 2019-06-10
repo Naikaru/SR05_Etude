@@ -6,37 +6,9 @@ QColor MapGui::cellEmptyColor = Qt::white;
 MapGui::MapGui(QWidget * parent) : QWidget(parent)
 {
 
-    map = Map(5, dimX, dimY);
-    map.initMap();
     //general layout
     l_mapGui = new QVBoxLayout;
 
-    /*
-    grid = new QTableWidget(dimY, dimX, this);
-    grid->setColumnCount(dimX);
-    grid->setRowCount(dimY);
-    grid->setShowGrid(true);
-    grid->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    for(unsigned int i=0 ; i<dimY; ++i ){
-        for (unsigned int j = 0 ; j<dimX;++j){
-            QTableWidgetItem* cellItem = new QTableWidgetItem ("");
-            cellItem->setFlags(Qt::NoItemFlags);
-            cellItem->setFlags(Qt::ItemIsEnabled);
-            grid->setItem(i,j,cellItem);
-            grid->item(i,j)->setBackgroundColor("white");
-            if(i==0)
-                grid->setColumnWidth(j,(int)(dimX));
-        }
-        grid->setRowHeight(i,dimY);
-    }
-    grid->setFixedSize(40 * dimY,40 * dimX);
-    grid->horizontalHeader()->setVisible(false);
-    grid->verticalHeader()->setVisible(false);
-    grid->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    grid->horizontalHeader()->hide();
-    grid->verticalHeader()->hide();
-    */
     grid = new QTableWidget(dimY, dimX, this);
     grid->setEditTriggers(QAbstractItemView::NoEditTriggers);
     grid->setFixedSize(width, height);
@@ -53,12 +25,18 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
             grid->item(i,j)->setTextColor(cellEmptyColor);
         }
     }
+    setWalls();
     //connection for cellModification
-    connect(grid, SIGNAL(clicked(const QModelIndex&)), this, SLOT(cellActivation(const QModelIndex&)));
+    //connect(grid, SIGNAL(clicked(const QModelIndex&)), this, SLOT(cellActivation(const QModelIndex&)));
     connect(grid, SIGNAL(itemSelectionChanged()), this, SLOT(cellSelection()));
 
     l_mapGui->addWidget(grid);
     l_mapModifier = new QHBoxLayout;
+
+    bt_run = new QPushButton("Run",this);
+    l_mapGui->addWidget(bt_run);
+
+    connect(bt_run, SIGNAL(clicked()), this, SLOT(run()));
 
     sb_selectX = new QSpinBox(this);
     sb_selectX->setRange(1,500);
@@ -88,6 +66,8 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     QObject::connect(sb_selectMaxW, SIGNAL(valueChanged(int)), this, SLOT(synchronizeMaxH(int)));
 
+    cb_selection = new QCheckBox("Ajout obstacles");
+    l_mapModifier->addWidget(cb_selection);
 
     l_mapGui->addLayout(l_mapModifier);
 
@@ -124,47 +104,96 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
 }
 
+void MapGui::setWalls()
+{
+    for(unsigned int x = 0; x< this->dimX; ++x){
+        for(unsigned int y=0; y < this->dimY; ++y){
+            if(x == 0 || x == this->dimX-1 || y == 0 || y == this->dimY-1)
+            {
+                grid->item(y,x)->setText("_");
+                grid->item(y,x)->setBackgroundColor(cellFullColor);
+                grid->item(y,x)->setTextColor(cellFullColor);
+            }
+        }
+
+    }
+}
 /* SLOTS */
 
-void MapGui::cellActivation(const QModelIndex &index){
-    if(isRunning)
-    {
-        qDebug() << "Modification case : " << index.row() << index.column();
-        grid->item(index.row(),index.column())->setSelected(false);
-        if(grid->item(index.row(),index.column())->text() == "")
-        {
-            map.changeState(index.column(), index.row(), CellState::full);
+void MapGui::run()
+{
+    map = Map(100, dimX, dimY);
+    map.initMap();
 
-            grid->item(index.row(),index.column())->setText("_");
-            grid->item(index.row(),index.column())->setBackgroundColor(cellFullColor);
-            grid->item(index.row(),index.column())->setTextColor(cellFullColor);
-
+    for(unsigned int x = 0; x< this->dimX; ++x){
+        for(unsigned int y=0; y < this->dimY; ++y){
+            if(grid->item(y,x)->text() == "")
+            {
+                map.changeState(x,y, CellState::empty);
+            }
+            else
+            {
+                map.changeState(x,y, CellState::full);
+            }
         }
-        else
-        {            
-            map.changeState(index.column(), index.row(), CellState::empty);
-            grid->item(index.row(),index.column())->setBackgroundColor(cellEmptyColor);
-            grid->item(index.row(),index.column())->setTextColor(cellEmptyColor);
-            grid->item(index.row(),index.column())->setText("");
-
-
-        }
-        map.printMap();
     }
 
+    isRunning = true;
+
+    bt_run->setEnabled(false);
+    sb_selectMaxH->setEnabled(false);
+    sb_selectMaxW->setEnabled(false);
+    sb_selectX->setEnabled(false);
+    sb_selectY->setEnabled(false);
+    map.printMap();
+
+}
+
+void MapGui::cellActivation(const QModelIndex &index){
+
+    qDebug() << "Modification case : " << index.row() << index.column();
+    grid->item(index.row(),index.column())->setSelected(false);
+    if(grid->item(index.row(),index.column())->text() == "")
+    {
+        grid->item(index.row(),index.column())->setText("_");
+        grid->item(index.row(),index.column())->setBackgroundColor(cellFullColor);
+        grid->item(index.row(),index.column())->setTextColor(cellFullColor);
+
+    }
+    else
+    {
+        grid->item(index.row(),index.column())->setBackgroundColor(cellEmptyColor);
+        grid->item(index.row(),index.column())->setTextColor(cellEmptyColor);
+        grid->item(index.row(),index.column())->setText("");
+
+    }
 }
 
 void MapGui::cellSelection()
 {
     QList<QTableWidgetItem *> itemsSelected = grid->selectedItems();
     for(QTableWidgetItem *cell : itemsSelected){
-        if(cell->backgroundColor() == cellEmptyColor){
+        if(cb_selection->isChecked()){
+            if(isRunning)
+            {
+                map.changeState(cell->column(),cell->row(), CellState::full);
+                map.printMap();
+            }
+            cell->setText("_");
             cell->setBackgroundColor(cellFullColor);
+            cell->setTextColor(cellFullColor);
         }else{
+            if(isRunning)
+            {
+                map.changeState(cell->column(),cell->row(), CellState::empty);
+                map.printMap();
+            }
+            cell->setText("");
             cell->setBackgroundColor(cellEmptyColor);
+            cell->setTextColor(cellEmptyColor);
         }
+        cell->setSelected(false);
     }
-
 }
 
 void MapGui::synchronizeDimX(int newDim)
@@ -205,6 +234,7 @@ void MapGui::synchronizeDimX(int newDim)
             grid->item(i,j)->setTextColor(MapGui::cellEmptyColor);
         }
     }
+    setWalls();
 }
 
 void MapGui::synchronizeDimY(int newDim)
@@ -245,6 +275,8 @@ void MapGui::synchronizeDimY(int newDim)
             grid->item(i,j)->setTextColor(MapGui::cellEmptyColor);
         }
     }
+    setWalls();
+
 }
 
 void MapGui::synchronizeMaxW(int newMax)
