@@ -29,7 +29,7 @@ private:
      * Implémentation de l'algorithme minPos:
      * Une frontère est affectée à un robot si il est le robot le plus proche de la frontière
      */
-    Pos getFrontierMinPos();
+    int getFrontierMinPos();
 
 public:
 
@@ -41,7 +41,7 @@ public:
     /*
      *  Permet de savoir quelle frontière choisir
      */
-    Pos minPos();
+    QString runMinPos();
 
 
 

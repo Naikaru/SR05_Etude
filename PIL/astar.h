@@ -53,7 +53,7 @@ public:
     void add_cell(Cellule* cell);
     Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
     Cellule* aStar();
-    unsigned int get_cost();
+    unsigned int get_cost(){return 0;}
     QString get_path() {}
 
     void init(Cellule* b, Cellule* e, unsigned int id, Map* m){
