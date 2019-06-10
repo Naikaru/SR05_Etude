@@ -60,7 +60,7 @@ public:
     Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
     void astar();
     unsigned int get_heuristique(){ return begin->get_heuristique(); }
-    //QString get_path() {}
+    QString get_path() { return QString();}
 
     void init(Cellule* b, Cellule* e, unsigned int id, Map* m){
         begin=b;

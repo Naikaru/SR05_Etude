@@ -33,7 +33,7 @@ void Algo::computeCost()
             //on initialise le AStar
             cost[i][j].init(c1,c2,i,map);
             //on calcule le plus court chemin pour y arriver ( = cost)
-            cost[i][j].aStar();
+            cost[i][j].astar();
         }
     }
 }
@@ -52,8 +52,8 @@ int Algo::getFrontierMinPos()
     {
         for(int i =0; i<nbRobot;i++)
         {
-            int costRobot(cost[id][j].get_cost()); //coût de notre robot sur cette frontière
-            if(i != id && cost[i][j].get_cost()<costRobot ){ //si un autre robot à un coût inferieur on se classe plus loin
+            int costRobot(cost[id][j].get_heuristique()); //coût de notre robot sur cette frontière
+            if(i != id && cost[i][j].get_heuristique()<costRobot ){ //si un autre robot à un coût inferieur on se classe plus loin
                 classment[j]++;
             }
         }
