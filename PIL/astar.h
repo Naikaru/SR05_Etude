@@ -33,6 +33,6 @@ void remove_cell(std::list<Cellule*>& alist, Cellule* cell);
 Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
 std::list<Cellule*>& add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
                     Map* map);
-std::list<Cellule*> aStar(std::list<Cellule*> closedList, Map* map, Cellule* begin, Cellule* frontier);
+Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellule* frontier);
 
 #endif // CELLULE_H

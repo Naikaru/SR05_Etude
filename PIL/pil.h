@@ -119,7 +119,7 @@ class Pil: public QWidget {
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
 
-        QPair<unsigned, unsigned> chooseFrontier();
+        QPair<unsigned int, unsigned int> chooseFrontier();
         QVector<QStringList> parseBuffer(QString payload);
 
     public:

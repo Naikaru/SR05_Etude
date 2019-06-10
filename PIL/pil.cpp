@@ -292,12 +292,13 @@ void Pil::sendBufferToNet() {
     sendBuffer(payload);
 }
 
-QPair<unsigned, unsigned> Pil::chooseFrontier(){
+QPair<unsigned int, unsigned int> Pil::chooseFrontier() {
     bool first = true;
     unsigned int minDist;
+    Cellule* path;
+    std::list<Cellule*> closedList;
     QPair<unsigned int, unsigned int> chosenFrontier;
     for(QVector<QPair<unsigned int, unsigned int>>::iterator it=frontiers.begin(); it!=frontiers.end(); ++it) {
-        std::list<Cellule*> closedList;
         Cellule begin(map->robots[ident].x, map->robots[ident].y);
         Cellule frontier(it->first, it->second);
         frontier.m_cost = 0;
@@ -306,7 +307,7 @@ QPair<unsigned, unsigned> Pil::chooseFrontier(){
         frontier.m_yp = -1;
 
         // Liste containing element of the path
-        //std::list<Cellule*> path = aStar(closedList, map, &begin, &frontier);
+        path = aStar(closedList, map, &begin, &frontier);
         if(first) {
             minDist = closedList.size();
             first = false;
@@ -317,6 +318,8 @@ QPair<unsigned, unsigned> Pil::chooseFrontier(){
             }
         }
     }
+    return QPair<unsigned int, unsigned int>(path->m_x, path->m_y);
+    // Pas encore fonctionnel
 }
 
 QVector<QStringList> Pil::parseBuffer(QString payload) {
