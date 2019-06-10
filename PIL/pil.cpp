@@ -112,6 +112,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 //    map->turn(0,90);
 //    map->move(0,5);
     map->show();
+    map->initRobot(ident,xInit,yInit,0);
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window

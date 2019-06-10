@@ -112,8 +112,11 @@ public :
     }
 
     unsigned int get_nbL() { return nbL; }
+
     unsigned int get_nbC() { return nbC; }
+
     QColor get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
+
 private:
 
     /*
@@ -133,7 +136,14 @@ private:
 
 
     void applyBufferForRobot(unsigned int, QVector<QStringList>);
+
     void applyAction(int, QStringList);
+
+    void moveTop(int id,int d);
+    void moveBottom(int id,int d);
+    void moveRight(int id,int d);
+    void moveLeft(int id,int d);
+
 };
 
 

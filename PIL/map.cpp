@@ -94,7 +94,6 @@ void Map::initRobot(int id,int x, int y,int heading)
             map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
             setFrontier(robots[id].x,robots[id].y);
         }
-
     }
 }
 
@@ -103,30 +102,69 @@ void Map::move(int id,int d)
 {
     if(robots.find(id) != robots.end())
     {
-        if(robots[id].heading == 180 || robots[id].heading == 0 )   //déplacement suivant une ligne
-        {
-            for(int i = std::min(robots[id].y+d,robots[id].y); i<=std::max(robots[id].y+d,robots[id].y); ++i)
-            {
-                map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
-                setFrontier(robots[id].x,i);
-            }
 
-             robots[id].y += d;
+        switch (robots[id].heading){
+            case 0:         //droite
+                moveRight(id,d);
+                break;
+            case 90:        //haut
+                moveTop(id,d);
+                break;
+            case 180:       //gauche
+                moveLeft(id,d);
+                break;
+            case 270:       //bas
+                moveBottom(id,d);
+                break;
+            default:
+                return;
         }
-        else if(robots[id].heading == 90 || robots[id].heading == 270 ) // déplacement suivant une colonne
-        {
-            for(int i = std::min(robots[id].x-d,robots[id].x); i<=std::max(robots[id].x-d,robots[id].x); ++i){
-                map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
-                setFrontier(i,robots[id].y);
-            }
-            robots[id].x -= d;
-        }
+
         map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
         setFrontier(robots[id].x,robots[id].y);
     }
     nbActionsRobot[id]++;
 
     return;
+}
+
+
+void Map::moveTop(int id,int d)
+{
+    for(int i = std::min(robots[id].x-d,robots[id].x); i<=std::max(robots[id].x-d,robots[id].x); ++i){
+        map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
+        setFrontier(i,robots[id].y);
+    }
+    robots[id].x -= d;
+}
+
+void Map::moveBottom(int id,int d)
+{
+    for(int i = std::min(robots[id].x+d,robots[id].x); i<=std::max(robots[id].x+d,robots[id].x); ++i){
+        map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
+        setFrontier(i,robots[id].y);
+    }
+    robots[id].x += d;
+}
+
+void Map::moveRight(int id,int d)
+{
+    for(int i = std::min(robots[id].y+d,robots[id].y); i<=std::max(robots[id].y+d,robots[id].y); ++i)
+    {
+        map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
+        setFrontier(robots[id].x,i);
+    }
+     robots[id].y += d;
+}
+
+void Map::moveLeft(int id,int d)
+{
+    for(int i = std::min(robots[id].y-d,robots[id].y); i<=std::max(robots[id].y-d,robots[id].y); ++i)
+    {
+        map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
+        setFrontier(robots[id].x,i);
+    }
+     robots[id].y -= d;
 }
 
 
@@ -160,7 +198,7 @@ void Map::setObstacle(int x, int y) {
     if (y < 0)
         y += nbC;
     // Mise à jour de la carte avec les bons indices
-//    qDebug() << "setobstacle, x=" << x << "y=" << y;
+    // qDebug() << "setobstacle, x=" << x << "y=" << y;
     map->item(x,y)->setBackgroundColor(OBSTA);
 }
 
