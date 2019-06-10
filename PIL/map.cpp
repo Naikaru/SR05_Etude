@@ -1,12 +1,9 @@
 #include "map.h"
 
 
-Map::Map(unsigned int nbR, unsigned int w,unsigned int h,unsigned int c,unsigned int l, QWidget* parent ):
-    QWidget(parent),width(w),height(h),nbC(c),nbL(l), nbRobots(nbR)
+Map::Map(unsigned int w,unsigned int h,unsigned int c,unsigned int l, QWidget* parent ):
+    QWidget(parent), width(w),height(h),nbC(c),nbL(l)
 {
-    for (unsigned int i = 0; i < nbRobots; i++) {
-        nbActionsRobot[i] = 0;
-    }
     map = new QTableWidget();
     init();
 
@@ -90,6 +87,7 @@ void Map::initRobot(int id,int x, int y,int heading)
             robots[id].x = x; robots[id].y = y;
             robots[id].heading = heading;
             robots[id].color = colors.at(colors.size()-1);
+            nbActionsRobot[id] = 1;
             colors.pop_back();
             map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
             setFrontier(robots[id].x,robots[id].y);
@@ -99,7 +97,7 @@ void Map::initRobot(int id,int x, int y,int heading)
 }
 
 //déplacement uniquement suivant une grille
-void Map::move(int id,int d)
+void Map::move(int id,int d, bool incrRobotAction) // incrRobotAction à mettre à true si c'est une action du PIL correspondant
 {
     if(robots.find(id) != robots.end())
     {
@@ -123,8 +121,10 @@ void Map::move(int id,int d)
         }
         map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
         setFrontier(robots[id].x,robots[id].y);
+        if (incrRobotAction) {
+            nbActionsRobot[id]++;
+        }
     }
-    nbActionsRobot[id]++;
 
     return;
 }
@@ -181,7 +181,20 @@ void Map::applyAction(int r, QStringList action){
     QString destination = action[2];
     int realDestination = destination.split(",").first().toInt();
     int expectedDestination = destination.split(",").last().toInt();
-    if (movement == "move") {
+    QString finalPosition = action[3];
+    int x_final = finalPosition.split(",")[0].toInt();
+    int y_final = finalPosition.split(",")[1].toInt();
+    int heading_final = finalPosition.split(",")[2].toInt();
+
+    // On vérifie que le robot ait été initialisé
+    if (nbActionsRobot[r] == 0) {
+        if (movement == "init") {
+            initRobot(r, x_final, y_final, heading_final);
+            qDebug() << "Robot " << r << " initialisé";
+        } else {
+            qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+        }
+    } else if (movement == "move") {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination;
         move(r, realDestination);
         if (realDestination != expectedDestination) {
@@ -211,9 +224,12 @@ void Map::applyAction(int r, QStringList action){
 
 
 void Map::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
+    if (nbActionsRobot.find(r) == nbActionsRobot.end()) {
+        nbActionsRobot[r] = 0;
+    }
     unsigned int nbActions = nbActionsRobot[r];
-    // qDebug() << "robot number" << r;
-    // qDebug() << "action number" << buffer.first()[0];
+//     qDebug() << "robot number" << r;
+//     qDebug() << "action number" << buffer.first()[0];
 
     QVector<QStringList>::iterator it = buffer.begin();
     while ((*it)[0].toUInt() < nbActions && it != buffer.end()) {

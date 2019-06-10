@@ -52,9 +52,7 @@ class Pil: public QWidget {
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
 
-        QString bufferToNetPayload = "@buffertonet";
-        QString bufferFromNetPayload = "@bufferfromnet";
-        QString bufferToApply = "@buffer";
+        QString bufferPayload = "@buffer";
 
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
@@ -106,6 +104,8 @@ class Pil: public QWidget {
 
         const unsigned int MAX_BUFFER = 20;
 
+        const unsigned int DISTANCE_MAX = 10;
+
         QVector<QStringList> buffer;
         // sequence of instructions
         Map* map = nullptr;
@@ -122,6 +122,8 @@ class Pil: public QWidget {
         QPair<unsigned int, unsigned int> chooseFrontier();
         QVector<QStringList> parseBuffer(QString payload);
 
+        bool robotsTooFar(Pos, Pos);
+
     public:
         void applyBufferFromMessage(QString);
         Pil(int argc, char* argv[]);
@@ -130,7 +132,7 @@ class Pil: public QWidget {
         void enableSnapshot();
 
         QVector<QStringList> getBuffer() {return buffer; }
-        void addMovementInBuffer(unsigned int, QString, QString);
+        void addMovementInBuffer(unsigned int nbAction, QString movement, QString distance, QString finalPosition);
         void sendBufferToNet();
 
     protected slots:

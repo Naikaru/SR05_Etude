@@ -66,8 +66,6 @@ class Map : public QWidget {
     unsigned int height;    //hauteur
     unsigned int dCell;     //hauteur et largeur d'une cellule
 
-    unsigned int nbRobots;
-
     std::vector<QString> colors;    //défini les couleurs que peuvent prendre les robots sur la map
     std::map<int, Robot> robots;    // défini pour chaque robot sa position (x, y) et son angle heading, dans cet ordre
     std::map<unsigned int, unsigned int> nbActionsRobot;    // nb of actions of robots
@@ -77,10 +75,9 @@ class Map : public QWidget {
     QTableWidget* map;
     QGridLayout* legend;
     QVBoxLayout* mainLayout;
-
 public :
 
-    Map(unsigned int nbR = 1, unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
+    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
 
     //initialise la map avec les dimensions du constructeur.
     void init();
@@ -98,8 +95,9 @@ public :
      * le robot avance dans sa la direction de sa tête, si d est < 0 il recule
      * déplacement uniquement suivant une grille, pas de déplacement diagonaux
      */
-    void move(int id,int d);
+    void move(int id,int d, bool incrRobotAction = false);
 
+    Pos getRobotPosition(int id) { return Pos(robots[id].x, robots[id].y); }
 
     /*
      * Permet de tourner le robot d'un certain angle
