@@ -25,6 +25,12 @@ AStar::AStar(Cellule* b, Cellule* e, unsigned int id, Map* m):
     map(m)
 {}
 
+AStar::~AStar() {
+    for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
+        delete (*it);
+    for (std::list<Cellule*>::iterator it=closedList.begin(); it!=openList.end(); ++it)
+        delete (*it);
+}
 
 void AStar::add_cell(Cellule* cell){
     // Insertion triée (croissante) de cell dans list selon l'heuristique
@@ -52,7 +58,7 @@ Cellule* AStar::lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned
             return *it;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void AStar::add_neighbours(Cellule* cell){
@@ -101,7 +107,7 @@ void AStar::add_neighbours(Cellule* cell){
 }
 
 
-Cellule* AStar::aStar(){
+void AStar::astar(){
     // A* starts from the end to reach the beginning
     // then you read the path from the beginning to reach the end
 
@@ -118,7 +124,11 @@ Cellule* AStar::aStar(){
         if((cell->get_x() == begin->get_x()) && (cell->get_y() == begin->get_y())){
             for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
                 delete (*it);
-            return cell;
+            begin->set_cost(cell->get_cost());
+            begin->set_heuristique(cell->get_heuristique());
+            begin->set_xp(cell->get_xp());
+            begin->set_yp(cell->get_yp());
+            return;
             // Pareil que begin mais avec xp et yp mis à jour
         }
         else{
@@ -127,10 +137,10 @@ Cellule* AStar::aStar(){
         }
     }
     // End of loop : no path to reach end
-    std::cout << std::endl << "*** Pas de chemin possible ***" << std::endl;
+    // std::cout << std::endl << "*** Pas de chemin possible ***" << std::endl;
 
     for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
         delete (*it);
 
-    return nullptr;
+    return;
 }
