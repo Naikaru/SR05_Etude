@@ -28,23 +28,32 @@ public:
 };
 
 int estimation_heuristique(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-void add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last, Map* map);
-void add_cell(std::list<Cellule*>& alist, Cellule* cell);
-void remove_cell(std::list<Cellule*>& alist, Cellule* cell);
-Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
-Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellule* frontier);
+//void add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last, Map* map);
+//void add_cell(std::list<Cellule*>& alist, Cellule* cell);
+//void remove_cell(std::list<Cellule*>& alist, Cellule* cell);
+//Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
+//Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellule* frontier);
 
 
 class AStar
 {
 private:
+    std::list<Cellule*> openList;
     std::list<Cellule*> closedList;
     Cellule* begin;
     Cellule* end;
+    Map* map;
+    unsigned int ident;
 public:
-    AStar(Cellule* begin, Cellule* end);
+    AStar(Cellule* b, Cellule* e, unsigned int id, Map* m);
     ~AStar() {}
 
+    void add_neighbours(Cellule* cell);
+    void add_cell(Cellule* cell);
+    Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
+    Cellule* aStar();
     unsigned int get_cost();
     QString get_path() {}
+};
+
 #endif // CELLULE_H
