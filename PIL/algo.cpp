@@ -31,7 +31,7 @@ void Algo::computeCost()
             //cellule d'arrivée = une des frontières
             Cellule* c2 = new Cellule(frontiers[j].first,frontiers[j].second);
             //on initialise le AStar
-            cost[i][j].init(c1,c2,id,map);
+            cost[i][j].init(c1,c2,i,map);
             //on calcule le plus court chemin pour y arriver ( = cost)
             cost[i][j].aStar();
         }
