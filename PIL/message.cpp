@@ -1,4 +1,4 @@
-#include "messagemanager.h"
+#include "message.h"
 
 // Create a Message object from a received string.
 Message::Message(QString receivedMessage)
@@ -15,7 +15,7 @@ Message::Message(QString _APP, QString _WHO, QString _WHE)
 }
 
 
-
+// Create a message object from a received messages
 void Message::parseMessage(QString message){
     APP = message.left(3);
     WHO = message.mid(3,3);
@@ -34,21 +34,6 @@ void Message::parseMessage(QString message){
     }
 }
 
-//QString Message::getAttributeValue(QString mnemo, QString message){
-//    QString sepMnemVal(SEPMNEMVAL);
-//    // Separator between couples is the first charactere of the messages
-//    QStringList listMnemoVal = message.split(message[0],QString::SkipEmptyParts);
-//    QMap<QString, QString> couples;
-//    foreach (const QString &str, listMnemoVal) {
-//       QStringList tmp = str.split(sepMnemVal);
-//       if(tmp.size() == 2){
-//           couples.insert(tmp[0],tmp[1]);
-//       }
-//       else
-//            return "";
-//    }
-//    return couples.value(mnemo, "");
-//}
 
 void Message::setValue(QString mnemo, QString value){
     couples.insert(mnemo,value);
@@ -65,19 +50,4 @@ QString Message::getCompleteMessage(){
     return mess;
 }
 
-//QString Message::getAttributeValue(QString mnemo, QString message){
-//    QString sepMnemVal(SEPMNEMVAL);
-//    // Separator between couples is the first charactere of the messages
-//    QStringList listMnemoVal = message.split(message[0],QString::SkipEmptyParts);
-//    QMap<QString, QString> couples;
-//    foreach (const QString &str, listMnemoVal) {
-//       QStringList tmp = str.split(sepMnemVal);
-//       if(tmp.size() == 2){
-//           couples.insert(tmp[0],tmp[1]);
-//       }
-//       else
-//            return "";
-//    }
-//    return couples[mnemo];
-//}
 

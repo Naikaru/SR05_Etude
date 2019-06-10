@@ -1,5 +1,6 @@
 #include "map.h"
-#include "messagemanager.h"
+#include "message.h"
+#include "tcpServerManager.h"
 #include "position.h"
 #include "robot.h"
 #include <iostream>
@@ -59,8 +60,8 @@ void initMap(Map& m){
 
 
 int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
 
-     //QApplication app(argc, argv);
 //    Pil pil(argc, argv);
 //    pil.show();
 
@@ -73,6 +74,8 @@ int main(int argc, char* argv[]) {
     qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
     qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
     qDebug() << manager.getCompleteMessage();
+    socket sockServ(QHostAddress("127.0.0.1"), 4646);
+    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
 //    std::cout << "Coordonées : " << robot.getPosition().getX() << "," << robot.getPosition().getY() << std::endl;
 
 //    robot.setHeading(230);
@@ -138,7 +141,7 @@ int main(int argc, char* argv[]) {
 
     */
 
-    QApplication app(argc, argv);
+
     MapGui mapGui(nullptr);
     mapGui.show();
     return app.exec();

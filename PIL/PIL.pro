@@ -8,12 +8,16 @@ INCLUDEPATH += .
 
 # Input
 HEADERS += pil.h \
-    map.h
+    map.h \
+    tcpclientmanager.h \
+    message.h
 SOURCES += main.cpp pil.cpp \
-    map.cpp
+    map.cpp \
+    tcpclientmanager.cpp \
+    message.cpp
 
 
-QT += core gui widgets
+QT += core gui widgets network
 
 QMAKE_CXXFLAGS = -std=c++11
 QMAKE=LFLAGS = -std=c++11
