@@ -41,10 +41,10 @@ void Algo::computeCost()
 
 int Algo::getFrontierMinPos()
 {
-    QVector<int> classment(frontiers.size(),int(0));
+    QVector<int> classment(frontiers.size(),int(1));
 
     //pour chaque frontière on enregistre
-    //le classement du robot par rapport au autre
+    //le classement du robot par rapport aux autres
     // si = 1 -> il est le robot le + proche de la frontière
     // si = nbRobot -> il est le plus loin
 
