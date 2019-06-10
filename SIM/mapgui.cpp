@@ -82,9 +82,12 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     listRobotColor->horizontalHeader()->setDefaultSectionSize(20);
     listRobotColor->verticalHeader()->setDefaultSectionSize(20);
 
+    robotColors = std::map<int, Qt::GlobalColor>();
+
 
 
     b_addRobot = new QPushButton("AddNewRobot", this);
+    b_addRobot->setEnabled(false);
 
     QObject::connect(b_addRobot, SIGNAL(clicked()), this, SLOT(initRobot()));
 
@@ -103,8 +106,9 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     messageManager = new MessageManager("ROB","PIL", "LCH", this);
     QObject::connect(messageManager, SIGNAL(receivedMessageFromRobot(const std::pair<int,Message>&)), this, SLOT(handleMessageFromRobot(const std::pair<int,Message>&)));
 
-    robotColors = std::map<int, Qt::GlobalColor>();
+    l_mapGui->addWidget(messageManager);
 
+    //test
     bt_test = new QPushButton;
 
     connect(bt_test, SIGNAL(clicked()), this, SLOT(test()));
@@ -209,28 +213,31 @@ const Robot &MapGui::join(unsigned int id, int x, int y)
 }
 
 
-void MapGui::handleMessageFromRobot(const std::map<int, Message> &msg)
+void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 {
 
     Message ackMessage = messageManager->createMessage();
 
-    //QString order = msg.getValue(Message::mnemoRobotOrder);
-/*
+    QString order = msg.second.getValue(Message::mnemoRobotOrder);
+    std::vector<int> parameters = std::vector<int>();
     if(order.startsWith("move")) {
-        int distanceToTravel = Message::getOrderValue(order).toInt();
-        //appel move
-        ackMessage.setValue(Message::mnemoRobotAck, messageManager->mnemoAckMove + QString(":") + QString::number(distanceToTravel));
+        int distanceToTravel = Message::getOrderValue(order)[0];
+        int distanceTravelled = this->move(msg.first, distanceToTravel);
+        parameters.push_back(distanceTravelled);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckMove, parameters));
     }
     else if(order.startsWith("turn")){
-        int angleToTurn = Message::getOrderValue(order).toInt();
-        //appel turn
-        ackMessage.setValue(Message::mnemoRobotAck, messageManager->menmoAckTurn + QString(":") + QString::number(angleToTurn));
+        int angleToTurn = Message::getOrderValue(order)[0];
+        int angleTurned = this->turn(msg.first, angleToTurn);
+        parameters.push_back(angleTurned);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
     }
     else{
         //ordre non reconnu
-        ackMessage.setValue(Message::mnemoRobotAck, messageManager->mnemoAckError + QString(":ignoredbadarg"));
+        ackMessage.setValue(Message::mnemoRobotAck, Message::mnemoAckError + QString(":ignoredbadarg"));
     }
-    */
+
+    messageManager->sendMessage(msg.first, ackMessage);
 
 }
 unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
@@ -307,6 +314,7 @@ void MapGui::run()
     sb_selectMaxW->setEnabled(false);
     sb_selectX->setEnabled(false);
     sb_selectY->setEnabled(false);
+    b_addRobot->setEnabled(true);
     map.printMap();
 
 

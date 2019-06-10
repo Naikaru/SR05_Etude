@@ -10,9 +10,10 @@
 class Message
 {
 private:
-    const QString sepMnemVal = "~";
-    const QString mainSepVal = "/";
-    const QString sepOrderMnem = ":";
+    static const QString sepMnemVal;
+    static const QString mainSepVal;
+    static const QString sepOrderMnem ;
+    static const QString sepOrderValueMnem;
 
     //Sending APP
     QString APP;
@@ -30,6 +31,7 @@ private:
 public:
 
     void setValue(QString mnemo, QString value);
+
     QString getValue(QString mnemo) const;
     Message(QString receivedMessage);
     Message(QString _APP, QString _WHO, QString _WHE);
@@ -38,9 +40,14 @@ public:
     QString getAPP(){return APP;}
     QString getCompleteMessage() const;
 
+
     static const QString mnemoRobotOrder;
     static const QString mnemoRobotAck;
-    static QString getOrderValue(const QString& order);
+    static const QString mnemoAckMove;
+    static const QString mnemoAckTurn;
+    static const QString mnemoAckError;
+    static std::vector<int> getOrderValue(const QString& order);
+    static QString parseOrderValues(const QString& order, const std::vector<int>& values);
 
 };
 

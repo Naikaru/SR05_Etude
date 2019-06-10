@@ -35,6 +35,7 @@ public:
     ~MessageManager();
     bool addRobotSocket(int id);
     Message createMessage() const {return Message(APP, WHO, WHE);}
+    void sendMessage(int id, const Message& msg);
 
 signals:
 

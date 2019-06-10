@@ -17,7 +17,7 @@ socket::socket(QHostAddress address , int port):server()
     QObject::connect(&server, SIGNAL(newConnection()), this, SLOT(handleConnect()));
 }
 
-void socket::send(QString message){
+void socket::send(QString message) const{
     if (sock == nullptr || !sock->isOpen()){
         throw std::runtime_error("No socket to send the message on");
     } else {
@@ -25,7 +25,7 @@ void socket::send(QString message){
     }
 }
 
-void socket::send(Message message){
+void socket::send(Message message) const{
     send(message.getCompleteMessage());
 }
 

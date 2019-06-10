@@ -1,7 +1,17 @@
 #include "message.h"
 
+const QString Message::sepMnemVal = "~";
+const QString Message::mainSepVal = "/";
+const QString Message::sepOrderMnem = ":";
+const QString Message::sepOrderValueMnem = ",";
+
 const QString Message::mnemoRobotOrder = "robord";
 const QString Message::mnemoRobotAck = "roback";
+const QString Message::mnemoAckMove = "moved";
+const QString Message::mnemoAckTurn = "turned";
+const QString Message::mnemoAckError = "order";
+
+
 // Create a Message object from a received string.
 Message::Message(QString receivedMessage)
 {
@@ -51,11 +61,40 @@ QString Message::getCompleteMessage() const{
     }
     return mess;
 }
-
-QString Message::getOrderValue(const QString &order)
+//return the parameters of a robord
+std::vector<int> Message::getOrderValue(const QString &order)
 {
-    int index = order.indexOf(":");
-    return (index != - 1) ? order.mid(index + 1) : QString("");
+    std::vector<int> values = std::vector<int>();
+    int startIndex;
+    int endIndex;
+
+
+    QString currentString = order;
+    startIndex = currentString.indexOf(sepOrderMnem);
+    while(startIndex !=  -1){
+
+        endIndex = order.indexOf(sepOrderValueMnem, startIndex);
+        if(endIndex != -1){
+            values.push_back(currentString.mid(startIndex + 1, endIndex - (startIndex + 1)).toInt());
+            currentString = currentString.mid(endIndex);
+
+        } else{
+            values.push_back(currentString.mid(startIndex + 1).toInt());
+        }
+        startIndex = endIndex;
+     }
+
+    return values;
+}
+
+//parse the parameters of a robord (order:param1,param2)
+QString Message::parseOrderValues(const QString &order, const std::vector<int> &values)
+{
+    QString result = order + sepOrderMnem;
+    for(int value : values){
+        result += QString::number(value) + sepOrderValueMnem;
+    }
+    result = result.right(result.lastIndexOf(sepOrderValueMnem));
 }
 
 

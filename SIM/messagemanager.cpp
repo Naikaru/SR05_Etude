@@ -44,9 +44,17 @@ bool MessageManager::addRobotSocket(int id)
     return true;
 }
 
+void MessageManager::sendMessage(int id, const Message &msg)
+{
+    sockets.at(id)->send(msg);
+    t_displayMessage->setTextColor(Qt::blue);
+    t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" >>  " +  msg.getCompleteMessage()));
+}
+
 void MessageManager::addMessageInDisplay(const Message &msg)
 {
-    t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" : " + msg.getCompleteMessage()));
+    t_displayMessage->setTextColor(Qt::green);
+    t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" << " + msg.getCompleteMessage()));
 }
 
 

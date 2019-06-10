@@ -91,7 +91,7 @@ private :
     unsigned int convert(unsigned int coord, unsigned int dim);
 
 public slots:
-    void handleMessageFromRobot(const std::map<int,Message>& msg);
+    void handleMessageFromRobot(const std::pair<int, Message> &msg);
 
 private slots:
 
