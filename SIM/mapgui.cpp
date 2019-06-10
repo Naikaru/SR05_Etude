@@ -98,9 +98,20 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     this->setLayout(l_mapGui);
 
+
     //Messages
     messageManager = new MessageManager("ROB","PIL", "LCH", this);
     QObject::connect(messageManager, SIGNAL(receivedMessageFromRobot(const std::pair<int,Message>&)), this, SLOT(handleMessageFromRobot(const std::pair<int,Message>&)));
+
+    robotColors = std::map<int, Qt::GlobalColor>();
+
+    bt_test = new QPushButton;
+
+    connect(bt_test, SIGNAL(clicked()), this, SLOT(test()));
+
+    l_mapGui->addWidget(bt_test);
+
+
 
 }
 
@@ -124,8 +135,28 @@ void MapGui::addMessageInDisplay(const QString &msg)
 
 void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &newPosition)
 {
+    qDebug() << "fonction";
+    unsigned int formerX = formerPosition.getX();
+    unsigned int formerY = convert(formerPosition.getY(), dimY);
+
+    unsigned int newX = newPosition.getX();
+    unsigned int newY = convert(newPosition.getY(), dimY);
+
+    if(grid->item(formerY,formerX)->text() == "R")
+    {
+        qDebug() << "yoo :";
+
+        grid->item(newY, newX)->setText("R");
+        grid->item(newY, newX)->setBackgroundColor(grid->item(formerY,formerX)->backgroundColor());
+        grid->item(newY, newX)->setTextColor(grid->item(formerY,formerX)->textColor());
+
+        grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
+        grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
+        grid->item(newY, newX)->setText("");
+    }
 
 }
+
 
 int MapGui::move(int id, int d)
 {
@@ -177,6 +208,7 @@ const Robot &MapGui::join(unsigned int id, int x, int y)
     return map.getRobots().at(id);
 }
 
+
 void MapGui::handleMessageFromRobot(const std::map<int, Message> &msg)
 {
 
@@ -201,21 +233,35 @@ void MapGui::handleMessageFromRobot(const std::map<int, Message> &msg)
     */
 
 }
+unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
+{
+    return dim - coord -1;
+
+}
 
 
 
 void MapGui::initRobot()
 {
-    int x = 1, y = 2, heading = 3, id = 1;
+    int x = 1, y = 4, heading = 3, id = 1;
+    Position pos = Position(x, y);
+    pos = map.getCoordinatesFromPosition(pos);
+    qDebug() << "Pose : " << map.getNbCols() << map.getNbRows();
+    qDebug() << "Pose : " << pos.getX() << pos.getY();
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
-        if(map.addRobot(id, Robot(heading, Position(x, y)))){ //robot was added
+        if(map.addRobot(id, Robot(heading, pos))){ //robot was added
+            robotColors[id] = colorList[robotColors.size()];
+            grid->item(convert(pos.getY(), dimY), pos.getX())->setBackgroundColor(robotColors[id]);
+            grid->item(convert(pos.getY(), dimY), pos.getX())->setTextColor(robotColors[id]);
+            grid->item(convert(pos.getY(), dimY), pos.getX())->setText("R");
 
             listRobotColor->insertColumn(listRobotColor->columnCount());
             listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
             listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextColor("white");
             //listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextAlignment(Qt::AlignCenter);
-            listRobotColor->item(0, listRobotColor->columnCount() - 1)->setBackgroundColor(this->colorList[listRobotColor->columnCount() - 1]);
+            listRobotColor->item(0, listRobotColor->columnCount() - 1)->setBackgroundColor(robotColors[id]);
             listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
+
 
         } else{
             addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") );
@@ -223,9 +269,15 @@ void MapGui::initRobot()
         }
     }else{
         addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
-        map.init(id, x, y, heading);
+        //map.init(id, x, y, heading);
     }
+    map.printMap();
 
+}
+
+void MapGui::test()
+{
+    updateRobotOnGrid(Position(5, 8), Position(2,2));
 }
 
 
@@ -240,23 +292,23 @@ void MapGui::run()
         for(unsigned int y=0; y < this->dimY; ++y){
             if(grid->item(y,x)->text() == "")
             {
-                map.changeState(x,y, CellState::empty);
+                map.changeState(x,convert(y, dimY), CellState::empty);
             }
             else
             {
-                map.changeState(x,y, CellState::full);
+                map.changeState(x,convert(y, dimY), CellState::full);
             }
         }
     }
 
     isRunning = true;
-
     bt_run->setEnabled(false);
     sb_selectMaxH->setEnabled(false);
     sb_selectMaxW->setEnabled(false);
     sb_selectX->setEnabled(false);
     sb_selectY->setEnabled(false);
     map.printMap();
+
 
 }
 
@@ -284,26 +336,61 @@ void MapGui::cellSelection()
 {
     QList<QTableWidgetItem *> itemsSelected = grid->selectedItems();
     for(QTableWidgetItem *cell : itemsSelected){
-        if(cb_selection->isChecked()){
-            if(isRunning)
-            {
-                map.changeState(cell->column(),cell->row(), CellState::full);
-                map.printMap();
-            }
-            cell->setText("_");
-            cell->setBackgroundColor(cellFullColor);
-            cell->setTextColor(cellFullColor);
-        }else{
-            if(isRunning)
-            {
-                map.changeState(cell->column(),cell->row(), CellState::empty);
-                map.printMap();
-            }
-            cell->setText("");
-            cell->setBackgroundColor(cellEmptyColor);
-            cell->setTextColor(cellEmptyColor);
+        if(cell->text()=="R")
+        {
+           std::map<int,Robot> robots = map.getRobots();
+                   for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
+                   {
+                       Position robotPosition = it->second.getPosition();
+                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimX))
+                       {
+
+
+                          qDebug() << map.getRobots().size();
+
+                          if(map.getRobots().size() == 1)
+                          {
+                              qDebug() << "Ici 1 dim";
+                              listRobotColor->removeColumn(0);
+                              listRobotColor->setFixedSize(0*20, 0*20);
+                          }
+                          else{
+                          listRobotColor->removeColumn(it->first);
+                          listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
+                          }
+                          map.deleteRobot(it->first);
+                          cell->setText("");
+                          cell->setBackgroundColor(cellEmptyColor);
+                          cell->setTextColor(cellEmptyColor);
+                       }
+                   }
         }
-        cell->setSelected(false);
+        else
+        {
+
+
+            if(cb_selection->isChecked()){
+
+                if(isRunning)
+                {
+                    map.changeState(cell->column(),convert(cell->row(), dimY), CellState::full);
+                    map.printMap();
+                }
+                cell->setText("_");
+                cell->setBackgroundColor(cellFullColor);
+                cell->setTextColor(cellFullColor);
+            }else{
+                if(isRunning)
+                {
+                    map.changeState(cell->column(),convert(cell->row(), dimY), CellState::empty);
+                    map.printMap();
+                }
+                cell->setText("");
+                cell->setBackgroundColor(cellEmptyColor);
+                cell->setTextColor(cellEmptyColor);
+            }
+            cell->setSelected(false);
+        }
     }
 }
 

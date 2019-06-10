@@ -16,6 +16,13 @@ bool Map::addRobot(int id, const Robot &newRobot)
     return false;
 }
 
+bool Map::deleteRobot(int id)
+{
+    Robot robotToDelete = robots.at(id);
+    this->changeState(robotToDelete.getPosition().getX(), robotToDelete.getPosition().getY(), CellState::empty);
+    robots.erase(id);
+}
+
 
 
 unsigned int Map::getNbRows() const
@@ -275,7 +282,7 @@ void Map::printMap(){
 
             for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
             {
-                robotPosition = this->getCoordinatesFromPosition(it->second.getPosition());
+                robotPosition = it->second.getPosition();
                 if(robotPosition.getX() == x && robotPosition.getY() == y)
                 {
                     isRobot = true;

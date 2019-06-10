@@ -28,8 +28,8 @@ class MapGui : QWidget
 
     QTableWidget* grid;
 
-    unsigned int dimX = 50; //nb de lignes
-    unsigned int dimY = 50; //nb de colonne
+    unsigned int dimX = 10; //nb de lignes
+    unsigned int dimY = 10; //nb de colonne
     unsigned int maxW = 500;
     unsigned int maxH = 500;
     unsigned int width = 400;     //largeur
@@ -41,8 +41,8 @@ class MapGui : QWidget
 
 
 
-    Qt::GlobalColor colorList[6] {Qt::black, Qt::blue, Qt::red, Qt::green, Qt::yellow,Qt::magenta};
-    std::map<int, QColor> robotColors;
+    Qt::GlobalColor colorList[6] {Qt::blue, Qt::red, Qt::green, Qt::yellow, Qt::magenta, Qt::black};
+    std::map<int, Qt::GlobalColor> robotColors;
 
     QPushButton * bt_run;
 
@@ -59,8 +59,11 @@ class MapGui : QWidget
 
     QTextEdit * t_display;
 
+
     //MessageManager
-    MessageManager           * messageManager;
+    MessageManager  * messageManager;
+
+    QPushButton * bt_test;
 
 public:
     MapGui(QWidget *parent);
@@ -73,27 +76,27 @@ public:
     void setWalls();
 
     void addMessageInDisplay(const QString& msg);
+
+
     void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
 
     int move(int id, int d);
     int turn(unsigned int id, int angle);
     const Robot& curr(unsigned int id);
     const Robot&join(unsigned int id, int x, int y );
+    void addRobot(int x, int y, unsigned int heading, unsigned int id);
+
+
+private :
+    unsigned int convert(unsigned int coord, unsigned int dim);
 
 public slots:
     void handleMessageFromRobot(const std::map<int,Message>& msg);
+
 private slots:
 
     void run();
 
-    void addRobot(){
-
-        listRobotColor->setColumnCount(listRobotColor->columnCount() + 1);
-        listRobotColor->setFixedSize(listRobotColor->columnCount() * 40 ,40);
-
-
-
-    }
     void cellActivation(const QModelIndex& index);
     void cellSelection();
 
@@ -102,6 +105,8 @@ private slots:
     void synchronizeMaxW(int newMax);
     void synchronizeMaxH(int newMax);
     void initRobot();
+
+    void test();
 };
 
 #endif // MAPGUI_H

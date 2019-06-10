@@ -47,6 +47,7 @@ private:
         //getter and setter
         const std::map<int, Robot>& getRobots() const;
         bool addRobot(int id, const Robot& newRobot);
+        bool deleteRobot(int id);
 
         unsigned int getNbRows() const;
         void setNbRows(unsigned int value);
