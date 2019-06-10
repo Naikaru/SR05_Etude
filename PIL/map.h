@@ -2,6 +2,7 @@
 #define MAP_H
 
 #include <QtWidgets>
+#include <QDebug>
 #include <algorithm>
 #include <unistd.h>
 #include <fcntl.h>
@@ -65,8 +66,13 @@ class Map : public QWidget {
     unsigned int height;    //hauteur
     unsigned int dCell;     //hauteur et largeur d'une cellule
 
+    unsigned int nbRobots;
+
     std::vector<QString> colors;    //défini les couleurs que peuvent prendre les robots sur la map
     std::map<int, Robot> robots;    // défini pour chaque robot sa position (x, y) et son angle heading, dans cet ordre
+    std::map<unsigned int, unsigned int> nbActionsRobot;    // nb of actions of robots
+
+    QString bufferPayloadMnemo = "@buffer";
 
     QTableWidget* map;
     QGridLayout* legend;
@@ -74,7 +80,7 @@ class Map : public QWidget {
 
 public :
 
-    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50,QWidget* parent = NULL);
+    Map(unsigned int nbR = 1, unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
 
     //initialise la map avec les dimensions du constructeur.
     void init();
@@ -116,10 +122,18 @@ private:
      */
     void setFrontier(int x,int y);
     /*
+     * x, y représente une case qui doit être définie comme obstacle
+     */
+    void setObstacle(int x, int y);
+    /*
      *                                                               y ^
      * Converti les coordonnées pour un affichage comme dans un repère |__> x
      */
     void convert(int* x, int* y);
+
+
+    void applyBufferForRobot(unsigned int, QVector<QStringList>);
+    void applyAction(int, QStringList);
 };
 
 

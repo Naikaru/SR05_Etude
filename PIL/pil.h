@@ -11,6 +11,7 @@
 #include <QTextEdit>
 #include <QSpinBox>
 #include <QtTest/QtTest>
+#include <QDebug>
 
 #include <QSocketNotifier>
 #include "map.h"
@@ -24,6 +25,10 @@ enum Options {
     OP_x,
     OP_y,
     OP_remote
+};
+
+enum Actions {
+    AC_buffer = 0,
 };
 
 /*
@@ -47,11 +52,15 @@ class Pil: public QWidget {
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
 
-        QString bufferPayload = "@buffer";
+        QString bufferToNetPayload = "@buffertonet";
+        QString bufferFromNetPayload = "@bufferfromnet";
+        QString bufferToApply = "@buffer";
 
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
         unsigned int ident; // ident of the robot (unique)
+
+        unsigned int nbActions = 1;
 
         unsigned int nbRobot;   //number of robots
         int xInit;              //initial pos of the robot
@@ -95,9 +104,9 @@ class Pil: public QWidget {
 
         bool reading_writing = false;
 
-        const unsigned int MAX_BUFFER = 100;
+        const unsigned int MAX_BUFFER = 20;
 
-        QVector<QPair<QString, QString>> buffer;
+        QVector<QStringList> buffer;
         // sequence of instructions
         Map* map = nullptr;
         // local map of the environment
@@ -110,16 +119,19 @@ class Pil: public QWidget {
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
 
+        QPair<unsigned, unsigned> chooseFrontier();
+        QVector<QStringList> parseBuffer(QString payload);
+
     public:
+        void applyBufferFromMessage(QString);
         Pil(int argc, char* argv[]);
         ~Pil();
         QString parseMessage(QString mnemo, QString message); //return the value linked to a mnemonic, "" if no mnemonic find in the message
         void enableSnapshot();
 
-        QVector<QPair<QString, QString>> getBuffer() {return buffer; }
-        void addMovementInBuffer(QString, QString);
+        QVector<QStringList> getBuffer() {return buffer; }
+        void addMovementInBuffer(unsigned int, QString, QString);
         void sendBufferToNet();
-        QPair<unsigned, unsigned> chooseFrontier();
 
     protected slots:
         void sendMessage();

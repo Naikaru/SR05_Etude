@@ -1,8 +1,12 @@
 #include "map.h"
 
 
-Map::Map(unsigned int w,unsigned int h,unsigned int c,unsigned int l,QWidget* parent ): QWidget(parent),width(w),height(h),nbC(c),nbL(l)
+Map::Map(unsigned int nbR, unsigned int w,unsigned int h,unsigned int c,unsigned int l, QWidget* parent ):
+    QWidget(parent),width(w),height(h),nbC(c),nbL(l), nbRobots(nbR)
 {
+    for (unsigned int i = 0; i < nbRobots; i++) {
+        nbActionsRobot[i] = 0;
+    }
     map = new QTableWidget();
     init();
 
@@ -120,6 +124,8 @@ void Map::move(int id,int d)
         map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
         setFrontier(robots[id].x,robots[id].y);
     }
+    nbActionsRobot[id]++;
+
     return;
 }
 
@@ -146,6 +152,18 @@ void Map::setFrontier(int x,int y)
     }
 }
 
+void Map::setObstacle(int x, int y) {
+    x = x % nbL;
+    y = y % nbC;
+    if (x < 0)
+        x += nbL;
+    if (y < 0)
+        y += nbC;
+    // Mise à jour de la carte avec les bons indices
+//    qDebug() << "setobstacle, x=" << x << "y=" << y;
+    map->item(x,y)->setBackgroundColor(OBSTA);
+}
+
 void Map::convert(int* x, int* y)
 {
     int tmp =*y;
@@ -153,4 +171,62 @@ void Map::convert(int* x, int* y)
     *x = (nbL-1-tmp);
 }
 
+
+// Buffer functions
+
+void Map::applyAction(int r, QStringList action){
+//    qDebug() << "applyAction";
+    unsigned int numAction = action[0].toUInt();
+    QString movement = action[1];
+    QString destination = action[2];
+    int realDestination = destination.split(",").first().toInt();
+    int expectedDestination = destination.split(",").last().toInt();
+    if (movement == "move") {
+        // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination;
+        move(r, realDestination);
+        if (realDestination != expectedDestination) {
+            // qDebug() << "robot: x=" << robots[r].x << "y=" << robots[r].y;
+            // ajout d'un obstacle car on a pas atteint la destination souhaitée
+            if(robots[r].heading == 180 ) {
+                // obstacle vers la gauche
+                setObstacle(robots[r].x, robots[r].y - 1);
+            } else if(robots[r].heading == 0) {
+                // obstacle vers la droite
+                setObstacle(robots[r].x, robots[r].y + 1);
+            } else if (robots[r].heading == 90) {
+                // obstacle au dessus
+                setObstacle(robots[r].x + 1, robots[r].y);
+            } else if (robots[r].heading == 270) {
+                // obstacle en dessous
+                setObstacle(robots[r].x - 1, robots[r].y);
+            }
+        }
+    } else if (movement == "turn") {
+        // qDebug() << "turn";
+        turn(r, realDestination);
+    }
+    nbActionsRobot[r] = numAction;
+    // qDebug() << "maj action" << nbActionsRobot[r];
+}
+
+
+void Map::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
+    unsigned int nbActions = nbActionsRobot[r];
+    // qDebug() << "robot number" << r;
+    // qDebug() << "action number" << buffer.first()[0];
+
+    QVector<QStringList>::iterator it = buffer.begin();
+    while ((*it)[0].toUInt() < nbActions && it != buffer.end()) {
+        // qDebug() << "action number" << (*it)[0];
+        it++;
+    }
+
+    // qDebug() << "fin 1er while";
+
+    // On est arrivé aux actions à appliquer pour le robot
+    while (it != buffer.end()) {
+        applyAction(r, (*it));
+        it++;
+    }
+}
 

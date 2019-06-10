@@ -10,7 +10,15 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     nseq = 0;
     init = false;
 
+//    // TODO: changer pour récupérer depuis lancement appli
+//    unsigned int nbRobots = 5;
+//    map = new Map(nbRobots);
     map = new Map();
+
+//    // to test
+//    for (unsigned int i = 0; i < nbRobots; i++) {
+//        map->initRobot(i, i, 0, 0);
+//    }
 
     // Top bar with 2 buttons: Envoyer - Quitter
     button_area = new QHBoxLayout();
@@ -96,6 +104,14 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 
     initialization(argc,argv);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
+
+//    // to test
+//    map->move(0,5);
+//    map->turn(0,270);
+//    map->move(0,5);
+//    map->turn(0,90);
+//    map->move(0,5);
+    map->show();
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
@@ -217,16 +233,18 @@ void Pil::readStdin() {
     do {
         std::getline(std::cin, message);
         if (parseMessage(appnetMnemo, QString::fromStdString(message)) == "") {
-            /* if (parseMessage(payloadMnemo, QString::fromStdString(message)) == action ){
-               fonction();
+            QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
+            if (payload.startsWith(bufferToApply)){
+                applyBufferFromMessage(QString::fromStdString(message));
             }
-            */
-           // Recepted message is for a BAS app
-           reception_fullmessage->setText(QString::fromStdString(message));
-           reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
-           reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
-           reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
-           reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
+            else {
+                // Recepted message is for a BAS app
+                reception_fullmessage->setText(QString::fromStdString(message));
+                reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
+                reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
+                reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
+                reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
+            }
         }
 
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
@@ -245,26 +263,32 @@ void Pil::parseMessage() {
     parse_value->setText(parseMessage(mnemo,message));
 }
 
-void Pil::addMovementInBuffer(QString movement, QString distance) {
+void Pil::addMovementInBuffer(unsigned int nbAction, QString movement, QString distance) {
     if (buffer.length() >= MAX_BUFFER) {
-        buffer.pop_back();
+        buffer.pop_front();
     }
+    // nbAction = nb of actions of robot : compteur local à chaque robot
     // movement = action ("move", "turn")
         // movement format: move
     // distance = real distance, expected distance (to see if there is an obstacle)
         // distance format: 10,10
-    // format final: move:10,10
-    buffer.push_front(QPair<QString, QString>(movement, distance));
+    // format final: nbAction:move:10,10
+    QStringList line;
+    line.append(QString::number(nbAction));
+    line.append(movement);
+    line.append(distance);
+    buffer.push_back(line);
 }
 
 void Pil::sendBufferToNet() {
-    QString payload = bufferPayload;
-    QVector<QPair<QString, QString>> buf = getBuffer();
+    QString payload = bufferToNetPayload;
+    QVector<QStringList> buf = getBuffer();
 
-    for (QVector<QPair<QString, QString>>::iterator it = buf.begin(); it != buf.end(); it++) {
-        payload += "|" + it->first + ":" + it->second;
+    for (QVector<QStringList>::iterator it = buf.begin(); it != buf.end(); it++) {
+        payload += "|" + (*it)[0] + ":" + (*it)[1] + ":" + (*it)[2];
     }
-
+    // payload format:
+    // @buffertonet|10:move:10,10|12:turn:90,90
     sendBuffer(payload);
 }
 
@@ -282,7 +306,7 @@ QPair<unsigned, unsigned> Pil::chooseFrontier(){
         frontier.m_yp = -1;
 
         // Liste containing element of the path
-        std::list<Cellule*> path = aStar(closedList, map, &begin, &frontier);
+        //std::list<Cellule*> path = aStar(closedList, map, &begin, &frontier);
         if(first) {
             minDist = closedList.size();
             first = false;
@@ -292,5 +316,34 @@ QPair<unsigned, unsigned> Pil::chooseFrontier(){
                 minDist = closedList.size();
             }
         }
+    }
+}
+
+QVector<QStringList> Pil::parseBuffer(QString payload) {
+    // message: @buffer|1:move:10,10|turn:90,90
+    QVector<QStringList> vector;
+    QStringList parse = payload.split("|", QString::SkipEmptyParts);
+
+    for (QString action: parse) {
+        QStringList line;
+        if (action != bufferToApply) {
+            QStringList param = action.split(":");
+            for (QString p: param) {
+                line.append(p);
+            }
+            vector.push_back(line);
+        }
+    }
+    return vector;
+}
+
+void Pil::applyBufferFromMessage(QString message){
+    QString identRobot = parseMessage(senderMnemo, message);
+    QString payload = parseMessage(payloadMnemo, message);
+    if (identRobot < nbRobot) {
+    //    qDebug() << "identRobot" << identRobot << " payload = " << payload;
+        QVector<QStringList> buffer = parseBuffer(payload);
+    //    qDebug() << "length vector buffer" << buffer.length();
+        map->applyBufferForRobot(identRobot.toUInt(), buffer);
     }
 }
