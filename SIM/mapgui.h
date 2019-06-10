@@ -12,6 +12,9 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QLabel>
+#include <QTextEdit>
+#include <QDateTime>
 class MapGui : QWidget
 {
 
@@ -24,8 +27,8 @@ class MapGui : QWidget
 
     QTableWidget* grid;
 
-    unsigned int dimX = 10; //nb de lignes
-    unsigned int dimY = 10; //nb de colonne
+    unsigned int dimX = 50; //nb de lignes
+    unsigned int dimY = 50; //nb de colonne
     unsigned int maxW = 500;
     unsigned int maxH = 500;
     unsigned int width = 400;     //largeur
@@ -37,7 +40,7 @@ class MapGui : QWidget
 
 
 
-    QColor colorList[3] {Qt::black, Qt::blue, Qt::red};
+    Qt::GlobalColor colorList[6] {Qt::black, Qt::blue, Qt::red, Qt::green, Qt::yellow,Qt::magenta};
     std::map<int, QColor> robotColors;
 
     QPushButton * bt_run;
@@ -49,12 +52,11 @@ class MapGui : QWidget
     QSpinBox *sb_selectMaxH;
     QCheckBox * cb_selection;
 
-
-
     QHBoxLayout * l_addRobot;
     QTableWidget * listRobotColor;
-    QTableWidget* listRobotId;
     QPushButton * b_addRobot;
+
+    QTextEdit * t_display;
 
 
 public:
@@ -67,6 +69,15 @@ public:
 
     void setWalls();
 
+    void addMessageInDisplay(const QString& msg);
+    void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
+
+    int move(int id, int d);
+    int turn(unsigned int id, int angle);
+    const Robot& curr(unsigned int id);
+    const Robot&join(unsigned int id, int x, int y );
+
+
 private slots:
 
     void run();
@@ -77,8 +88,6 @@ private slots:
         listRobotColor->setFixedSize(listRobotColor->columnCount() * 40 ,40);
 
 
-        listRobotId->setColumnCount(listRobotId->columnCount() + 1);
-        listRobotId->setFixedSize(listRobotId->columnCount() * 40, 40);
 
     }
     void cellActivation(const QModelIndex& index);
@@ -88,7 +97,7 @@ private slots:
     void synchronizeDimY(int newDim);
     void synchronizeMaxW(int newMax);
     void synchronizeMaxH(int newMax);
-
+    void initRobot();
 };
 
 #endif // MAPGUI_H

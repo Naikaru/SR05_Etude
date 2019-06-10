@@ -1,7 +1,7 @@
 #include "map.h"
 
 
-
+//return true if a robot was added
 bool Map::addRobot(int id, const Robot &newRobot)
 {
     if(robots.size() < nbRobotMax)
@@ -144,6 +144,7 @@ int Map::turn(unsigned int id, int angle){
 
 void Map::init(unsigned int id, int x, int y, int heading){
     Robot& robotToChange = robots[id];
+
     robotToChange.setPosition(Position(x,y));
     robotToChange.setHeading(heading);
 }
