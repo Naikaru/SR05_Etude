@@ -107,7 +107,7 @@ public :
 
     unsigned int get_nbL() { return nbL; }
     unsigned int get_nbC() { return nbC; }
-    unsigned int get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
+    QColor get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
 private:
 
     /*

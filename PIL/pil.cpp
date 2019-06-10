@@ -1,5 +1,4 @@
 #include "pil.h"
-#include "astar.h"
 
 
 // ###################### Constructor #########################
@@ -283,13 +282,13 @@ QPair<unsigned, unsigned> Pil::chooseFrontier(){
         frontier.m_yp = -1;
 
         // Liste containing element of the path
-        Cellule* path = aStar(closedList, map, &begin, &frontier);
+        std::list<Cellule*> path = aStar(closedList, map, &begin, &frontier);
         if(first) {
             minDist = closedList.size();
             first = false;
         } else {
             if (closedList.size() < minDist) {
-                chosenFrontier = QPair(it->first, it->second);
+                chosenFrontier = QPair<unsigned int, unsigned int>(it->first, it->second);
                 minDist = closedList.size();
             }
         }

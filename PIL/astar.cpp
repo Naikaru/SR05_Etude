@@ -55,10 +55,10 @@ Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y)
     return NULL;
 }
 
-void add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
+std::list<Cellule*>& add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
                     Map* map){
-    int x = cell->m_x;
-    int y = cell->m_y;
+    int x = cell->get_x();
+    int y = cell->get_y();
     // Access to element (x,y)
 
     // right neighbour:
@@ -116,7 +116,7 @@ Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellul
         }
         else{
           // ajout des voisins
-          openList = add_neighbours(openList, closedList, cell, end, map);
+          openList = add_neighbours(openList, closedList, cell, openList.back()/*end*/, map); //attention, modif du end par openList.back()??
         }
     }
     // End of loop : no path to reach end

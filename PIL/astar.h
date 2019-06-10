@@ -31,7 +31,7 @@ int estimation_heuristique(unsigned int x1, unsigned int y1, unsigned int x2, un
 void add_cell(std::list<Cellule*>& alist, Cellule* cell);
 void remove_cell(std::list<Cellule*>& alist, Cellule* cell);
 Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
-void add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
+std::list<Cellule*>& add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
                     Map* map);
 std::list<Cellule*> aStar(std::list<Cellule*> closedList, Map* map, Cellule* begin, Cellule* frontier);
 

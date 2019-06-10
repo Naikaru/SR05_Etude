@@ -14,6 +14,7 @@
 
 #include <QSocketNotifier>
 #include "map.h"
+#include "astar.h"
 
 enum Options {
     OP_wrong = 0,
@@ -118,6 +119,7 @@ class Pil: public QWidget {
         QVector<QPair<QString, QString>> getBuffer() {return buffer; }
         void addMovementInBuffer(QString, QString);
         void sendBufferToNet();
+        QPair<unsigned, unsigned> chooseFrontier();
 
     protected slots:
         void sendMessage();
