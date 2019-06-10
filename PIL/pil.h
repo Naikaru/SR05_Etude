@@ -56,13 +56,13 @@ class Pil: public QWidget {
 
         unsigned int nseq;  // number of message sent localy
         bool init;          // boolean to know if the ident initialization has been done
-        unsigned int ident; // ident of the robot (unique)
+        unsigned int ident=0; // ident of the robot (unique)
 
         unsigned int nbActions = 1;
 
         unsigned int nbRobot;   //number of robots
-        int xInit;              //initial pos of the robot
-        int yInit;
+        int xInit=0;              //initial pos of the robot
+        int yInit=0;
 
         QVBoxLayout* main; // Window
 
@@ -119,7 +119,7 @@ class Pil: public QWidget {
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
 
-        QPair<unsigned int, unsigned int> chooseFrontier();
+        QPair<unsigned int, unsigned int> chooseFrontier(std::list<Cellule*> closedList);
         QVector<QStringList> parseBuffer(QString payload);
 
         bool robotsTooFar(Pos, Pos);
