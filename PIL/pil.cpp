@@ -102,17 +102,38 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
-    initialization(argc,argv);
+    //initialization(argc,argv);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
 
-//    // to test
-//    map->move(0,5);
-//    map->turn(0,270);
-//    map->move(0,5);
-//    map->turn(0,90);
-//    map->move(0,5);
-    map->show();
+    // to test
     map->initRobot(ident,xInit,yInit,0);
+    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
+    map->move(0,5);
+    map->turn(0,90);
+    map->move(0,5);
+    map->turn(0,-90);
+    map->move(0,5);
+    map->show();
+
+    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
+    std::list<Cellule*> closedList;
+    Cellule begin(map->robots[ident].x, map->robots[ident].y);
+    Cellule frontier(49,0);
+    Cellule* path;
+    frontier.m_cost = 0;
+    frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, 49, 0);
+    frontier.m_xp = -1;
+    frontier.m_yp = -1;
+    path = aStar(closedList, map, &begin, &frontier);
+    if(path != NULL){
+        qDebug() << "\nPoint de depart du chemin : (" << path->m_x << "," << path->m_y << ")";
+        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
+            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
+            path = lookfor_cell(closedList, path->m_xp, path->m_yp);
+        }
+    }
+
+
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
@@ -293,11 +314,10 @@ void Pil::sendBufferToNet() {
     sendBuffer(payload);
 }
 
-QPair<unsigned int, unsigned int> Pil::chooseFrontier() {
+QPair<unsigned int, unsigned int> Pil::chooseFrontier(std::list<Cellule*> closedList) {
     bool first = true;
     unsigned int minDist;
     Cellule* path;
-    std::list<Cellule*> closedList;
     QPair<unsigned int, unsigned int> chosenFrontier;
     for(QVector<QPair<unsigned int, unsigned int>>::iterator it=frontiers.begin(); it!=frontiers.end(); ++it) {
         Cellule begin(map->robots[ident].x, map->robots[ident].y);

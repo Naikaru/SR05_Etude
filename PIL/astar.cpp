@@ -55,45 +55,42 @@ Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y)
     return NULL;
 }
 
-std::list<Cellule*>& add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
+void add_neighbours(std::list<Cellule*>& openList, std::list<Cellule*>& closedList, Cellule* cell, Cellule* last,
                     Map* map){
     int x = cell->get_x();
     int y = cell->get_y();
     // Access to element (x,y)
+    std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
 
     // right neighbour:
-    if(x+1 < map->get_nbL() && map->get_cell(x+1,y) != OBSTA
+    if(x+1 < map->get_nbL() && (map->get_cell(x+1,y) == EXPLO || map->get_cell(x+1,y) == map->get_color(0))
             && (lookfor_cell(closedList, x+1, y) == NULL)
             && (lookfor_cell(openList, x+1, y) == NULL)){
         //printf("\nAjout droit");
-        Cellule newCell(x+1, y, 1, cell, last);
-        add_cell(openList, &newCell);
+        add_cell(openList, new Cellule(x+1, y, 1, cell, last));
     }
 
     // voisin gauche :
-    if(x-1 >= 0 && map->get_cell(x-1,y) != OBSTA
+    if(x > 0 && (map->get_cell(x-1,y) == EXPLO || map->get_cell(x-1,y) == map->get_color(0))
             && (lookfor_cell(closedList, x-1, y) == NULL)
             && (lookfor_cell(openList, x-1, y) == NULL)){
-        Cellule newCell(x-1, y, 1, cell, last);
-        add_cell(openList, &newCell);
+        add_cell(openList, new Cellule(x-1, y, 1, cell, last));
     }
 
     // voisin haut :
-    if(y+1 < map->get_nbC() && map->get_cell(x,y+1) != OBSTA
+    if(y+1 < map->get_nbC() && (map->get_cell(x,y+1) == EXPLO || map->get_cell(x,y+1) == map->get_color(0))
             && (lookfor_cell(closedList, x, y+1) == NULL)
             && (lookfor_cell(openList, x, y+1) == NULL)){
-        Cellule newCell(x, y+1, 1, cell, last);
-        add_cell(openList, &newCell);
+        add_cell(openList, new Cellule(x, y+1, 1, cell, last));
     }
 
     // voisin bas :
-    if(y-1 >= 0 && map->get_cell(x,y-1) != OBSTA
+    if(y > 0 && (map->get_cell(x,y-1) == EXPLO || map->get_cell(x,y-1) == map->get_color(0))
             && (lookfor_cell(closedList, x, y-1) == NULL)
             && (lookfor_cell(openList, x, y-1) == NULL)){
-        Cellule newCell(x, y-1, 1, cell, last);
-        add_cell(openList, &newCell);
+        add_cell(openList, new Cellule(x, y-1, 1, cell, last));
     }
-    return openList;
+    return;
 }
 
 
@@ -103,24 +100,31 @@ Cellule* aStar(std::list<Cellule*>& closedList, Map* map, Cellule* begin, Cellul
 
     std::list<Cellule*> openList;
     openList.push_front(frontier);
+    Cellule* cell;
 
     while(openList.empty() == false){
         // Récupération du plus petit element (donc la tete)
-        Cellule* cell = openList.front();
+        cell = openList.front();
         closedList.push_front(cell);
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'
         if((cell->get_x() == begin->get_x()) && (cell->get_y() == begin->get_y())){
+            for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
+                delete (*it);
             return cell;
             // Pareil que begin mais avec xp et yp mis à jour
         }
         else{
           // ajout des voisins
-          openList = add_neighbours(openList, closedList, cell, openList.back()/*end*/, map); //attention, modif du end par openList.back()??
+          add_neighbours(openList, closedList, cell, begin/*end*/, map); //attention, modif du end par openList.back()??
         }
     }
     // End of loop : no path to reach end
     std::cout << std::endl << "*** Pas de chemin possible ***" << std::endl;
+
+    for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
+        delete (*it);
+
     return NULL;
 }
 

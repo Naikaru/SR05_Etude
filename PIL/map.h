@@ -106,9 +106,9 @@ public :
      */
     void turn(int id,int angle)
     {
-        if(angle <0)
-            angle = 360 - angle;
-        robots[id].heading = (robots[id].heading +angle)%360;
+        if(angle < 0)
+            angle = 360 + angle;
+        robots[id].heading = (robots[id].heading + angle)%360;
     }
 
     unsigned int get_nbL() { return nbL; }
@@ -116,6 +116,7 @@ public :
     unsigned int get_nbC() { return nbC; }
 
     QColor get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
+    QColor get_color(unsigned int id) { return robots[id].color; }
 
 private:
 
