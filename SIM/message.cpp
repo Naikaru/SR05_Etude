@@ -1,5 +1,7 @@
 #include "message.h"
 
+const QString Message::mnemoRobotOrder = "robord";
+const QString Message::mnemoRobotAck = "roback";
 // Create a Message object from a received string.
 Message::Message(QString receivedMessage)
 {
@@ -38,16 +40,22 @@ void Message::parseMessage(QString message){
 void Message::setValue(QString mnemo, QString value){
     couples.insert(mnemo,value);
 }
-QString Message::getValue(QString mnemo){
+QString Message::getValue(QString mnemo) const{
     return couples.value(mnemo);
 }
 
-QString Message::getCompleteMessage(){
+QString Message::getCompleteMessage() const{
     QString mess = APP+WHO+WHE;
     for (auto key : couples.keys()){
         mess += mainSepVal + key + sepMnemVal + couples.value(key);
     }
     return mess;
+}
+
+QString Message::getOrderValue(const QString &order)
+{
+    int index = order.indexOf(":");
+    return (index != - 1) ? order.mid(index + 1) : QString("");
 }
 
 

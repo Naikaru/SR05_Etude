@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "map.h"
+#include "messagemanager.h"
 #include <QColor>
 #include <QGridLayout>
 #include <QPushButton>
@@ -58,6 +59,8 @@ class MapGui : QWidget
 
     QTextEdit * t_display;
 
+    //MessageManager
+    MessageManager           * messageManager;
 
 public:
     MapGui(QWidget *parent);
@@ -77,7 +80,8 @@ public:
     const Robot& curr(unsigned int id);
     const Robot&join(unsigned int id, int x, int y );
 
-
+public slots:
+    void handleMessageFromRobot(const std::map<int,Message>& msg);
 private slots:
 
     void run();

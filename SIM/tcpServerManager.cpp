@@ -1,6 +1,13 @@
 #include "tcpServerManager.h"
-socket::socket(QHostAddress address, int port = 4646):server()
+int socket::getRobotId() const
 {
+    return robotId;
+}
+
+socket::socket(QHostAddress address , int port):server()
+{
+    robotId = address.toString().left(1).toInt();
+
     if (server.listen(address, port)){
         qDebug() << QString("Server listening on ")+address.toString()+":"+QString(std::to_string(port).c_str());
     } else {
@@ -54,7 +61,8 @@ void socket::handleMessage()
                 break;
             }
         } else {
-            sock->write("Received your message\n");
+            qDebug() << "Envoie au manager";
+            emit recievedMessage(Message(message));
         }
     }
 }

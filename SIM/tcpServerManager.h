@@ -19,13 +19,21 @@ const QString handshakeMessages[4] = {QString("^ ~ app beglch begair endlch enda
                                       QString("^app~PIL"),
                                       QString("ROB"),
                                       QString("^begair~PIL")};
+
+int robotId;
 public:
-    socket(QHostAddress address, int port);
+    socket(QHostAddress address, int port = 4646);
     void send(QString message);
     void send(Message message);
+    int getRobotId() const;
+
 private slots:
     void handleConnect();
     void handleMessage();
+signals :
+    void recievedMessage(const Message& message);
+
+
 };
 
 #endif // SOCKET_H

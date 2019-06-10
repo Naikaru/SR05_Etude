@@ -12,6 +12,8 @@ class Message
 private:
     const QString sepMnemVal = "~";
     const QString mainSepVal = "/";
+    const QString sepOrderMnem = ":";
+
     //Sending APP
     QString APP;
     //Receiving app
@@ -28,13 +30,17 @@ private:
 public:
 
     void setValue(QString mnemo, QString value);
-    QString getValue(QString mnemo);
+    QString getValue(QString mnemo) const;
     Message(QString receivedMessage);
     Message(QString _APP, QString _WHO, QString _WHE);
     QString getWHO(){return WHO;}
     QString getWHE(){return WHE;}
     QString getAPP(){return APP;}
-    QString getCompleteMessage();
+    QString getCompleteMessage() const;
+
+    static const QString mnemoRobotOrder;
+    static const QString mnemoRobotAck;
+    static QString getOrderValue(const QString& order);
 
 };
 

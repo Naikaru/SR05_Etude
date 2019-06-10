@@ -98,6 +98,9 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     this->setLayout(l_mapGui);
 
+    //Messages
+    messageManager = new MessageManager("ROB","PIL", "LCH", this);
+    QObject::connect(messageManager, SIGNAL(receivedMessageFromRobot(const std::pair<int,Message>&)), this, SLOT(handleMessageFromRobot(const std::pair<int,Message>&)));
 
 }
 
@@ -172,6 +175,31 @@ const Robot &MapGui::join(unsigned int id, int x, int y)
     Position newPosition = map.getRobots().at(id).getPosition();
     updateRobotOnGrid(robotBeforeMove, newPosition);
     return map.getRobots().at(id);
+}
+
+void MapGui::handleMessageFromRobot(const std::map<int, Message> &msg)
+{
+
+    Message ackMessage = messageManager->createMessage();
+
+    //QString order = msg.getValue(Message::mnemoRobotOrder);
+/*
+    if(order.startsWith("move")) {
+        int distanceToTravel = Message::getOrderValue(order).toInt();
+        //appel move
+        ackMessage.setValue(Message::mnemoRobotAck, messageManager->mnemoAckMove + QString(":") + QString::number(distanceToTravel));
+    }
+    else if(order.startsWith("turn")){
+        int angleToTurn = Message::getOrderValue(order).toInt();
+        //appel turn
+        ackMessage.setValue(Message::mnemoRobotAck, messageManager->menmoAckTurn + QString(":") + QString::number(angleToTurn));
+    }
+    else{
+        //ordre non reconnu
+        ackMessage.setValue(Message::mnemoRobotAck, messageManager->mnemoAckError + QString(":ignoredbadarg"));
+    }
+    */
+
 }
 
 

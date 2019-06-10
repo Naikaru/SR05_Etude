@@ -13,7 +13,8 @@ HEADERS += \
     message.h \
     mathhelper.h \
     simgui.h \
-    mapgui.h
+    mapgui.h \
+    messagemanager.h
 
 SOURCES += \
     map.cpp \
@@ -24,4 +25,5 @@ SOURCES += \
     message.cpp \
     mathhelper.cpp \
     simgui.cpp \
-    mapgui.cpp
+    mapgui.cpp \
+    messagemanager.cpp
