@@ -109,8 +109,10 @@ class Pil: public QWidget {
         QVector<QStringList> buffer;
         // sequence of instructions
         Map* map = nullptr;
+
         // local map of the environment
         QVector<QPair<unsigned int, unsigned int>> frontiers;
+
         // list of frontiers coords
 
         // Functions

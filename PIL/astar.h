@@ -38,7 +38,14 @@ private:
     Cellule* end;
     Map* map;
     unsigned int ident;
+
 public:
+    AStar(){
+        begin=nullptr;
+        end=nullptr;
+        map=nullptr;
+        ident =0;
+    }
     AStar(Cellule* b, Cellule* e, unsigned int id, Map* m);
     ~AStar() {}
 
@@ -48,6 +55,14 @@ public:
     Cellule* aStar();
     unsigned int get_cost();
     QString get_path() {}
+
+    void init(Cellule* b, Cellule* e, unsigned int id, Map* m){
+        begin=b;
+        end=e;
+        map=m;
+        ident =id;
+    }
+
 };
 
 #endif // CELLULE_H

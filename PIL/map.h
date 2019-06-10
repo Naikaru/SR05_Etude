@@ -104,9 +104,12 @@ public :
      */
     void turn(int id,int angle)
     {
-        if(angle < 0)
-            angle = 360 + angle;
-        robots[id].heading = (robots[id].heading + angle)%360;
+        if(robots.find(id) != robots.end())
+        {
+            if(angle <0)
+                angle = 360 + angle;
+            robots[id].heading = (robots[id].heading +angle)%360;
+        }
     }
 
     unsigned int get_nbL() { return nbL; }
