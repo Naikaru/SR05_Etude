@@ -54,7 +54,7 @@ void socket::handleMessage()
                 break;
             }
         } else {
-            sock->write("Received your message\n");
+            emit receivedMessage(Message(message));
         }
     }
 }

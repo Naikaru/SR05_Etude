@@ -23,6 +23,9 @@ public:
     socket(QHostAddress address, int port);
     void send(QString message);
     void send(Message message);
+
+signals:
+    void receivedMessage(Message message);
 private slots:
     void handleConnect();
     void handleMessage();
