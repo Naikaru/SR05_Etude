@@ -35,14 +35,17 @@ void MessageManager::handleMessage(const Message &msg)
 
 bool MessageManager::addRobotSocket(QString adress)
 {
-    int id = adress.right(adress.size() - 1).toInt();
+
+    int id = adress.right(1).toInt();
     if(sockets.find(id) != sockets.end())
         return false;
 
     //QString address = QString("127.0.0.") + QString::number(id);
-    sockets.insert(std::pair<int, socket *>(id, new socket(QHostAddress (adress))));
+
+    sockets[id] = new socket(QHostAddress (adress));
 
     QObject::connect(sockets[id], SIGNAL(recievedMessage(const Message&)), this, SLOT(handleMessage(const Message&)));
+
     return true;
 }
 

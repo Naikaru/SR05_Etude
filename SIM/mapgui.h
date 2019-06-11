@@ -84,7 +84,7 @@ public:
 
     void setWalls();
 
-    void addMessageInDisplay(const QString& msg);
+    void addMessageInDisplay(const QString& msg, bool warning = false);
 
 
     void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);

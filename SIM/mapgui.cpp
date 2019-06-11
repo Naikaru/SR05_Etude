@@ -156,8 +156,12 @@ void MapGui::setWalls()
         }
     }
 }
-void MapGui::addMessageInDisplay(const QString &msg)
+void MapGui::addMessageInDisplay(const QString &msg, bool warning)
 {
+    if(warning)
+        t_display->setTextColor(Qt::red);
+    else
+        t_display->setTextColor(Qt::black);
     t_display->append(QDateTime::currentDateTime().time().toString() + QString(" : ") + msg);
 }
 
@@ -185,14 +189,16 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
 Robot MapGui::init(int id, int x, int y, int heading){
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return Robot(heading,Position(x, y));
     }
-    Position robotBeforeMove = map.getRobots().at(id).getPosition();
+
     //on considère que ca renvoie le bon
     map.init(id, x, y, heading);
     Position newPosition = map.getRobots().at(id).getPosition();
-    updateRobotOnGrid(robotBeforeMove, newPosition);
+    grid->item(newPosition.getY(), newPosition.getX())->setText("R");
+    grid->item(newPosition.getY(), newPosition.getX())->setBackgroundColor(robotColors[id]);
+    grid->item(newPosition.getY(), newPosition.getX())->setTextColor(robotColors[id]);
     return map.getRobots().at(id);
 
 }
@@ -202,7 +208,7 @@ int MapGui::move(int id, int d)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Move : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Move : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return 0;
     }
 
@@ -217,7 +223,7 @@ int MapGui::turn(unsigned int id, int angle)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Turn : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Turn : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return 0;
     }
     return map.turn(id, angle);
@@ -227,7 +233,7 @@ Robot MapGui::curr(unsigned int id)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Curr : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Curr : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         throw QString("Id non reconnu");
     }
     return map.curr(id);
@@ -237,7 +243,7 @@ Robot MapGui::join(unsigned int id, int x, int y)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Join : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Join : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         throw QString("Id non reconnu");
     }
 
@@ -355,16 +361,19 @@ unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 void MapGui::initRobot()
 {
     QString adress = t_adress->text();
-    int x = 1, y = 4, heading = 3, id = 1;
+    int id = adress.right(1).toInt();
+    int x = 0, y = 0, heading = 0;
     Position pos = Position(x, y);
     pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
-            robotColors[id] = colorList[robotColors.size()];
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setBackgroundColor(robotColors[id]);
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setTextColor(robotColors[id]);
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setText("R");
 
+            robotColors[id] = colorList[robotColors.size()];
+            /*
+                grid->item(convert(pos.getY(), dimY), pos.getX())->setBackgroundColor(robotColors[id]);
+                grid->item(convert(pos.getY(), dimY), pos.getX())->setTextColor(robotColors[id]);
+                grid->item(convert(pos.getY(), dimY), pos.getX())->setText("R");
+            */
             listRobotColor->insertColumn(listRobotColor->columnCount());
             listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
             listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextColor("white");
@@ -374,15 +383,16 @@ void MapGui::initRobot()
 
             //createSocket
             if(!messageManager->addRobotSocket(adress))
-                addMessageInDisplay(QString("The robot of id ") + adress + QString(" could not open a tcp socket") );
-
+                addMessageInDisplay(QString("The robot of id ") + adress + QString(" could not open a tcp socket"), true );
+            else
+                addMessageInDisplay(QString("Le robot d'id ") + QString::number(id) + QString(" a bien été ajouté : en attente d'instructions sur la socket :") + adress);
 
         } else{
-            addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") );
+            addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") , true);
 
         }
     }else{
-        addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
+        addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" was already initialized"), true );
         //map.init(id, x, y, heading);
     }
 
