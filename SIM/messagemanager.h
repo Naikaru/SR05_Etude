@@ -35,7 +35,7 @@ public:
     explicit MessageManager(QString app, QString who, QString whe, QWidget *parent = 0);
 
     ~MessageManager();
-    bool addRobotSocket(int id);
+    bool addRobotSocket(QString adress);
     Message createMessage() const {return Message(APP, WHO, WHE);}
     void sendMessage(int id, const Message& msg);
 

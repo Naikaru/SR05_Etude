@@ -69,6 +69,11 @@ class MapGui : QWidget
     QLabel * lb_message;
     MessageManager  * messageManager;
 
+    //Config
+    QPushButton * bt_configSave;
+    QPushButton * bt_configLoad;
+    QHBoxLayout * l_config;
+
 public:
     MapGui(QWidget *parent);
     void show()
