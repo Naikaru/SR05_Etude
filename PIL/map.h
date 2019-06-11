@@ -118,6 +118,7 @@ public :
 
     QColor get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
     QColor get_color(unsigned int id) { return robots[id].color; }
+    int get_heading(unsigned int id) { return robots[id].heading; }
 
 private:
 

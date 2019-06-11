@@ -60,15 +60,17 @@ public:
     Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
     void astar();
     unsigned int get_heuristique(){ return begin->get_heuristique(); }
-    QString get_path() { return QString();}
+    QStringList get_path();
 
     void init(Cellule* b, Cellule* e, unsigned int id, Map* m){
         begin=b;
         end=e;
         map=m;
-        ident =id;
+        ident=id;
     }
 
 };
+
+int compute_angle(int heading, unsigned int x, unsigned int y, unsigned int xp, unsigned int yp);
 
 #endif // CELLULE_H

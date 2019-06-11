@@ -115,7 +115,7 @@ void AStar::astar(){
     openList.push_front(end);
     Cellule* cell;
 
-    while(openList.empty() == false){
+    while(openList.empty() == false && begin->get_xp() == -1 && begin->get_yp() == -1){
         // Récupération du plus petit element (donc la tete)
         cell = openList.front();
         closedList.push_front(cell);
@@ -143,4 +143,44 @@ void AStar::astar(){
         delete (*it);
 
     return;
+}
+
+int compute_angle(int heading, unsigned int x, unsigned int y, unsigned int xp, unsigned int yp) {
+    // Next coord is another cell, so compulsory having (x != xp) OR (y != yp)
+    unsigned int angle;
+    if (yp - y == 1)
+        angle = 0;
+    if (yp - y == -1)
+        angle = 180;
+    if (xp - x == 1)
+        angle = 270;
+    if (xp - x == -1)
+        angle = 90;
+    return heading - angle;
+}
+
+
+QStringList AStar::get_path() {
+    unsigned int x, y;
+    int heading = map->get_heading(ident);
+    unsigned int dist(0);
+    QStringList path("");
+    Cellule* cell = begin;
+
+    while(cell->get_xp() != -1 && cell->get_yp() != -1) {
+        x = cell->get_x();
+        y = cell->get_y();
+        cell = lookfor_cell(closedList, cell->get_xp(), cell->get_yp());
+        dist += 1;
+        int angle = compute_angle(heading, x, y, cell->get_x(), cell->get_y());
+        if (angle != 0) {
+            path << QString("turn:"+QString::number(angle)+"|");
+            path << QString("move:"+QString::number(dist)+"|");
+            dist = 0;
+        }
+        else if ((cell->get_xp() == -1 && cell->get_yp() == -1) ||
+                 (compute_angle(heading, x, y, cell->get_x(), cell->get_y()) != 0))
+                path << QString("move:"+QString::number(dist)+"|");
+    }
+    return path;
 }

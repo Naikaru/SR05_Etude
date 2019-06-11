@@ -68,7 +68,7 @@ int Algo::getFrontierMinPos()
 }
 
 
-QString Algo::runMinPos()
+QStringList Algo::runMinPos()
 {
     findFrontier();
     computeCost();
@@ -151,7 +151,7 @@ int Algo::getFrontierMinPosOpti()
 }
 
 
-QString Algo::runMinPosOpti()
+QStringList Algo::runMinPosOpti()
 {
     findFrontier();
     sortFrontier(); //premier trie par la distance euclidienne

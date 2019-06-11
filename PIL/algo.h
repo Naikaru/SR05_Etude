@@ -50,13 +50,12 @@ public:
 
     Algo(Map* m,unsigned int ident,unsigned int r):map(m),id(ident),nbRobot(r) {}
 
-
     /*
      *  Permet de savoir quelle frontière choisir
      */
-    QString runMinPos();
+    QStringList runMinPos();
 
-    QString runMinPosOpti();
+    QStringList runMinPosOpti();
 
 
 
