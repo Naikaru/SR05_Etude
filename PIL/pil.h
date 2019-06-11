@@ -55,10 +55,10 @@ class Pil: public QWidget {
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
         const QString mnemoAckMove = "moved";
-        const QString menmoAckTurn = "turned";
+        const QString mnemoAckTurn = "turned";
         const QString mnemoAckError = "order";
         const QString mnemoMove = "move";
-        const QString menmoTurn = "turn";
+        const QString mnemoTurn = "turn";
 
         QString bufferPayload = "@buffer";
 
@@ -144,6 +144,8 @@ class Pil: public QWidget {
         QVector<QStringList> parseBuffer(QString payload);
         void applyBufferForRobot(unsigned int r, QVector<QStringList> buffer);
         void applyActionFromBuffer(int r, QStringList action);
+        void moveMovementReceived(unsigned int, unsigned int);
+        void turnMovementReceived(unsigned int);
 
         bool robotsTooFar(Pos, Pos);
 

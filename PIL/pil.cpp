@@ -94,6 +94,10 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
+    nbRobotsInitialized = nbRobot - 1;
+    if (nbRobotsInitialized == 0) {
+        runAlgo();
+    }
 
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
@@ -233,7 +237,6 @@ void Pil::initialization(int argc, char* argv[])
                     break;
                 case OP_nbRobot:
                     nbRobot=arg[1].toUInt();
-                    nbRobotsInitialized = nbRobot;
                     break;
                 case OP_x:
                     xInit=arg[1].toInt();
@@ -306,6 +309,28 @@ void Pil::parseMessage() {
     QString message = reception_fullmessage->text();
     QString mnemo = mnemonic->text();
     parse_value->setText(parseMessage(mnemo,message));
+}
+
+void Pil::moveMovementReceived(unsigned int realDistance, unsigned int expectedDistance) {
+    QString distance = QString(QString::number(realDistance) + "," + QString::number(expectedDistance));
+    Robot rob = map->robots[ident];
+    QString finalPosition = QString(
+                                QString::number(rob.x) + "," +
+                                QString::number(rob.y) + "," +
+                                QString::number(rob.heading)
+                            );
+    addMovementInBuffer(nbActionsRobot[ident], mnemoMove, distance, finalPosition);
+}
+
+void Pil::turnMovementReceived(unsigned int t) {
+    QString turn = QString(QString::number(t) + "," + QString::number(t));
+    Robot rob = map->robots[ident];
+    QString finalPosition = QString(
+                                QString::number(rob.x) + "," +
+                                QString::number(rob.y) + "," +
+                                QString::number(rob.heading)
+                            );
+    addMovementInBuffer(nbActionsRobot[ident], mnemoTurn, turn, finalPosition);
 }
 
 void Pil::addMovementInBuffer(unsigned int nbAction, QString movement, QString distance, QString finalPosition) {
@@ -460,11 +485,11 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
         } else {
             qDebug() << "Le robot " << r << " n'a jamais été initialisé";
         }
-    } else if (movement == "move") {
+    } else if (movement == mnemoMove) {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;
         map->move(r, realDestination, realDestination != expectedDestination);
         nbActionsRobot[r] = numAction;
-    } else if (movement == "turn") {
+    } else if (movement == mnemoTurn) {
         // qDebug() << "turn";
         map->turn(r, realDestination);
         nbActionsRobot[r] = numAction;
@@ -518,16 +543,20 @@ void Pil::rmtMessage(Message mess){
         if(val != ""){
             obs = tmp[1].toInt() != val.toInt();
             map->move(ident,val.toInt(),obs);
+            nbActionsRobot[ident]++;
+            moveMovementReceived(val.toUInt(), tmp[1].toUInt());
         }
     }
     //sinon si c'est un turn
-    else if (action == menmoTurn)
+    else if (action == mnemoTurn)
     {
-        val = mess.getValue(menmoAckTurn);
+        val = mess.getValue(mnemoAckTurn);
         obs = tmp[1].toInt() != val.toInt();
 
         if(val != "" && !obs){
             map->turn(ident,val.toInt());
+            nbActionsRobot[ident]++;
+            turnMovementReceived(val.toUInt());
         }
     }
 
