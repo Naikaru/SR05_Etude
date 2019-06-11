@@ -139,7 +139,13 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     QObject::connect(bt_configLoad, SIGNAL(clicked()), this, SLOT(loadConfig()));
     l_mapGui->addLayout(l_config);
 
+    bt_test = new QPushButton("test");
+    l_mapGui->addWidget(bt_test);
+    QObject::connect(bt_test, SIGNAL(clicked()), this, SLOT(handleMessageFromRobotTest()));
+
     this->setLayout(l_mapGui);
+
+
 
 }
 
@@ -199,6 +205,7 @@ Robot MapGui::init(int id, int x, int y, int heading){
     grid->item(newPosition.getY(), newPosition.getX())->setText("R");
     grid->item(newPosition.getY(), newPosition.getX())->setBackgroundColor(robotColors[id]);
     grid->item(newPosition.getY(), newPosition.getX())->setTextColor(robotColors[id]);
+    addMessageInDisplay(QString("Le robot d'id ") + QString::number(id) + QString(" a bien été positionné"));
     return map.getRobots().at(id);
 
 }
@@ -279,6 +286,50 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
         int x = inputParameters[0];
         int y = inputParameters[1];
         int heading = inputParameters[2];
+        Robot newPosition = this->init(msg.first, x, y, heading);
+        parameters.push_back(newPosition.getPosition().getX());
+        parameters.push_back(newPosition.getPosition().getY());
+        parameters.push_back(newPosition.getHeading());
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
+    }
+    else{
+        //ordre non reconnu
+        ackMessage.setValue(Message::mnemoRobotAck, Message::mnemoAckError + QString(":ignoredbadarg"));
+    }
+
+    messageManager->sendMessage(msg.first, ackMessage);
+
+}
+
+void MapGui::handleMessageFromRobotTest()
+{
+
+    std::pair<int, Message> msg(1, Message("PILROBLCH/robord~init:3,3,0"));
+    Message ackMessage = messageManager->createMessage();
+
+    QString order = msg.second.getValue(Message::mnemoRobotOrder);
+    std::vector<int> parameters = std::vector<int>();
+    if(order.startsWith("move")) {
+        qDebug() << "move";
+        int distanceToTravel = Message::getOrderValue(order)[0];
+        int distanceTravelled = this->move(msg.first, distanceToTravel);
+        parameters.push_back(distanceTravelled);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckMove, parameters));
+    }
+    else if(order.startsWith("turn")){
+        int angleToTurn = Message::getOrderValue(order)[0];
+        int angleTurned = this->turn(msg.first, angleToTurn);
+        parameters.push_back(angleTurned);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
+    }
+    else if(order.startsWith("init")){
+
+        std::vector<int> inputParameters = Message::getOrderValue(order);
+        qDebug() << inputParameters.size();
+        int x = inputParameters[0];
+        int y = inputParameters[1];
+        int heading = inputParameters[2];
+        qDebug() << "x : " << x << "y : " << y << "heading " << heading;
         Robot newPosition = this->init(msg.first, x, y, heading);
         parameters.push_back(newPosition.getPosition().getX());
         parameters.push_back(newPosition.getPosition().getY());

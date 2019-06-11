@@ -74,7 +74,7 @@ private:
 
         int turn(unsigned int id, int angle);
 
-        void init(unsigned int id, int x, int y, int heading);
+        bool init(unsigned int id, int x, int y, int heading);
 
         const Robot& curr(unsigned int id) const;
 

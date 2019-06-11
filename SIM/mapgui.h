@@ -74,6 +74,8 @@ class MapGui : QWidget
     QPushButton * bt_configLoad;
     QHBoxLayout * l_config;
 
+    QPushButton * bt_test;
+
 public:
     MapGui(QWidget *parent);
     void show()
@@ -103,7 +105,7 @@ private :
 
 public slots:
     void handleMessageFromRobot(const std::pair<int, Message> &msg);
-
+    void handleMessageFromRobotTest();
 private slots:
 
     void saveConfig();

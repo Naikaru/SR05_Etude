@@ -72,17 +72,20 @@ std::vector<int> Message::getOrderValue(const QString &order)
 
     QString currentString = order;
     startIndex = currentString.indexOf(sepOrderMnem);
+    qDebug() << "order : " << order << " sep :" << sepOrderMnem;
+    qDebug() << "startIndex = " << startIndex;
     while(startIndex !=  -1){
 
         endIndex = order.indexOf(sepOrderValueMnem, startIndex);
         if(endIndex != -1){
-            values.push_back(currentString.mid(startIndex + 1, endIndex - (startIndex + 1)).toInt());
-            currentString = currentString.mid(endIndex);
-
+            values.push_back(order.mid(startIndex + 1, endIndex - (startIndex + 1)).toInt());
+            qDebug() << "valeur ajoutée :" << values.back();
+            qDebug() << "index de fin :" <<endIndex;
+            startIndex = endIndex + 1; // après la virgule
         } else{
-            values.push_back(currentString.mid(startIndex + 1).toInt());
+            startIndex = -1;
         }
-        startIndex = endIndex;
+
      }
 
     return values;
@@ -93,9 +96,13 @@ QString Message::parseOrderValues(const QString &order, const std::vector<int> &
 {
     QString result = order + sepOrderMnem;
     for(int value : values){
+        qDebug() << "valeur : " << value;
         result += QString::number(value) + sepOrderValueMnem;
     }
-    result = result.right(result.lastIndexOf(sepOrderValueMnem));
+    result = result.mid(0,result.lastIndexOf(sepOrderValueMnem));
+    qDebug() << result;
+    return result;
+
 }
 
 
