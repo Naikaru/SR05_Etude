@@ -1,9 +1,11 @@
 #ifndef CELLULE_H
 #define CELLULE_H
 
-#include <math.h>
-#include <list>
 #include "map.h"
+
+#include <math.h>
+#include <limits>
+#include <list>
 
 class Cellule
 {
@@ -43,14 +45,18 @@ private:
     Cellule* end;
     Map* map;
     unsigned int ident;
+    QStringList pathList;
+    unsigned int m_heuristique;
 
+    void clear();
 
 public:
     AStar(){
         begin=nullptr;
         end=nullptr;
         map=nullptr;
-        ident =0;
+        ident=0;
+        m_heuristique=std::numeric_limits<int>::max();
     }
 
     AStar(Cellule* b, Cellule* e, unsigned int id, Map* m);
@@ -59,9 +65,14 @@ public:
     void add_neighbours(Cellule* cell);
     void add_cell(Cellule* cell);
     Cellule* lookfor_cell(std::list<Cellule*> alist, unsigned int x, unsigned int y);
-    void astar();
-    unsigned int get_heuristique(){ return begin->get_heuristique(); }
-    QStringList get_path();
+
+    void astar(); // launch A* algorithm
+    void compute_pathList();
+    QStringList get_path() { return pathList; }
+
+    unsigned int get_heuristique(){ return m_heuristique; }
+    Cellule* get_begin() { return begin; }
+    std::list<Cellule*> get_closedList(){ return closedList ; }
 
     void init(Cellule* b, Cellule* e, unsigned int id, Map* m){
         begin=b;

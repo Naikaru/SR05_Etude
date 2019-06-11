@@ -116,10 +116,6 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
 
-    client.connect(&client, SIGNAL(receivedMessage(Message)), this, SLOT(rmtMessage(Message)));
-    QString adr("127.0.0."); adr += QString::number(ident);
-    client.connectToRobot(QHostAddress(adr), 4646);
-
 //    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
 //    std::list<Cellule*> closedList;
 //    Cellule begin(map->robots[ident].x, map->robots[ident].y);
@@ -138,18 +134,27 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 //        }
 //    }
 
-//    Cellule begin(map->getRobotPosition(ident).x,map->getRobotPosition(ident).y);
-//    Cellule frontier(49,0);
-//    frontier.m_cost = 0;
-//    frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, 49, 0);
-//    frontier.m_xp = -1;
-//    frontier.m_yp = -1;
-//    AStar astar(&begin, &frontier, ident, map);
+
+//    Cellule* begin =  new Cellule(map->robots[ident].x,map->robots[ident].y);
+//    std::cout << "ident : " << ident << "x : " << begin->get_x() << "y : " << begin->get_y() << std::endl;
+//    Cellule* frontier = new Cellule(49,0);
+//    frontier->set_cost(0);
+//    frontier->set_heuristique(estimation_heuristique(begin->get_x(), begin->get_y(), 49, 0));
+//    AStar astar(begin, frontier, ident, map);
+//    astar.astar();
+
+//    Cellule* path = astar.get_begin();
+//    if(path != NULL){
+//        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
+//            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
+//            path = astar.lookfor_cell(astar.get_closedList(), path->m_xp, path->m_yp);
+//        }
+//    }
+
 //    QStringList path = astar.get_path();
-//    QStringList::const_iterator constIterator;
-//      for (constIterator = path.constBegin(); constIterator != path.constEnd();
-//             ++constIterator)
-//          std::cout << (*constIterator).toLocal8Bit().constData() << std::endl;
+//    for (QStringList::const_iterator it=path.constBegin(); it!=path.constEnd(); ++it)
+//        std::cout << (*it).toLocal8Bit().constData() << std::endl;
+
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
