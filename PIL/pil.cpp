@@ -95,9 +95,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 
     initialization(argc,argv);
     nbRobotsInitialized = nbRobot - 1;
-    if (nbRobotsInitialized == 0) {
-        runAlgo();
-    }
+
 
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
@@ -105,16 +103,18 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     // to test
     map->initRobot(ident,xInit,yInit,0);
     addInitInBufferAndSend();
-    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
-    map->move(0,5);
-    map->turn(0,90);
-    map->move(0,5);
-    map->turn(0,-90);
-    map->move(0,5);
-    map->show();
+//    map->move(0,5);
+//    map->turn(0,90);
+//    map->move(0,5);
+//    map->turn(0,-90);
+//    map->move(0,5);
+//    map->show();
 
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
+
+    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
+    std::cout << "ident : " << ident << "x : " << map->getRobotPosition(ident).x << "y : " << map->getRobotPosition(ident).y << std::endl;
 
 //    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
 //    std::list<Cellule*> closedList;
@@ -163,6 +163,10 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     connect(mnemonic, SIGNAL(returnPressed()), this, SLOT(parseMessage())); // parse message
     // Slot for notifier (reading)
     connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
+
+    if (nbRobotsInitialized == 0) {
+        runAlgo();
+    }
 }
 
 

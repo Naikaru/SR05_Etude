@@ -7,7 +7,7 @@ void Algo::findFrontier()
     for(int i =0; i<map->get_nbL();i++){
         for(int j =0; j<map->get_nbC();j++){
             if(map->get_cell(i,j) == FRONT){
-                QPair<Pos,float> p(Pos(i,j),euclidDist( Pos( map->getRobotPosition(i).x,map->getRobotPosition(i).y ),Pos(i,j)));
+                QPair<Pos,float> p(Pos(i,j),euclidDist(Pos(map->robots[i].x,map->robots[i].y),Pos(i,j)));
                 frontiers.push_back(p);
             }
         }
@@ -29,7 +29,7 @@ void Algo::computeCost()
         for(int j =0; j<nbFrontier;j++)
         {
             //cellule de départ = position du robot d'indice i
-            Cellule* c1 = new Cellule(map->getRobotPosition(i).x,map->getRobotPosition(i).y);
+            Cellule* c1 = new Cellule(map->robots[i].x,map->robots[i].y);
             //cellule d'arrivée = une des frontières
             Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
             //on initialise le AStar
@@ -112,7 +112,7 @@ int Algo::getFrontierMinPosOpti()
     for(int j =0; j<nbFrontier;j++)
     {
         //calcul d'abord de la frontière de robot courant
-        Cellule* c1 = new Cellule(map->getRobotPosition(id).x,map->getRobotPosition(id).y);
+        Cellule* c1 = new Cellule(map->robots[id].x,map->robots[id].y);
         //cellule d'arrivée = une des frontières
         Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
         //on initialise le AStar
@@ -127,7 +127,7 @@ int Algo::getFrontierMinPosOpti()
         {
             if( i != id){
                 //cellule de départ = position du robot d'indice i
-                Cellule* c1 = new Cellule(map->getRobotPosition(i).x,map->getRobotPosition(i).y);
+                Cellule* c1 = new Cellule(map->robots[i].x,map->robots[i].y);
                 //cellule d'arrivée = une des frontières
                 Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
                 //on initialise le AStar
@@ -139,7 +139,6 @@ int Algo::getFrontierMinPosOpti()
                     classment[j]++;
                 }
             }
-
         }
         if( classment[j] == 1)
             return j;

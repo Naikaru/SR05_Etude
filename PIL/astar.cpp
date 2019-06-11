@@ -81,7 +81,7 @@ void AStar::add_neighbours(Cellule* cell){
     int x = cell->get_x();
     int y = cell->get_y();
     // Access to element (x,y)
-    // std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
+    std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
 
     // right neighbour:
     if(x+1 < map->get_nbL() && (map->get_cell(x+1,y) == EXPLO ||

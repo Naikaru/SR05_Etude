@@ -29,6 +29,11 @@ public:
         y=0;
     }
 
+    Pos(const Pos& p): x(p.x), y(p.y)
+    {}
+
+    Pos& operator=(const Pos& p) { x = p.x; y = p.y; return *this; }
+
     Pos(int x,int y){
         this->x=x;
         this->x=y;
@@ -63,6 +68,7 @@ class Map : public QWidget {
     Q_OBJECT
 
     friend class Pil;
+    friend class Algo;
 
     unsigned int nbC;       //nb de colonne
     unsigned int nbL;       //nb de ligne

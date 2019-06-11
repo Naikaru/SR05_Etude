@@ -84,6 +84,7 @@ void Map::initRobot(int id,int x, int y,int heading)
             std::cerr<< "Il est impossible d'ajouter un nouveau Robot !\n"<< std::endl;
         }
         else{
+            std::cerr << "Initialisation robot " << id << std::endl;
             robots[id].x = x; robots[id].y = y;
             robots[id].heading = heading;
             robots[id].color = colors.at(colors.size()-1);
