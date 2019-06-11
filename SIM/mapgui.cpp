@@ -136,6 +136,7 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_config->addWidget(bt_configLoad);
 
     QObject::connect(bt_configSave, SIGNAL(clicked()), this, SLOT(saveConfig()));
+    QObject::connect(bt_configLoad, SIGNAL(clicked()), this, SLOT(loadConfig()));
     l_mapGui->addLayout(l_config);
 
     this->setLayout(l_mapGui);
@@ -289,35 +290,61 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 
 void MapGui::saveConfig()
 {
-    std::vector<char> gridToSave = std::vector<char>();
-    gridToSave.resize(dimX * dimY);
+
+    QString gridToSave = QString("");
+
     for(unsigned int i = 0; i < dimX; ++i){
         for(unsigned int j=0; j < dimY; ++j){
-            gridToSave.push_back( (grid->item(j,i)->backgroundColor() == MapGui::cellEmptyColor) ? '0' : '1');
+            gridToSave += QString((grid->item(j,i)->backgroundColor() == MapGui::cellEmptyColor) ? "0" : "1");
         }
     }
     QString filename = QFileDialog::getSaveFileName(this);
-    if(filename.isEmpty()){
+    if(filename.isNull()){
         return;
     }
     QFile file(filename);
-    if(!file.open(QIODevice::WriteOnly)){
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
         QMessageBox::information(this,"Information", "Erreur lors de l'ouverture du fichier");
         return;
     }
 
-    QDataStream out(&file);
-    out << dimX << "\n";
-    out << dimY << "\n";
-    for(int cell : gridToSave){
-        out << cell;
-    }
-
+    QTextStream out(&file);
+    out << QString::number(dimX) << "\n";
+    out << QString::number(dimY) << "\n";
+    out << gridToSave;
 
     QMessageBox::information(this,"Information", "Sauvegarde réussie");
 
-
 }
+
+void MapGui::loadConfig(){
+    QString filename = QFileDialog::getOpenFileName(this);
+    if(filename.isNull()){
+        return;
+    }
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::information(this,"Information", "Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    QTextStream in(&file);
+
+    sb_selectX->setValue(in.readLine().toInt());
+    synchronizeDimX(sb_selectX->value());
+    sb_selectY->setValue(in.readLine().toInt());
+    synchronizeDimY(sb_selectY->value());
+    QString gridToLoad = in.readLine();
+    for(unsigned int i = 0; i<dimX; i++){
+        for(unsigned int j = 0; j<dimY; j++){
+            grid->item(j,i)->setBackgroundColor( (gridToLoad.left(1).toInt() == 0) ? MapGui::cellEmptyColor : MapGui::cellFullColor);
+            gridToLoad = gridToLoad.mid(1);
+        }
+    }
+
+    QMessageBox::information(this, "Information", "Map chargée avec succès");
+}
+
 unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 {
     return dim - coord -1;
