@@ -9,7 +9,6 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     main = new QVBoxLayout();
     nseq = 0;
     init = false;
-
     map = new Map();
 
     // Top bar with 2 buttons: Envoyer - Quitter
@@ -95,6 +94,8 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
+
+    algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
 
     // to test
@@ -408,9 +409,66 @@ bool Pil::robotsTooFar(Pos a, Pos b) {
     return sqrt(pow((b.x - a.x), 2) - pow((b.y - a.y),2)) > DISTANCE_MAX;
 }
 
-// Slot to handle the message from the robot
-void Pil::rmtMessage(Message mess){
-    // TODO : have a correct behaviour
-    qDebug()<<"Hey !" + mess.getCompleteMessage();
-
+void Pil::applyAction()
+{
+    //si on a fini les actions
+    if(currentIndexOfAction == currentActionToDo.size()){
+        runAlgo();
+    }
+    //sinon on applique les actions en l'envoyant au robot ou à la simu
+    else
+    {
+        Message m("PIL","ROB","LCH");
+        QStringList action = currentActionToDo[currentIndexOfAction].split(":");
+        m.setValue(action[0],action[1]);
+        client.send(m);
+        currentIndexOfAction++;
+    }
+    return;
 }
+
+
+void Pil::runAlgo()
+{
+    currentActionToDo = algo->runMinPosOpti();
+    currentIndexOfAction = 0;
+    applyAction();
+}
+
+
+// Slot to handle the message from the robot OR the simu
+void Pil::rmtMessage(Message mess){
+    //reception d'une réponse de la simu
+    QStringList tmp= currentActionToDo[currentIndexOfAction-1].split(":");
+    QString action = tmp[0];
+    QString val("");
+    bool obs = false;
+    //si c'est un move
+    if(action == mnemoMove)
+    {
+        val = mess.getValue(mnemoAckMove);
+        if(val != ""){
+            obs = tmp[1].toInt() != val.toInt();
+            map->move(ident,val.toInt(),obs);
+        }
+    }
+    //sinon si c'est un turn
+    else if (action == menmoTurn)
+    {
+        val = mess.getValue(menmoAckTurn);
+        obs = tmp[1].toInt() != val.toInt();
+
+        if(val != "" && !obs){
+            map->turn(ident,val.toInt());
+        }
+    }
+
+    if(obs)
+        runAlgo();
+    else
+        applyAction();
+}
+
+
+
+

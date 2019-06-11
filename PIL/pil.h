@@ -18,7 +18,7 @@
 #include "astar.h"
 #include "message.h"
 #include "tcpclientmanager.h"
-
+#include "algo.h"
 
 enum Options {
     OP_wrong = 0,
@@ -54,7 +54,11 @@ class Pil: public QWidget {
         QString appnetMnemo = "appnet";     //the mnemonic to have access to the appnet
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
-
+        const QString mnemoAckMove = "moved";
+        const QString menmoAckTurn = "turned";
+        const QString mnemoAckError = "order";
+        const QString mnemoMove = "move";
+        const QString menmoTurn = "turn";
 
         QString bufferPayload = "@buffer";
 
@@ -64,14 +68,17 @@ class Pil: public QWidget {
 
         unsigned int nbActions = 1;
 
-        unsigned int nbRobot;   //number of robots
+        unsigned int nbRobot = 1;   //number of robots
         int xInit=0;              //initial pos of the robot
         int yInit=0;
 
         TcpClientManager client;
 
-        QVBoxLayout* main; // Window
+        QStringList currentActionToDo;
+        unsigned int currentIndexOfAction;
+        Algo* algo;
 
+        QVBoxLayout* main; // Window
         QHBoxLayout* button_area;   // Top part containing three buttons
         QPushButton* quit;
         QPushButton* mode;
@@ -146,11 +153,18 @@ class Pil: public QWidget {
         void addMovementInBuffer(unsigned int nbAction, QString movement, QString distance, QString finalPosition);
         void sendBufferToNet();
 
+        //lance l'algorithme
+        void runAlgo();
+
+        //applique l'action courante en l'envoyant au robot ou à la simu
+        void applyAction();
+
     protected slots:
         void sendMessage();
         void sendBuffer(QString);
         void readStdin();
         void parseMessage();
+
     public slots:
         void rmtMessage(Message mess);
 };

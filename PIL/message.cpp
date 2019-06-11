@@ -39,7 +39,10 @@ void Message::setValue(QString mnemo, QString value){
     couples.insert(mnemo,value);
 }
 QString Message::getValue(QString mnemo){
-    return couples.value(mnemo);
+    if(couples.contains(mnemo))
+        return couples.value(mnemo);
+    else
+        return "";
 }
 
 QString Message::getCompleteMessage(){
