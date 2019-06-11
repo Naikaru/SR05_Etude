@@ -275,6 +275,38 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
     messageManager->sendMessage(msg.first, ackMessage);
 
 }
+
+void MapGui::saveConfig()
+{
+    std::vector<char> gridToSave = std::vector<char>();
+    gridToSave.resize(dimX * dimY);
+    for(unsigned int i = 0; i < dimX; ++i){
+        for(unsigned int j=0; j < dimY; ++j){
+            gridToSave.push_back( (grid->item(j,i)->backgroundColor() == MapGui::cellEmptyColor) ? '0' : '1');
+        }
+    }
+    QString filename = QFileDialog::getSaveFileName(this);
+    if(filename.isEmpty()){
+        return;
+    }
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly)){
+        QMessageBox::information(this,"Information", "Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    QDataStream out(&file);
+    out << dimX << "\n";
+    out << dimY << "\n";
+    for(int cell : gridToSave){
+        out << cell;
+    }
+
+
+    QMessageBox::information(this,"Information", "Sauvegarde réussie");
+
+
+}
 unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 {
     return dim - coord -1;

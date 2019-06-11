@@ -17,6 +17,7 @@
 #include <QTextEdit>
 #include <QDateTime>
 #include <QLineEdit>
+#include <QFile>
 class MapGui : QWidget
 {
 
@@ -100,6 +101,7 @@ public slots:
 
 private slots:
 
+    void saveConfig();
     void run();
 
     void cellActivation(const QModelIndex& index);
