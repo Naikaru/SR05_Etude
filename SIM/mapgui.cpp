@@ -302,6 +302,10 @@ void MapGui::initRobot()
             listRobotColor->item(0, listRobotColor->columnCount() - 1)->setBackgroundColor(robotColors[id]);
             listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
 
+            //createSocket
+            if(!messageManager->addRobotSocket(id))
+                addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not open a tcp socket") );
+
 
         } else{
             addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") );
