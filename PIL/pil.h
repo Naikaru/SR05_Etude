@@ -17,6 +17,8 @@
 #include "map.h"
 #include "astar.h"
 #include "message.h"
+#include "tcpclientmanager.h"
+
 
 enum Options {
     OP_wrong = 0,
@@ -65,6 +67,8 @@ class Pil: public QWidget {
         unsigned int nbRobot;   //number of robots
         int xInit=0;              //initial pos of the robot
         int yInit=0;
+
+        TcpClientManager client;
 
         QVBoxLayout* main; // Window
 

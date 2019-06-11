@@ -6,6 +6,10 @@
 #include <QDebug>
 #define SEPMNEMVAL '~'
 
+//app = PIL
+//who = ROB
+//whe = LCH
+
 //Class which handles a message.
 class Message
 {

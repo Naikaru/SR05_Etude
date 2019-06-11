@@ -110,6 +110,10 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
 
+    client.connect(&client, SIGNAL(receivedMessage(Message)), this, SLOT(rmtMessage(Message)));
+    QString adr("127.0.0."); adr += QString::number(ident);
+    client.connectToRobot(QHostAddress(adr), 4646);
+
 //    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
 //    std::list<Cellule*> closedList;
 //    Cellule begin(map->robots[ident].x, map->robots[ident].y);
