@@ -21,7 +21,7 @@ client.connect(&client, SIGNAL(receivedMessage(Message)), &this, SLOT(rmtMessage
 client.connectToRobot(QHostAddress("127.0.0.1"), 4646);
 
 # Création d'un message à envoyer en whatwhowhere
-Message messageToSend = Message(PIL,ROB,LCH);
+Message messageToSend = Message("PIL","ROB","LCH");
 # Ajout de la mnémonique d'avancée
 messageToSend.setValue("move","50");
 # Envoie du message
