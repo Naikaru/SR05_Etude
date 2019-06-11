@@ -125,7 +125,18 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 //        }
 //    }
 
-
+//    Cellule begin(map->getRobotPosition(ident).x,map->getRobotPosition(ident).y);
+//    Cellule frontier(49,0);
+//    frontier.m_cost = 0;
+//    frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, 49, 0);
+//    frontier.m_xp = -1;
+//    frontier.m_yp = -1;
+//    AStar astar(&begin, &frontier, ident, map);
+//    QStringList path = astar.get_path();
+//    QStringList::const_iterator constIterator;
+//      for (constIterator = path.constBegin(); constIterator != path.constEnd();
+//             ++constIterator)
+//          std::cout << (*constIterator).toLocal8Bit().constData() << std::endl;
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window

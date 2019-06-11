@@ -166,11 +166,13 @@ QStringList AStar::get_path() {
     unsigned int dist(0);
     QStringList path("");
     Cellule* cell = begin;
+    x = cell->get_x();
+    y = cell->get_y();
 
-    while(cell->get_xp() != -1 && cell->get_yp() != -1) {
-        x = cell->get_x();
-        y = cell->get_y();
+    while((cell != nullptr) && (cell->get_xp() != -1) && (cell->get_yp() != -1)) {
         cell = lookfor_cell(closedList, cell->get_xp(), cell->get_yp());
+        if (cell == nullptr)
+            break;
         dist += 1;
         int angle = compute_angle(heading, x, y, cell->get_x(), cell->get_y());
         if (angle != 0) {
@@ -181,6 +183,8 @@ QStringList AStar::get_path() {
         else if ((cell->get_xp() == -1 && cell->get_yp() == -1) ||
                  (compute_angle(heading, x, y, cell->get_x(), cell->get_y()) != 0))
                 path << QString("move:"+QString::number(dist)+"|");
+        x = cell->get_x();
+        y = cell->get_y();
     }
     return path;
 }
