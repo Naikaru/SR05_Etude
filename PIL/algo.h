@@ -7,7 +7,7 @@
 class Algo
 {
 private:
-    QVector<QPair<unsigned int, unsigned int>> frontiers;
+    QVector<QPair<Pos, float>> frontiers; // pos = frontier et unsigned int = distance euclidienne entre robot et la frontière
     QVector<QVector<AStar>> cost;
     Map* map;
     unsigned int id;
@@ -31,17 +31,32 @@ private:
      */
     int getFrontierMinPos();
 
+    // ######### version opti #########
+
+    /*
+     * Tri des frontières
+     */
+    void sortFrontier();
+
+    float euclidDist(Pos a, Pos b);
+
+    static bool cmp(const QPair<Pos, float>& a,const QPair<Pos, float>& b){
+        return a.second < b.second;
+    }
+    
+    int getFrontierMinPosOpti();
+
 public:
 
-    Algo(Map* m,unsigned int ident,unsigned int r):map(m),id(ident),nbRobot(r) {
-
-    }
+    Algo(Map* m,unsigned int ident,unsigned int r):map(m),id(ident),nbRobot(r) {}
 
 
     /*
      *  Permet de savoir quelle frontière choisir
      */
     QString runMinPos();
+
+    QString runMinPosOpti();
 
 
 
