@@ -7,7 +7,7 @@ void Algo::findFrontier()
     for(int i =0; i<map->get_nbL();i++){
         for(int j =0; j<map->get_nbC();j++){
             if(map->get_cell(i,j) == FRONT){
-                QPair<Pos,float> p(Pos(i,j),euclidDist(Pos(map->robots[i].x,map->robots[i].y),Pos(i,j)));
+                QPair<QPair<int,int>,float> p(QPair<int,int>(i,j),euclidDist(Pos(map->robots[id].x,map->robots[id].y),Pos(i,j)));
                 frontiers.push_back(p);
             }
         }
@@ -31,7 +31,7 @@ void Algo::computeCost()
             //cellule de départ = position du robot d'indice i
             Cellule* c1 = new Cellule(map->robots[i].x,map->robots[i].y);
             //cellule d'arrivée = une des frontières
-            Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
+            Cellule* c2 = new Cellule(frontiers[j].first.first,frontiers[j].first.second);
             //on initialise le AStar
             cost[i][j].init(c1,c2,i,map);
             //on calcule le plus court chemin pour y arriver ( = cost)
@@ -114,7 +114,7 @@ int Algo::getFrontierMinPosOpti()
         //calcul d'abord de la frontière de robot courant
         Cellule* c1 = new Cellule(map->robots[id].x,map->robots[id].y);
         //cellule d'arrivée = une des frontières
-        Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
+        Cellule* c2 = new Cellule(frontiers[j].first.first,frontiers[j].first.second);
         //on initialise le AStar
         cost[id][j].init(c1,c2,id,map);
         //on calcule le plus court chemin pour y arriver ( = cost)
@@ -129,7 +129,7 @@ int Algo::getFrontierMinPosOpti()
                 //cellule de départ = position du robot d'indice i
                 Cellule* c1 = new Cellule(map->robots[i].x,map->robots[i].y);
                 //cellule d'arrivée = une des frontières
-                Cellule* c2 = new Cellule(frontiers[j].first.x,frontiers[j].first.y);
+                Cellule* c2 = new Cellule(frontiers[j].first.first,frontiers[j].first.second);
                 //on initialise le AStar
                 cost[i][j].init(c1,c2,i,map);
                 //on calcule le plus court chemin pour y arriver ( = cost)

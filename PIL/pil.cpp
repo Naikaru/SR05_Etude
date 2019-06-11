@@ -108,7 +108,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 //    map->move(0,5);
 //    map->turn(0,-90);
 //    map->move(0,5);
-//    map->show();
+    map->show();
 
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
@@ -526,6 +526,7 @@ void Pil::applyAction()
         client.send(m);
         currentIndexOfAction++;
     }
+
     return;
 }
 
@@ -554,6 +555,7 @@ void Pil::rmtMessage(Message mess){
             map->move(ident,val.toInt(),obs);
             nbActionsRobot[ident]++;
             moveMovementReceived(val.toUInt(), tmp[1].toUInt());
+            //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
         }
     }
     //sinon si c'est un turn
@@ -568,7 +570,6 @@ void Pil::rmtMessage(Message mess){
             turnMovementReceived(val.toUInt());
         }
     }
-
     if(obs)
         runAlgo();
     else

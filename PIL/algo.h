@@ -9,7 +9,7 @@ class Algo
 
 private:
 
-    QVector<QPair<Pos, float>> frontiers; // pos = frontier et float = distance euclidienne entre robot et la frontière
+    QVector<QPair<QPair<int,int>, float>> frontiers; // QPair<int,int> = frontier et float = distance euclidienne entre robot et la frontière
     QVector<QVector<AStar>> cost;
     Map* map;
     unsigned int id;
@@ -42,7 +42,7 @@ private:
 
     float euclidDist(Pos a, Pos b);
 
-    static bool cmp(const QPair<Pos, float>& a,const QPair<Pos, float>& b){
+    static bool cmp(const QPair<QPair<int,int>, float>& a,const QPair<QPair<int,int>, float>& b){
         return a.second < b.second;
     }
     
