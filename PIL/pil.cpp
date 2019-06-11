@@ -107,6 +107,9 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     map->move(0,5);
     map->show();
 
+    //par défaut on ne connait pas les robots qui sont à notre portée.
+    nearRobot= QVector<int>(nbRobot,int(0));
+
 //    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
 //    std::list<Cellule*> closedList;
 //    Cellule begin(map->robots[ident].x, map->robots[ident].y);
@@ -176,6 +179,10 @@ QString Pil::parseMessage(QString mnemo, QString message){
 QString Pil::getFormatedMessage(QString payload, QString desti)
 {
     QString ret("");
+
+    //      apply    dest   envoyer à ts les robots
+    //ret+= "PIL"+  "ROB" +  "AIR";// who
+
     ret+= defaultSep+ senderMnemo+ valueSep+info_ident->text(); // who
 
     // payload
@@ -191,6 +198,7 @@ QString Pil::getFormatedMessage(QString payload, QString desti)
         ret += defaultSep + destMnemo + valueSep + dest->text();
     else
          ret += defaultSep + destMnemo + valueSep + desti;  //for demand SC desti is him self
+
     return ret;
 }
 
@@ -257,7 +265,12 @@ void Pil::readStdin() {
     int c;
     do {
         std::getline(std::cin, message);
-        if (parseMessage(appnetMnemo, QString::fromStdString(message)) == "") {
+        //si le message vient du robot ou de la simu
+        if(message.substr(0,3) == "ROB")
+        {
+
+        }
+        else if (parseMessage(appnetMnemo, QString::fromStdString(message)) == "") {
             QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
             if (payload.startsWith(bufferPayload)){
                 applyBufferFromMessage(QString::fromStdString(message));

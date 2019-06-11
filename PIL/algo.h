@@ -6,8 +6,10 @@
 
 class Algo
 {
+
 private:
-    QVector<QPair<Pos, float>> frontiers; // pos = frontier et unsigned int = distance euclidienne entre robot et la frontière
+
+    QVector<QPair<Pos, float>> frontiers; // pos = frontier et float = distance euclidienne entre robot et la frontière
     QVector<QVector<AStar>> cost;
     Map* map;
     unsigned int id;
@@ -56,8 +58,6 @@ public:
     QStringList runMinPos();
 
     QStringList runMinPosOpti();
-
-
 
 };
 

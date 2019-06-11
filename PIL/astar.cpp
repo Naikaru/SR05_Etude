@@ -141,7 +141,6 @@ void AStar::astar(){
 
     for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
         delete (*it);
-
     return;
 }
 

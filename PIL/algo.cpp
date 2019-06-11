@@ -92,7 +92,7 @@ void Algo::sortFrontier(){
 }
 
 /*
- * Calcul des coûts et de la frontière en même temps :
+ * Calcul des coûts et de la frontière à choisir en même temps :
  *  comme ça dès qu'on trouve une frontière pour laquelle
  *  on est le robot le plus proche on la choisit
  */
