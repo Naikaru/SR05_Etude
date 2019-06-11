@@ -100,6 +100,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 
     // to test
     map->initRobot(ident,xInit,yInit,0);
+    addInitInBufferAndSend();
     std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
     map->move(0,5);
     map->turn(0,90);
@@ -227,11 +228,12 @@ void Pil::initialization(int argc, char* argv[])
             switch (getOption(arg[0]))
             {
                 case OP_ident:
-                    ident = arg[1].toInt();
+                    ident = arg[1].toUInt();
                     info_ident->setText(QString::number(ident));
                     break;
                 case OP_nbRobot:
-                    nbRobot=arg[1].toInt();
+                    nbRobot=arg[1].toUInt();
+                    nbRobotsInitialized = nbRobot;
                     break;
                 case OP_x:
                     xInit=arg[1].toInt();
@@ -326,6 +328,11 @@ void Pil::addMovementInBuffer(unsigned int nbAction, QString movement, QString d
     buffer.push_back(line);
 }
 
+void Pil::addInitInBufferAndSend() {
+    addMovementInBuffer(1, "init", "0,0", QString(QString::number(xInit) + "," + QString::number(yInit) + ",0"));
+    sendBufferToNet();
+}
+
 void Pil::sendBufferToNet() {
     QString payload = bufferPayload;
     QVector<QStringList> buf = getBuffer();
@@ -398,12 +405,73 @@ void Pil::applyBufferFromMessage(QString message){
         QString finalPosition = buffer.last()[3];
         Pos otherPos = Pos(finalPosition.split(",")[0].toInt(), finalPosition.split(",")[1].toInt());
         if (!robotsTooFar(myPos, otherPos)) {
-            map->applyBufferForRobot(identRobot.toUInt(), buffer);
+            applyBufferForRobot(identRobot.toUInt(), buffer);
         } else {
             qDebug() << "Robots too far, message not received";
         }
     }
 }
+
+void Pil::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
+    if (nbActionsRobot.find(r) == nbActionsRobot.end()) {
+        nbActionsRobot[r] = 0;
+    }
+    unsigned int nbActions = nbActionsRobot[r];
+//     qDebug() << "robot number" << r;
+//     qDebug() << "action number" << buffer.first()[0];
+
+    QVector<QStringList>::iterator it = buffer.begin();
+    while ((*it)[0].toUInt() < nbActions && it != buffer.end()) {
+        // qDebug() << "action number" << (*it)[0];
+        it++;
+    }
+
+    // qDebug() << "fin 1er while";
+
+    // On est arrivé aux actions à appliquer pour le robot
+    while (it != buffer.end()) {
+        applyActionFromBuffer(r, (*it));
+        it++;
+    }
+}
+
+void Pil::applyActionFromBuffer(int r, QStringList action){
+//    qDebug() << "applyAction";
+    unsigned int numAction = action[0].toUInt();
+    QString movement = action[1];
+    QString destination = action[2];
+    int realDestination = destination.split(",").first().toInt();
+    int expectedDestination = destination.split(",").last().toInt();
+    QString finalPosition = action[3];
+    int x_final = finalPosition.split(",")[0].toInt();
+    int y_final = finalPosition.split(",")[1].toInt();
+    int heading_final = finalPosition.split(",")[2].toInt();
+
+    // On vérifie que le robot ait été initialisé
+    if (nbActionsRobot[r] == 0) {
+        if (movement == "init") {
+            map->initRobot(r, x_final, y_final, heading_final);
+            nbActionsRobot[r] = std::max(numAction, (unsigned int)1);
+            nbRobotsInitialized--;
+            if (nbRobotsInitialized == 0) {
+                runAlgo();
+            }
+            qDebug() << "Robot " << r << " initialisé";
+        } else {
+            qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+        }
+    } else if (movement == "move") {
+        // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;
+        map->move(r, realDestination, realDestination != expectedDestination);
+        nbActionsRobot[r] = numAction;
+    } else if (movement == "turn") {
+        // qDebug() << "turn";
+        map->turn(r, realDestination);
+        nbActionsRobot[r] = numAction;
+    }
+    // qDebug() << "maj action" << nbActionsRobot[r];
+}
+
 
 bool Pil::robotsTooFar(Pos a, Pos b) {
     return sqrt(pow((b.x - a.x), 2) - pow((b.y - a.y),2)) > DISTANCE_MAX;

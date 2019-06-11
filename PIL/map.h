@@ -72,9 +72,6 @@ class Map : public QWidget {
 
     std::vector<QString> colors;    //défini les couleurs que peuvent prendre les robots sur la map
     std::map<int, Robot> robots;    // défini pour chaque robot sa position (x, y) et son angle heading, dans cet ordre
-    std::map<unsigned int, unsigned int> nbActionsRobot;    // nb of actions of robots
-
-    QString bufferPayloadMnemo = "@buffer";
 
     QTableWidget* map;
     QGridLayout* legend;
@@ -99,7 +96,7 @@ public :
      * le robot avance dans sa la direction de sa tête, si d est < 0 il recule
      * déplacement uniquement suivant une grille, pas de déplacement diagonaux
      */
-    void move(int id,int d, bool incrRobotAction = false);
+    void move(int id,int d, bool setObstacle = false);
 
     Pos getRobotPosition(int id) { return Pos(robots[id].x, robots[id].y); }
 
@@ -134,17 +131,12 @@ private:
     /*
      * x, y représente une case qui doit être définie comme obstacle
      */
-    void setObstacle(int x, int y);
+    void setObstacle(int id);
     /*
      *                                                               y ^
      * Converti les coordonnées pour un affichage comme dans un repère |__> x
      */
     void convert(int* x, int* y);
-
-
-    void applyBufferForRobot(unsigned int, QVector<QStringList>);
-
-    void applyAction(int, QStringList);
 
     void moveTop(int id,int d);
     void moveBottom(int id,int d);

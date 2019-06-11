@@ -69,8 +69,11 @@ class Pil: public QWidget {
         unsigned int nbActions = 1;
 
         unsigned int nbRobot = 1;   //number of robots
+        unsigned int nbRobotsInitialized;
         int xInit=0;              //initial pos of the robot
         int yInit=0;
+
+        std::map<unsigned int, unsigned int> nbActionsRobot;
 
         TcpClientManager client;
 
@@ -139,6 +142,8 @@ class Pil: public QWidget {
 
         QPair<unsigned int, unsigned int> chooseFrontier(std::list<Cellule*> closedList);
         QVector<QStringList> parseBuffer(QString payload);
+        void applyBufferForRobot(unsigned int r, QVector<QStringList> buffer);
+        void applyActionFromBuffer(int r, QStringList action);
 
         bool robotsTooFar(Pos, Pos);
 
@@ -151,6 +156,7 @@ class Pil: public QWidget {
 
         QVector<QStringList> getBuffer() {return buffer; }
         void addMovementInBuffer(unsigned int nbAction, QString movement, QString distance, QString finalPosition);
+        void addInitInBufferAndSend();
         void sendBufferToNet();
 
         //lance l'algorithme
