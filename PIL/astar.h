@@ -52,6 +52,7 @@ public:
         map=nullptr;
         ident =0;
     }
+
     AStar(Cellule* b, Cellule* e, unsigned int id, Map* m);
     ~AStar();
 

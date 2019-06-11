@@ -52,6 +52,7 @@ class Pil: public QWidget {
         QString defaultSep= "/";            //separator between information in message
         QString valueSep= "~";              //separator between mnemonic and value
 
+
         QString bufferPayload = "@buffer";
 
         unsigned int nseq;  // number of message sent localy
@@ -103,10 +104,13 @@ class Pil: public QWidget {
         bool reading_writing = false;
 
         const unsigned int MAX_BUFFER = 20;
-
         const unsigned int DISTANCE_MAX = 10;
 
         QVector<QStringList> buffer;
+
+        //permet de savoir les robots à proximités
+        QVector<int> nearRobot;
+
         // sequence of instructions
         Map* map = nullptr;
 
