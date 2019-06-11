@@ -16,7 +16,11 @@
 #define UNEXP "gray"
 #define OBSTA "black"
 
-typedef struct Pos{
+
+class Pos
+{
+public:
+
     int x;
     int y;
 
@@ -29,7 +33,7 @@ typedef struct Pos{
         this->x=x;
         this->x=y;
     }
-}Pos;
+};
 
 typedef struct Robot
 {
