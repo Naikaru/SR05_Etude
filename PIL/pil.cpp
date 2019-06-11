@@ -403,3 +403,10 @@ void Pil::applyBufferFromMessage(QString message){
 bool Pil::robotsTooFar(Pos a, Pos b) {
     return sqrt(pow((b.x - a.x), 2) - pow((b.y - a.y),2)) > DISTANCE_MAX;
 }
+
+// Slot to handle the message from the robot
+void Pil::rmtMessage(Message mess){
+    // TODO : have a correct behaviour
+    qDebug()<<"Hey !" + mess.getCompleteMessage();
+
+}

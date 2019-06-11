@@ -1,5 +1,5 @@
 #include "pil.h"
-
+#include "tcpclientmanager.h"
 int main(int argc, char* argv[]) {
 
     QApplication app(argc, argv);
@@ -12,6 +12,11 @@ int main(int argc, char* argv[]) {
     pil.sendBufferToNet();
     pil.applyBufferFromMessage(QString::fromStdString("/who~1/payload~@buffer|1:init:0,0:10,20,0|2:move:10,20:0,0,0|3:turn:90,90:10,20,0/nseq~1/dest~-1"));
     pil.show();
+
+
+    TcpClientManager client;
+    client.connect(&client, SIGNAL(receivedMessage(Message)), &pil, SLOT(rmtMessage(Message)));
+    client.connectToRobot(QHostAddress("127.0.0.1"), 4646);
 
     return app.exec();
 }

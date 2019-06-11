@@ -16,6 +16,7 @@
 #include <QSocketNotifier>
 #include "map.h"
 #include "astar.h"
+#include "message.h"
 
 enum Options {
     OP_wrong = 0,
@@ -146,6 +147,8 @@ class Pil: public QWidget {
         void sendBuffer(QString);
         void readStdin();
         void parseMessage();
+    public slots:
+        void rmtMessage(Message mess);
 };
 
 

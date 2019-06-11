@@ -3,3 +3,10 @@
 *.pro
 
 build-*
+
+
+*.config
+*.creator
+*.files
+*.includes
+
