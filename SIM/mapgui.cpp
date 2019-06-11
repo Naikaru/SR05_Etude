@@ -134,6 +134,8 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     l_config->addWidget(bt_configSave);
     l_config->addWidget(bt_configLoad);
+
+    QObject::connect(bt_configSave, SIGNAL(clicked()), this, SLOT(saveConfig()));
     l_mapGui->addLayout(l_config);
 
     this->setLayout(l_mapGui);
