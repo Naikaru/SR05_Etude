@@ -149,11 +149,14 @@ int Map::turn(unsigned int id, int angle){
  *
  */
 
-void Map::init(unsigned int id, int x, int y, int heading){
-    Robot& robotToChange = robots[id];
+bool Map::init(unsigned int id, int x, int y, int heading){
 
+    Robot& robotToChange = robots[id];
+    if(getState(x, y) != CellState::empty)
+        return false;
     robotToChange.setPosition(Position(x,y));
     robotToChange.setHeading(heading);
+    return true;
 }
 
 /*

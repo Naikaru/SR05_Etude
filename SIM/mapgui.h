@@ -17,6 +17,7 @@
 #include <QTextEdit>
 #include <QDateTime>
 #include <QLineEdit>
+#include <QFile>
 class MapGui : QWidget
 {
 
@@ -68,6 +69,13 @@ class MapGui : QWidget
     QLabel * lb_message;
     MessageManager  * messageManager;
 
+    //Config
+    QPushButton * bt_configSave;
+    QPushButton * bt_configLoad;
+    QHBoxLayout * l_config;
+
+    QPushButton * bt_test;
+
 public:
     MapGui(QWidget *parent);
     void show()
@@ -78,7 +86,7 @@ public:
 
     void setWalls();
 
-    void addMessageInDisplay(const QString& msg);
+    void addMessageInDisplay(const QString& msg, bool warning = false);
 
 
     void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
@@ -97,9 +105,11 @@ private :
 
 public slots:
     void handleMessageFromRobot(const std::pair<int, Message> &msg);
-
+    void handleMessageFromRobotTest();
 private slots:
 
+    void saveConfig();
+    void loadConfig();
     void run();
 
     void cellActivation(const QModelIndex& index);
@@ -110,6 +120,7 @@ private slots:
     void synchronizeMaxW(int newMax);
     void synchronizeMaxH(int newMax);
     void initRobot();
+
 
 };
 

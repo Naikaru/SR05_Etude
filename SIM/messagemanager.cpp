@@ -33,21 +33,26 @@ void MessageManager::handleMessage(const Message &msg)
 
 }
 
-bool MessageManager::addRobotSocket(int id)
+bool MessageManager::addRobotSocket(QString adress)
 {
+
+    int id = adress.right(1).toInt();
     if(sockets.find(id) != sockets.end())
         return false;
 
-    QString address = QString("127.0.0.") + QString::number(id);
-    sockets.insert(std::pair<int, socket *>(id, new socket(QHostAddress (address))));
+    //QString address = QString("127.0.0.") + QString::number(id);
+
+    sockets[id] = new socket(QHostAddress (adress));
 
     QObject::connect(sockets[id], SIGNAL(recievedMessage(const Message&)), this, SLOT(handleMessage(const Message&)));
+
     return true;
 }
 
 void MessageManager::sendMessage(int id, const Message &msg)
 {
-    sockets.at(id)->send(msg);
+    qDebug() << "sending " <<msg.getCompleteMessage();
+    sockets[id]->send(msg);
     t_displayMessage->setTextColor(Qt::blue);
     t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" >>  " +  msg.getCompleteMessage()));
 }
