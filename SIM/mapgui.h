@@ -80,15 +80,17 @@ public:
 
     void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
 
+    Robot init(int id, int x, int y, int heading);
     int move(int id, int d);
     int turn(unsigned int id, int angle);
-    const Robot& curr(unsigned int id);
-    const Robot&join(unsigned int id, int x, int y );
+    Robot curr(unsigned int id);
+    Robot join(unsigned int id, int x, int y );
     void addRobot(int x, int y, unsigned int heading, unsigned int id);
 
 
 private :
     unsigned int convert(unsigned int coord, unsigned int dim);
+
 
 public slots:
     void handleMessageFromRobot(const std::pair<int, Message> &msg);

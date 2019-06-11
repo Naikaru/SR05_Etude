@@ -10,6 +10,7 @@ const QString Message::mnemoRobotAck = "roback";
 const QString Message::mnemoAckMove = "moved";
 const QString Message::mnemoAckTurn = "turned";
 const QString Message::mnemoAckError = "order";
+const QString Message::mnemoAckInit = "init";
 
 
 // Create a Message object from a received string.

@@ -134,7 +134,7 @@ void MapGui::setWalls()
 }
 void MapGui::addMessageInDisplay(const QString &msg)
 {
-    t_display->append(QDateTime::currentDateTime().time().toString() + QString(": ") + msg);
+    t_display->append(QDateTime::currentDateTime().time().toString() + QString(" : ") + msg);
 }
 
 void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &newPosition)
@@ -158,6 +158,21 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
         grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
         grid->item(newY, newX)->setText("");
     }
+
+}
+
+Robot MapGui::init(int id, int x, int y, int heading){
+    if(map.getRobots().find(id) == map.getRobots().end())
+    {
+        addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        return Robot(heading,Position(x, y));
+    }
+    Position robotBeforeMove = map.getRobots().at(id).getPosition();
+    //on considère que ca renvoie le bon
+    map.init(id, x, y, heading);
+    Position newPosition = map.getRobots().at(id).getPosition();
+    updateRobotOnGrid(robotBeforeMove, newPosition);
+    return map.getRobots().at(id);
 
 }
 
@@ -187,7 +202,7 @@ int MapGui::turn(unsigned int id, int angle)
     return map.turn(id, angle);
 }
 
-const Robot &MapGui::curr(unsigned int id)
+Robot MapGui::curr(unsigned int id)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
@@ -197,7 +212,7 @@ const Robot &MapGui::curr(unsigned int id)
     return map.curr(id);
 }
 
-const Robot &MapGui::join(unsigned int id, int x, int y)
+Robot MapGui::join(unsigned int id, int x, int y)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
@@ -231,6 +246,17 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
         int angleTurned = this->turn(msg.first, angleToTurn);
         parameters.push_back(angleTurned);
         ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
+    }
+    else if(order.startsWith("init")){
+        std::vector<int> inputParameters = Message::getOrderValue(order);
+        int x = inputParameters[0];
+        int y = inputParameters[1];
+        int heading = inputParameters[2];
+        Robot newPosition = this->init(msg.first, x, y, heading);
+        parameters.push_back(newPosition.getPosition().getX());
+        parameters.push_back(newPosition.getPosition().getY());
+        parameters.push_back(newPosition.getHeading());
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
     }
     else{
         //ordre non reconnu

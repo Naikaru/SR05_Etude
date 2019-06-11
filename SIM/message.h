@@ -46,6 +46,7 @@ public:
     static const QString mnemoAckMove;
     static const QString mnemoAckTurn;
     static const QString mnemoAckError;
+    static const QString mnemoAckInit;
     static std::vector<int> getOrderValue(const QString& order);
     static QString parseOrderValues(const QString& order, const std::vector<int>& values);
 
