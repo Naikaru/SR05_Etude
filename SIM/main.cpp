@@ -19,31 +19,34 @@ int main(int argc, char* argv[]) {
 //    Position origine(0, 0);
 //    Position milieu(5, 5);
 //    Map m(1, 10, 10);
-//    Robot robot(0, milieu);
-    QString message("WHEROBLCH/mnemo~value3/mnemo1~value2");
-    Message manager(message);
-    qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
-    qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
-    qDebug() << manager.getCompleteMessage();
-    socket sockServ(QHostAddress("127.0.0.1"), 4646);
-    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
+//    Robot robot(90, milieu);
+
+//    QString message("WHEROBLCH/mnemo~value3/mnemo1~value2");
+//    Message manager(message);
+//    qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
+//    qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
+//    qDebug() << manager.getCompleteMessage();
+//    socket sockServ(QHostAddress("127.0.0.1"), 4646);
+//    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
 //    std::cout << "Coordonées : " << robot.getPosition().getX() << "," << robot.getPosition().getY() << std::endl;
 
-//    robot.setHeading(230);
 
 //    std::cout << "Heading : " << robot.getHeading() << std::endl;
 
 //    m.addRobot(1, robot);
+//    m.printMap();
 
-//    m.changeState(3,3,full);
+//    //m.changeState(3,3,full);
 
-//    //std::cout << "X : " << robot.getPosition().getX() << std::endl;
-//    //std::cout << "Y : " << robot.getPosition().getY() << std::endl;
+//    std::cout << "X : " << robot.getPosition().getX() << std::endl;
+//    std::cout << "Y : " << m.convert(robot.getPosition().getY(), m.getNbRows()) << std::endl;
 
+//    robot.setHeading(230);
 
-//    m.move(1, 4);
+//    m.move(1, 2);
+//    m.printMap();
 
-//    std::cout << "Coordonées : " << m.getRobots()[1].getPosition().getX() << "," << m.getRobots()[1].getPosition().getY() << std::endl;
+    //std::cout << "Coordonées : " << m.getRobots()[1].getPosition().getX() << "," << m.getRobots()[1].getPosition().getY() << std::endl;
 /*
     std::srand(std::time(nullptr));
     Position origine(0, 0);

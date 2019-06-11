@@ -321,7 +321,6 @@ void MapGui::saveConfig()
 unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 {
     return dim - coord -1;
-
 }
 
 
@@ -329,14 +328,13 @@ void MapGui::initRobot()
 {
     QString adress = t_adress->text();
     int x = 1, y = 4, heading = 3, id = 1;
-    Position pos = Position(x, y);
-    pos = map.getCoordinatesFromPosition(pos);
+    Position pos = Position(x, convert(y, dimY));
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
             robotColors[id] = colorList[robotColors.size()];
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setBackgroundColor(robotColors[id]);
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setTextColor(robotColors[id]);
-            grid->item(convert(pos.getY(), dimY), pos.getX())->setText("R");
+            grid->item(pos.getY(), pos.getX())->setBackgroundColor(robotColors[id]);
+            grid->item(pos.getY(), pos.getX())->setTextColor(robotColors[id]);
+            grid->item(pos.getY(), pos.getX())->setText("R");
 
             listRobotColor->insertColumn(listRobotColor->columnCount());
             listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
@@ -358,7 +356,7 @@ void MapGui::initRobot()
         addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
         //map.init(id, x, y, heading);
     }
-
+    map.printMap();
 }
 
 
@@ -371,11 +369,11 @@ void MapGui::run()
         for(unsigned int y=0; y < this->dimY; ++y){
             if(grid->item(y,x)->text() == "")
             {
-                map.changeState(x,convert(y, dimY), CellState::empty);
+                map.changeState(x,y, CellState::empty);
             }
             else
             {
-                map.changeState(x,convert(y, dimY), CellState::full);
+                map.changeState(x, y, CellState::full);
             }
         }
     }
@@ -388,6 +386,7 @@ void MapGui::run()
     sb_selectY->setEnabled(false);
     bt_addRobot->setEnabled(true);
     t_adress->setEnabled(true);
+    map.printMap();
 }
 
 void MapGui::cellActivation(const QModelIndex &index){
@@ -413,14 +412,14 @@ void MapGui::cellSelection()
 {
     QList<QTableWidgetItem *> itemsSelected = grid->selectedItems();
     for(QTableWidgetItem *cell : itemsSelected){
-        lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(convert(cell->row(), dimX)));
+        lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(cell->row()));
         if(cell->text()=="R")
         {
            std::map<int,Robot> robots = map.getRobots();
                    for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
                    {
                        Position robotPosition = it->second.getPosition();
-                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimX))
+                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == cell->row())
                        {
                           if(map.getRobots().size() == 1)
                           {
@@ -461,6 +460,7 @@ void MapGui::cellSelection()
             cell->setSelected(false);
         }
     }
+    map.printMap();
 }
 
 void MapGui::synchronizeDimX(int newDim)
