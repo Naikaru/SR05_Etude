@@ -9,55 +9,6 @@
 #include "simgui.h"
 #include "mapgui.h"
 
-void printMap(const Map& m){
-    bool isRobot;
-    Position robotPosition;
-    std::map<int, Robot> robots = m.getRobots();
-    std::cout << "Map : \n";
-    for(unsigned int i = 0; i< m.getNbRows(); ++i){
-        for(unsigned int j=0; j < m.getNbCols(); ++j){
-            isRobot = false;
-
-            for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
-            {
-                robotPosition = m.getCoordinatesFromPosition(it->second.getPosition());
-                if(robotPosition.getX() == i && robotPosition.getY() == j)
-                {
-                    isRobot = true;
-                    std::cout << "R";
-                }
-            }
-            if(isRobot == false)
-            {
-                std::cout << ((m.getState(i,j) == CellState::empty) ? "_" : "X");
-            }
-        }
-        std::cout << std::endl;
-    }
-}
-
-void initMap(Map& m){
-    for(unsigned int i = 0; i< m.getNbRows(); ++i){
-        for(unsigned int j=0; j < m.getNbCols(); ++j){
-
-            m.changeState(i,j,CellState::empty);
-            if(i == 0 || i == m.getNbRows()-1 || j == 0 || j == m.getNbCols()-1)
-            {
-                m.changeState(i,j,CellState::full);
-            }
-
-
-
-            int obstacle = std::rand()%10;
-            //if(obstacle == 5 || i == 0 || j == 0 || j == (m.getNbCols() - 1) ||i == (m.getNbRows() - 1)){
-              //  m.changeState(i,j,CellState::full);
-            //}
-            //else{
-            //}
-        }
-    }
-}
-
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);

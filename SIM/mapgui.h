@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QDateTime>
+#include <QLineEdit>
 class MapGui : QWidget
 {
 
@@ -30,21 +31,21 @@ class MapGui : QWidget
 
     unsigned int dimX = 10; //nb de lignes
     unsigned int dimY = 10; //nb de colonne
-    unsigned int maxW = 500;
-    unsigned int maxH = 500;
-    unsigned int width = 400;     //largeur
-    unsigned int height = 400;    //hauteur
+    unsigned int maxW = 300;
+    unsigned int maxH = 300;
+    unsigned int width = 300;     //largeur
+    unsigned int height = 300;    //hauteur
     unsigned int dCell() {return std::min(width/dimX,height/dimY);}     //hauteur et largeur d'une cellule
     bool isRunning = false;
     static QColor cellEmptyColor;
     static QColor cellFullColor;
 
-
-
     Qt::GlobalColor colorList[6] {Qt::blue, Qt::red, Qt::green, Qt::yellow, Qt::magenta, Qt::black};
     std::map<int, Qt::GlobalColor> robotColors;
 
+    QHBoxLayout * l_run_coord;
     QPushButton * bt_run;
+    QLabel * lb_coord;
 
     QHBoxLayout * l_mapModifier;
     QSpinBox *sb_selectX;
@@ -55,15 +56,17 @@ class MapGui : QWidget
 
     QHBoxLayout * l_addRobot;
     QTableWidget * listRobotColor;
-    QPushButton * b_addRobot;
+    QPushButton * bt_addRobot;
+    QLabel * lb_adress;
+    QLineEdit * t_adress;
 
+    //Error
+    QLabel * lb_error;
     QTextEdit * t_display;
 
-
     //MessageManager
+    QLabel * lb_message;
     MessageManager  * messageManager;
-
-    QPushButton * bt_test;
 
 public:
     MapGui(QWidget *parent);
@@ -106,7 +109,6 @@ private slots:
     void synchronizeMaxH(int newMax);
     void initRobot();
 
-    void test();
 };
 
 #endif // MAPGUI_H
