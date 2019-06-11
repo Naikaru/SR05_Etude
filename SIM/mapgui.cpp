@@ -127,6 +127,15 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     t_display->setFixedSize(500, 50);
     l_mapGui->addWidget(t_display);
 
+
+    l_config = new QHBoxLayout();
+    bt_configSave = new QPushButton("Sauvegarder la configuration");
+    bt_configLoad = new QPushButton("Charger une configuration");
+
+    l_config->addWidget(bt_configSave);
+    l_config->addWidget(bt_configLoad);
+    l_mapGui->addLayout(l_config);
+
     this->setLayout(l_mapGui);
 
 }
@@ -303,8 +312,8 @@ void MapGui::initRobot()
             listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
 
             //createSocket
-            if(!messageManager->addRobotSocket(id))
-                addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not open a tcp socket") );
+            if(!messageManager->addRobotSocket(adress))
+                addMessageInDisplay(QString("The robot of id ") + adress + QString(" could not open a tcp socket") );
 
 
         } else{
