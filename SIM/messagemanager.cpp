@@ -3,6 +3,7 @@
 MessageManager::MessageManager(QString app, QString who, QString whe, QWidget *parent) : QWidget(parent), APP(app), WHO(who), WHE(whe)
 {
 
+
     t_displayMessage = new QTextEdit(this);
     t_displayMessage ->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     t_displayMessage ->setFocusPolicy(Qt::NoFocus);

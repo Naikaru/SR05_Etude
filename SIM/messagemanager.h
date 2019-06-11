@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QTextEdit>
 #include <QDateTime>
+#include <QVBoxLayout>
 #include "message.h"
 #include "map.h"
 #include "tcpServerManager.h"
@@ -12,6 +13,7 @@
 class MessageManager : public QWidget
 {
     Q_OBJECT
+
 
     QTextEdit * t_displayMessage;
 
@@ -36,6 +38,11 @@ public:
     bool addRobotSocket(int id);
     Message createMessage() const {return Message(APP, WHO, WHE);}
     void sendMessage(int id, const Message& msg);
+
+    void show()
+    {
+        QWidget::show();
+    }
 
 signals:
 

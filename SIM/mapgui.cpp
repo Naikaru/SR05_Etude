@@ -33,8 +33,12 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_mapGui->addWidget(grid);
     l_mapModifier = new QHBoxLayout;
 
+    l_run_coord = new QHBoxLayout;
     bt_run = new QPushButton("Run",this);
-    l_mapGui->addWidget(bt_run);
+    lb_coord = new QLabel("X : 0 | Y : 0 ");
+    l_run_coord->addWidget(bt_run);
+    l_run_coord->addWidget(lb_coord);
+    l_mapGui->addLayout(l_run_coord);
 
     connect(bt_run, SIGNAL(clicked()), this, SLOT(run()));
 
@@ -54,14 +58,14 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     sb_selectMaxW = new QSpinBox(this);
     sb_selectMaxW->setRange(100,1000);
-    sb_selectMaxW->setValue(500);
+    sb_selectMaxW->setValue(300);
     l_mapModifier->addWidget(sb_selectMaxW);
 
     QObject::connect(sb_selectMaxW, SIGNAL(valueChanged(int)), this, SLOT(synchronizeMaxW(int)));
 
     sb_selectMaxH = new QSpinBox(this);
     sb_selectMaxH->setRange(100,1000);
-    sb_selectMaxH->setValue(500);
+    sb_selectMaxH->setValue(300);
     l_mapModifier->addWidget(sb_selectMaxH);
 
     QObject::connect(sb_selectMaxW, SIGNAL(valueChanged(int)), this, SLOT(synchronizeMaxH(int)));
@@ -85,13 +89,37 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     robotColors = std::map<int, Qt::GlobalColor>();
 
 
+    //AddRobot
+    l_addRobot = new QHBoxLayout();
 
-    b_addRobot = new QPushButton("AddNewRobot", this);
-    b_addRobot->setEnabled(false);
+    bt_addRobot = new QPushButton("Connexion", this);
+    bt_addRobot->setEnabled(false);
+    lb_adress = new QLabel("Adresse TCP : ");
+    t_adress = new QLineEdit();
+    t_adress->setPlaceholderText("127.0.0.1");
+    t_adress->setEnabled("false");
 
-    QObject::connect(b_addRobot, SIGNAL(clicked()), this, SLOT(initRobot()));
+    l_addRobot->addWidget(bt_addRobot);
+    l_addRobot->addWidget(lb_adress);
+    l_addRobot->addWidget(t_adress);
+    l_mapGui->addLayout(l_addRobot);
 
-    l_mapGui->addWidget(b_addRobot);
+    QObject::connect(bt_addRobot, SIGNAL(clicked()), this, SLOT(initRobot()));
+
+
+
+    //Messages
+    lb_message = new QLabel("Gestion des messages");
+    l_mapGui->addWidget(lb_message);
+    messageManager = new MessageManager("ROB","PIL", "LCH", this);
+    messageManager->setFixedSize(500, 50);
+    QObject::connect(messageManager, SIGNAL(receivedMessageFromRobot(const std::pair<int,Message>&)), this, SLOT(handleMessageFromRobot(const std::pair<int,Message>&)));
+
+    l_mapGui->addWidget(messageManager);
+
+    //Erreurs
+    lb_error = new QLabel("Gestion des erreurs");
+    l_mapGui->addWidget(lb_error);
 
     t_display = new QTextEdit(this);
     t_display->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -100,22 +128,6 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_mapGui->addWidget(t_display);
 
     this->setLayout(l_mapGui);
-
-
-    //Messages
-    messageManager = new MessageManager("ROB","PIL", "LCH", this);
-    QObject::connect(messageManager, SIGNAL(receivedMessageFromRobot(const std::pair<int,Message>&)), this, SLOT(handleMessageFromRobot(const std::pair<int,Message>&)));
-
-    l_mapGui->addWidget(messageManager);
-
-    //test
-    bt_test = new QPushButton;
-
-    connect(bt_test, SIGNAL(clicked()), this, SLOT(test()));
-
-    l_mapGui->addWidget(bt_test);
-
-
 
 }
 
@@ -139,7 +151,6 @@ void MapGui::addMessageInDisplay(const QString &msg)
 
 void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &newPosition)
 {
-    qDebug() << "fonction";
     unsigned int formerX = formerPosition.getX();
     unsigned int formerY = convert(formerPosition.getY(), dimY);
 
@@ -148,8 +159,6 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
 
     if(grid->item(formerY,formerX)->text() == "R")
     {
-        qDebug() << "yoo :";
-
         grid->item(newY, newX)->setText("R");
         grid->item(newY, newX)->setBackgroundColor(grid->item(formerY,formerX)->backgroundColor());
         grid->item(newY, newX)->setTextColor(grid->item(formerY,formerX)->textColor());
@@ -273,14 +282,12 @@ unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 }
 
 
-
 void MapGui::initRobot()
 {
+    QString adress = t_adress->text();
     int x = 1, y = 4, heading = 3, id = 1;
     Position pos = Position(x, y);
     pos = map.getCoordinatesFromPosition(pos);
-    qDebug() << "Pose : " << map.getNbCols() << map.getNbRows();
-    qDebug() << "Pose : " << pos.getX() << pos.getY();
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
             robotColors[id] = colorList[robotColors.size()];
@@ -304,13 +311,7 @@ void MapGui::initRobot()
         addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
         //map.init(id, x, y, heading);
     }
-    map.printMap();
 
-}
-
-void MapGui::test()
-{
-    updateRobotOnGrid(Position(5, 8), Position(2,2));
 }
 
 
@@ -319,8 +320,6 @@ void MapGui::test()
 void MapGui::run()
 {
     map = Map(100, dimX, dimY);
-    map.initMap();
-
     for(unsigned int x = 0; x< this->dimX; ++x){
         for(unsigned int y=0; y < this->dimY; ++y){
             if(grid->item(y,x)->text() == "")
@@ -340,15 +339,12 @@ void MapGui::run()
     sb_selectMaxW->setEnabled(false);
     sb_selectX->setEnabled(false);
     sb_selectY->setEnabled(false);
-    b_addRobot->setEnabled(true);
-    map.printMap();
-
-
+    bt_addRobot->setEnabled(true);
+    t_adress->setEnabled(true);
 }
 
 void MapGui::cellActivation(const QModelIndex &index){
 
-    qDebug() << "Modification case : " << index.row() << index.column();
     grid->item(index.row(),index.column())->setSelected(false);
     if(grid->item(index.row(),index.column())->text() == "")
     {
@@ -370,6 +366,7 @@ void MapGui::cellSelection()
 {
     QList<QTableWidgetItem *> itemsSelected = grid->selectedItems();
     for(QTableWidgetItem *cell : itemsSelected){
+        lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(convert(cell->row(), dimX)));
         if(cell->text()=="R")
         {
            std::map<int,Robot> robots = map.getRobots();
@@ -378,13 +375,8 @@ void MapGui::cellSelection()
                        Position robotPosition = it->second.getPosition();
                        if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimX))
                        {
-
-
-                          qDebug() << map.getRobots().size();
-
                           if(map.getRobots().size() == 1)
                           {
-                              qDebug() << "Ici 1 dim";
                               listRobotColor->removeColumn(0);
                               listRobotColor->setFixedSize(0*20, 0*20);
                           }
@@ -401,14 +393,11 @@ void MapGui::cellSelection()
         }
         else
         {
-
-
             if(cb_selection->isChecked()){
 
                 if(isRunning)
                 {
                     map.changeState(cell->column(),convert(cell->row(), dimY), CellState::full);
-                    map.printMap();
                 }
                 cell->setText("_");
                 cell->setBackgroundColor(cellFullColor);
@@ -417,7 +406,6 @@ void MapGui::cellSelection()
                 if(isRunning)
                 {
                     map.changeState(cell->column(),convert(cell->row(), dimY), CellState::empty);
-                    map.printMap();
                 }
                 cell->setText("");
                 cell->setBackgroundColor(cellEmptyColor);
@@ -430,7 +418,7 @@ void MapGui::cellSelection()
 
 void MapGui::synchronizeDimX(int newDim)
 {
-    qDebug() << "Nouvelle dimension :" << newDim;
+    //qDebug() << "Nouvelle dimension :" << newDim;
 
     //on garde la même largeur
     //on diminue la hauteur
@@ -438,12 +426,12 @@ void MapGui::synchronizeDimX(int newDim)
     {
         width = maxW;
         height = ((width) / ((float)newDim/(float)dimY));
-        qDebug() << "w :" << width << " h:" << height;
+        //qDebug() << "w :" << width << " h:" << height;
     }else if(dimY > newDim){
         height = maxH;
         width = (float)(height) / ((float)dimY/(float)newDim);
 
-        qDebug() << "w :" << width << " h:" << height;
+        //qDebug() << "w :" << width << " h:" << height;
     } else{
         width = maxW;
         height = maxH;
@@ -471,7 +459,7 @@ void MapGui::synchronizeDimX(int newDim)
 
 void MapGui::synchronizeDimY(int newDim)
 {
-    qDebug() << "Nouvelle dimension " << newDim;
+    //qDebug() << "Nouvelle dimension " << newDim;
 
     //on garde la même largeur
     //on diminue la hauteur
@@ -479,11 +467,11 @@ void MapGui::synchronizeDimY(int newDim)
     {
         width = maxW;
         height = ((float)(width) / ((float)dimX / (float)newDim));
-        qDebug() << "w :" << width << " h:" << height;
+        //qDebug() << "w :" << width << " h:" << height;
     }else if(dimX < newDim){
         height = maxH;
         width = (float)(height) / ((float)newDim / (float)dimX);
-        qDebug() << "w :" << width << " h:" << height;
+        //qDebug() << "w :" << width << " h:" << height;
     }else{
         width = maxW;
         height = maxH;
