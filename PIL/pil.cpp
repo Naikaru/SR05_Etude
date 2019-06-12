@@ -150,7 +150,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     connect(parse, SIGNAL(clicked()), this, SLOT(parseMessage())); // parse message
     connect(mnemonic, SIGNAL(returnPressed()), this, SLOT(parseMessage())); // parse message
     // Slot for notifier (reading)
-    //connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
+    connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
     connect(&client, SIGNAL(receivedMessage(Message)), this, SLOT(rmtMessage(Message)));
 
     while(!client.isHandshakeFinished())
