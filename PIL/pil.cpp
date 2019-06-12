@@ -3,7 +3,7 @@
 
 // ###################### Constructor #########################
 
-Pil::Pil(int argc, char* argv[]): QWidget() {
+Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     this->setAttribute(Qt::WA_DeleteOnClose, true);
     this->resize(500,350);
     main = new QVBoxLayout();

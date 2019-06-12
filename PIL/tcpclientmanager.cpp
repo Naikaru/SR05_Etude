@@ -14,7 +14,7 @@ void TcpClientManager::connectToRobot(QHostAddress addr, int port){
 }
 
 bool TcpClientManager::send(QString message){
-    if (sock.isOpen() && handshakeState == 3){
+    if (sock.isOpen() && handshakeState > 1){
         if (sock.write(message.toStdString().c_str()) >= 0){
             return true;
         }
