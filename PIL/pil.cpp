@@ -533,26 +533,28 @@ void Pil::applyAction()
 
 void Pil::runAlgo()
 {
-    currentActionToDo = algo->runMinPosOpti();
-//    for (QStringList::const_iterator it=currentActionToDo.constBegin(); it!=currentActionToDo.constEnd(); ++it) {
-//        //std::cout << (*it).toLocal8Bit().constData() << std::endl;
-//        QString message = (*it).mid(0,4);
-//        // std::cout << message.toStdString() << std::endl;
-//        if (message == "turn")
-//            map->turn(0,((*it).mid(5)).toInt());
-//        else if (message == "move")
-//            map->move(0,((*it).mid(5)).toUInt());
-//    }
+    if (nbRobotsInitialized == 0) {
+        currentActionToDo = algo->runMinPosOpti();
+    //    for (QStringList::const_iterator it=currentActionToDo.constBegin(); it!=currentActionToDo.constEnd(); ++it) {
+    //        //std::cout << (*it).toLocal8Bit().constData() << std::endl;
+    //        QString message = (*it).mid(0,4);
+    //        // std::cout << message.toStdString() << std::endl;
+    //        if (message == "turn")
+    //            map->turn(0,((*it).mid(5)).toInt());
+    //        else if (message == "move")
+    //            map->move(0,((*it).mid(5)).toUInt());
+    //    }
 
-    currentIndexOfAction = 0;
+        currentIndexOfAction = 0;
 
 
-    //si il est vide -> plus de frontières -> on a fini l'exploration !
-    if(!currentActionToDo.isEmpty())
-        applyAction();
-    //FIN FIN FIN
-    else{
-        QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+        //si il est vide -> plus de frontières -> on a fini l'exploration !
+        if(!currentActionToDo.isEmpty())
+            applyAction();
+        //FIN FIN FIN
+        else{
+            QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+        }
     }
 }
 
@@ -599,6 +601,7 @@ void Pil::rmtMessage(Message mess){
     }
     else if (action == mnemoInit)
     {
+        std::cerr << "PIL " << ident << " s'est initialise" << std::endl;
         val = Message::getOrderValue(order);
         map->initRobot(ident,val[0],val[1],val[2]);
         addInitInBufferAndSend();
