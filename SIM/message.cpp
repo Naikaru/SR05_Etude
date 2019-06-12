@@ -69,7 +69,6 @@ std::vector<int> Message::getOrderValue(const QString &order)
     int startIndex;
     int endIndex;
 
-
     QString currentString = order;
     startIndex = currentString.indexOf(sepOrderMnem);
     qDebug() << "order : " << order << " sep :" << sepOrderMnem;
@@ -83,6 +82,7 @@ std::vector<int> Message::getOrderValue(const QString &order)
             qDebug() << "index de fin :" <<endIndex;
             startIndex = endIndex + 1; // après la virgule
         } else{
+            values.push_back(order.mid(startIndex + 1));
             startIndex = -1;
         }
 
