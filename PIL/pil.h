@@ -195,7 +195,7 @@ class Pil: public QWidget {
 class SendingThread: public QThread {
     Q_OBJECT
     private:
-        const int WAITING_TIME = 3000;
+        const int WAITING_TIME = 500;
         Pil* pil;
         bool cont = true;
 
