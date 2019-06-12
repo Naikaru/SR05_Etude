@@ -74,8 +74,8 @@ class Pil: public QWidget {
 
         unsigned int nbRobot = 1;   //number of robots
         unsigned int nbRobotsInitialized;
-        int xInit=0;              //initial pos of the robot
-        int yInit=0;
+        int xInit=1;              //initial pos of the robot
+        int yInit=1;
 
         std::map<unsigned int, unsigned int> nbActionsRobot;
 

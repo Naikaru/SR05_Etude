@@ -150,14 +150,14 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     connect(parse, SIGNAL(clicked()), this, SLOT(parseMessage())); // parse message
     connect(mnemonic, SIGNAL(returnPressed()), this, SLOT(parseMessage())); // parse message
     // Slot for notifier (reading)
-    connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
+    //connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
     connect(&client, SIGNAL(receivedMessage(Message)), this, SLOT(rmtMessage(Message)));
 
-//    while(!client.isHandshakeFinished())
-//    {
-//        //int a(0);
-//        QTest::qWait(50);
-//    }
+    while(!client.isHandshakeFinished())
+    {
+        //int a(0);
+        QTest::qWait(50);
+    }
     QTest::qWait(50);
 
     if (nbRobotsInitialized == 0) {
@@ -415,7 +415,7 @@ void Pil::applyBufferFromMessage(QString message){
             reset_connected();
             applyBufferForRobot(identRobot.toUInt(), buffer);
         } else {
-            std::cerr << "Robots too far, message not received" << std::endl;
+            std::cerr << "Robots too far, message not received\n";
         }
     }
 }
@@ -478,7 +478,8 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
                 else
                     reach_nearestRob();
             }
-//            qDebug() << "Robot " << r << " initialisé";
+
+            std::cerr << "Robot " << r << " initialisé";
 
         } else {
             //qDebug() << "Le robot " << r << " n'a jamais été initialisé";
@@ -537,7 +538,9 @@ void Pil::runAlgo()
 //    }
 
     currentIndexOfAction = 0;
-    applyAction();
+    //si il est vide -> plus de frontières -> on a fini l'exploration !
+    if(!currentActionToDo.isEmpty())
+        applyAction();
 }
 
 
@@ -587,7 +590,6 @@ void Pil::rmtMessage(Message mess){
         map->initRobot(ident,val[0],val[1],val[2]);
         addInitInBufferAndSend();
     }
-//    qDebug() << order<<"\n";
 
     if(obs) {
         if (is_connected())
