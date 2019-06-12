@@ -100,22 +100,22 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
 
-    // to test
-    map->initRobot(ident,xInit,yInit,0);
-    addInitInBufferAndSend();
-//    map->move(0,5);
-//    map->turn(0,90);
-//    map->move(0,5);
-//    map->turn(0,-90);
-//    map->move(0,5);
+    QString tmp("127.0.0."); tmp+=QString::number(ident+1);
+    client.connectToRobot(QHostAddress(tmp),4646);
+
+    // initialisation du robot
+    QString initAction("");
+    initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
+    currentActionToDo<<initAction;
+    currentIndexOfAction =0;
+
     map->show();
 
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
 
-    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
-    std::cout << "ident : " << ident << "x : " << map->getRobotPosition(ident).x << "y : " << map->getRobotPosition(ident).y << std::endl;
-
+//    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
+//    std::cout << "ident : " << ident << "x : " << map->getRobotPosition(ident).x << "y : " << map->getRobotPosition(ident).y << std::endl;
 //    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
 //    std::list<Cellule*> closedList;
 //    Cellule begin(map->robots[ident].x, map->robots[ident].y);
@@ -133,7 +133,6 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
 //            path = lookfor_cell(closedList, path->m_xp, path->m_yp);
 //        }
 //    }
-
 
 //    Cellule* begin =  new Cellule(map->robots[ident].x,map->robots[ident].y);
 //    std::cout << "ident : " << ident << "x : " << begin->get_x() << "y : " << begin->get_y() << std::endl;
@@ -165,7 +164,7 @@ Pil::Pil(int argc, char* argv[]): QWidget() {
     connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
 
     if (nbRobotsInitialized == 0) {
-        runAlgo();
+        applyAction();
     }
 }
 
@@ -521,8 +520,7 @@ void Pil::applyAction()
     else
     {
         Message m("PIL","ROB","LCH");
-        QStringList action = currentActionToDo[currentIndexOfAction].split(":");
-        m.setValue(action[0],action[1]);
+        m.setValue(mnemoRobotOrder,currentActionToDo[currentIndexOfAction]);
         client.send(m);
         currentIndexOfAction++;
     }
@@ -544,32 +542,41 @@ void Pil::rmtMessage(Message mess){
     //reception d'une réponse de la simu
     QStringList tmp= currentActionToDo[currentIndexOfAction-1].split(":");
     QString action = tmp[0];
-    QString val("");
+    QString order= mess.getValue(mnemoRobotAck);
+    qDebug() << order;
     bool obs = false;
+    std::vector<int> val;
     //si c'est un move
     if(action == mnemoMove)
     {
-        val = mess.getValue(mnemoAckMove);
-        if(val != ""){
-            obs = tmp[1].toInt() != val.toInt();
-            map->move(ident,val.toInt(),obs);
-            nbActionsRobot[ident]++;
-            moveMovementReceived(val.toUInt(), tmp[1].toUInt());
-            //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
-        }
+        val = Message::getOrderValue(order);
+
+        obs = tmp[1].toInt() != val[0];
+        map->move(ident,val[0],obs);
+        nbActionsRobot[ident]++;
+        moveMovementReceived(val[0], tmp[1].toUInt());
+        //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
+
     }
     //sinon si c'est un turn
     else if (action == mnemoTurn)
     {
-        val = mess.getValue(mnemoAckTurn);
-        obs = tmp[1].toInt() != val.toInt();
+        val = Message::getOrderValue(order);
 
-        if(val != "" && !obs){
-            map->turn(ident,val.toInt());
-            nbActionsRobot[ident]++;
-            turnMovementReceived(val.toUInt());
-        }
+        obs = tmp[1].toInt() != val[0];
+
+        map->turn(ident,val[0]);
+        nbActionsRobot[ident]++;
+        turnMovementReceived(val[0]);
+
     }
+    else if (action == mnemoInit)
+    {
+        val = Message::getOrderValue(order);
+        map->initRobot(ident,val[0],val[1],val[2]);
+        addInitInBufferAndSend();
+    }
+
     if(obs)
         runAlgo();
     else

@@ -267,6 +267,8 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 
     Message ackMessage = messageManager->createMessage();
 
+    qDebug() <<msg.second.getCompleteMessage()<<endl;
+
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
     if(order.startsWith("move")) {
