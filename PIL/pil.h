@@ -57,8 +57,12 @@ class Pil: public QWidget {
         const QString mnemoAckMove = "moved";
         const QString mnemoAckTurn = "turned";
         const QString mnemoAckError = "order";
+        const QString mnemoAckInit = "init";
         const QString mnemoMove = "move";
+        const QString mnemoInit = "init";
         const QString mnemoTurn = "turn";
+        const QString mnemoRobotOrder = "robord";
+        const QString mnemoRobotAck = "roback";
 
         QString bufferPayload = "@buffer";
 

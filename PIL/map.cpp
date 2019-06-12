@@ -124,6 +124,7 @@ void Map::move(int id,int d, bool obstacle)
             setObstacle(id);
         }
     }
+    this->repaint();
 
     return;
 }
