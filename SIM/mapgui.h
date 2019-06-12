@@ -89,7 +89,7 @@ public:
     void addMessageInDisplay(const QString& msg, bool warning = false);
 
 
-    void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
+    void updateRobotOnGrid(int id, const Position& formerPosition);
 
     Robot init(int id, int x, int y, int heading);
     int move(int id, int d);

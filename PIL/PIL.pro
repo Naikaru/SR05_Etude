@@ -10,11 +10,15 @@ INCLUDEPATH += .
 HEADERS += pil.h \
     map.h \
     tcpclientmanager.h \
-    message.h
+    message.h \
+    algo.h \
+    astar.h
 SOURCES += main.cpp pil.cpp \
     map.cpp \
     tcpclientmanager.cpp \
-    message.cpp
+    message.cpp \
+    algo.cpp \
+    astar.cpp
 
 
 QT += core gui widgets network

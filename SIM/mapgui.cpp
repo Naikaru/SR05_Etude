@@ -44,14 +44,14 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
 
     sb_selectX = new QSpinBox(this);
     sb_selectX->setRange(1,500);
-    sb_selectX->setValue(10);
+    sb_selectX->setValue(50);
     l_mapModifier->addWidget(sb_selectX);
 
     QObject::connect(sb_selectX, SIGNAL(valueChanged(int)), this, SLOT(synchronizeDimX(int)));
 
     sb_selectY = new QSpinBox(this);
     sb_selectY->setRange(1,500);
-    sb_selectY->setValue(10);
+    sb_selectY->setValue(50);
     l_mapModifier->addWidget(sb_selectY);
 
     QObject::connect(sb_selectY, SIGNAL(valueChanged(int)), this, SLOT(synchronizeDimY(int)));
@@ -171,19 +171,22 @@ void MapGui::addMessageInDisplay(const QString &msg, bool warning)
     t_display->append(QDateTime::currentDateTime().time().toString() + QString(" : ") + msg);
 }
 
-void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &newPosition)
+void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
 {
+    qDebug() << "Updating Robot "<< id << " from position : " <<formerPosition.getX() << ":" << formerPosition.getY();
+
     unsigned int formerX = formerPosition.getX();
     unsigned int formerY = convert(formerPosition.getY(), dimY);
 
+    Position newPosition = map.getRobots().at(id).getPosition();
     unsigned int newX = newPosition.getX();
     unsigned int newY = convert(newPosition.getY(), dimY);
 
     if(grid->item(formerY,formerX)->text() == "R")
     {
         grid->item(newY, newX)->setText("R");
-        grid->item(newY, newX)->setBackgroundColor(grid->item(formerY,formerX)->backgroundColor());
-        grid->item(newY, newX)->setTextColor(grid->item(formerY,formerX)->textColor());
+        grid->item(newY, newX)->setBackgroundColor(robotColors[id]);
+        grid->item(newY, newX)->setTextColor(robotColors[id]);
 
         grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
         grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
@@ -225,7 +228,7 @@ int MapGui::move(int id, int d)
     Position robotBeforeMove = map.getRobots().at(id).getPosition();
     int distanceTravelled = map.move(id, d);
     Position newPosition = map.getRobots().at(id).getPosition();
-    updateRobotOnGrid(robotBeforeMove, newPosition);
+    updateRobotOnGrid(id, robotBeforeMove);
     return distanceTravelled;
 }
 
@@ -260,7 +263,7 @@ Robot MapGui::join(unsigned int id, int x, int y)
     Position robotBeforeMove = map.getRobots().at(id).getPosition();
     map.join(id, x, y);
     Position newPosition = map.getRobots().at(id).getPosition();
-    updateRobotOnGrid(robotBeforeMove, newPosition);
+    updateRobotOnGrid(id, robotBeforeMove);
     return map.getRobots().at(id);
 }
 
