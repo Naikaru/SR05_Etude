@@ -100,6 +100,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
+    map->setWindowTitle(QString("MAP ")+ QString::number(ident) );
 
     QString tmp("127.0.0."); tmp+=QString::number(ident+1);
     client.connectToRobot(QHostAddress(tmp),4646);
@@ -303,8 +304,8 @@ void Pil::readStdin() {
             QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
             if (payload.startsWith(bufferPayload)){
                 applyBufferFromMessage(QString::fromStdString(message));
-                reception_fullmessage->setText(QString::fromStdString(message));
-                reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
+                //reception_fullmessage->setText(QString::fromStdString(message));
+                //reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
                 reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
                 reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
                 reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
@@ -467,9 +468,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
     if (nbActionsRobot[r] == 0) {
         if (movement == mnemoInit) {
             map->initRobot(r, x_final, y_final, heading_final);
-//            qDebug() << "caca";
             nbActionsRobot[r] = std::max(numAction, (unsigned int)1);
-//            qDebug() << "prout";
             nbRobotsInitialized--;
             if (nbRobotsInitialized == 0) {
 //                qDebug() << "avant thread";
@@ -477,10 +476,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
                 sendingThread->setParam(this);
                 sendingThread->start();
                 if (is_connected()) {
-
-//                    qDebug() << "avant algo";
-//                    runAlgo();
-//                    qDebug() << "après algo";
+                      runAlgo();
                 }
                 else
                     reach_nearestRob();
@@ -489,7 +485,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             std::cerr << "Robot " << r << " initialisé";
 
         } else {
-            //qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+            qDebug() << "Le robot " << r << " n'a jamais été initialisé";
         }
     } else if (movement == mnemoMove) {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;

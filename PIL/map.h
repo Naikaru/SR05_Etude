@@ -10,6 +10,7 @@
 #include <string.h>
 #include <regex>
 #include <fstream>
+#include <QtTest/QtTest>
 
 #define FRONT "green"
 #define EXPLO "white"
