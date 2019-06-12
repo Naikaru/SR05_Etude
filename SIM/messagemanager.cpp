@@ -41,7 +41,7 @@ bool MessageManager::addRobotSocket(QString adress)
     if(sockets.find(id) != sockets.end())
         return false;
 
-    //QString address = QString("127.0.0.") + QString::number(id);
+
 
     sockets[id] = new socket(QHostAddress (adress));
 

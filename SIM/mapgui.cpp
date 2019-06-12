@@ -684,6 +684,7 @@ void MapGui::deleteRobot(int x, int y)
     }
 
     messageManager->removeRobotSocket(id);
+    addMessageInDisplay(QString("Le robot a été supprimé avec succès"));
 
 }
 

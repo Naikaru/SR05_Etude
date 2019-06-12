@@ -6,7 +6,7 @@ int socket::getRobotId() const
 
 socket::socket(QHostAddress address , int port):server()
 {
-    robotId = address.toString().left(1).toInt();
+    robotId = address.toString().right(1).toInt();
 
     if (server.listen(address, port)){
         //qDebug() << QString("Server listening on ")+address.toString()+":"+QString(std::to_string(port).c_str());
