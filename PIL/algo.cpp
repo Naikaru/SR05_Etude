@@ -89,7 +89,7 @@ QStringList Algo::runMinPos()
 
 
 void Algo::sortFrontier(){
-    std::sort(frontiers.begin(),frontiers.end(), Algo::cmp_frontiers);
+    std::stable_sort(frontiers.begin(),frontiers.end(), Algo::cmp_frontiers);
 }
 
 /*

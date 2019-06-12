@@ -94,6 +94,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
+    std::cerr << "PIL sazejfsqdfh " << ident << std::endl;
     nbRobotsInitialized = nbRobot - 1;
     // qDebug() << "PIL ident = " << ident;
 
@@ -107,7 +108,9 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
     currentActionToDo << initAction;
     currentIndexOfAction =0;
-    addInitInBufferAndSend();
+
+    // todo : à virer après vérif
+    //addInitInBufferAndSend();
 
     // to test
     // map->initRobot(ident,xInit,yInit,0);
@@ -160,12 +163,10 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     }
     QTest::qWait(50);
 
-    if (nbRobotsInitialized == 0) {
-        applyAction();
+    applyAction();
 //        sendingThread = new SendingThread();
 //        sendingThread->setParam(this);
 //        sendingThread->start();
-    }
 }
 
 
@@ -286,7 +287,12 @@ void Pil::readStdin() {
     // disconnect the socket and make another messages waiting
     std::string message;
     int c;
-    do {
+
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    c = ungetc(std::getc(stdin), stdin);
+    fcntl(STDIN_FILENO, F_SETFL, flags);
+    while(c != EOF) {
         std::getline(std::cin, message);
         //si le message vient du robot ou de la simu
         if(message.substr(0,3) == "ROB")
@@ -309,8 +315,7 @@ void Pil::readStdin() {
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
         c = ungetc(std::getc(stdin), stdin);
         fcntl(STDIN_FILENO, F_SETFL, flags);
-
-    } while (c != EOF);
+    }
     notifier->setEnabled(true);
 }
 
@@ -538,9 +543,15 @@ void Pil::runAlgo()
 //    }
 
     currentIndexOfAction = 0;
+
+
     //si il est vide -> plus de frontières -> on a fini l'exploration !
     if(!currentActionToDo.isEmpty())
         applyAction();
+    //FIN FIN FIN
+    else{
+        QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+    }
 }
 
 
