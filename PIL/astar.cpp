@@ -1,11 +1,11 @@
 #include "astar.h"
 #include "map.h"
 
-int estimation_heuristique(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2) {
+int estimation_heuristique(int x1, int y1, int x2, int y2) {
     return (fabs(x1 - x2) + fabs(y1 - y2));
 }
 
-Cellule::Cellule(unsigned int x, unsigned int y): m_x(x), m_y(y), m_xp(-1), m_yp(-1) {}
+Cellule::Cellule(unsigned int x, unsigned int y): m_x(x), m_y(y), m_xp(-1), m_yp(-1), m_cost(0), m_heuristique(std::numeric_limits<int>::max()) {}
 
 Cellule::Cellule(unsigned int x, unsigned int y, unsigned int cost, Cellule *pred, Cellule *last):
     m_x(x),
@@ -52,14 +52,14 @@ void AStar::add_cell(Cellule* cell){
     // On fait ici le choix de placer, à heuristique égale, la nouvelle cellule en première
 
     if (openList.empty() == true){ // cell devient la tete de liste comme seul element
-        openList.push_back(cell);
+        openList.push_front(cell);
     }
-    else if (cell->get_heuristique() <= openList.front()->get_heuristique()){ // insertion en tete
+    else if (cell->get_heuristique() < openList.front()->get_heuristique()){ // insertion en tete
         openList.push_front(cell);
     }
     else{
         std::list<Cellule*>::iterator it = openList.begin();
-        while(it != openList.end() && cell->get_heuristique() <= (*it)->get_heuristique()) {
+        while(it != openList.end() && cell->get_heuristique() > (*it)->get_heuristique()) {
             ++it;
         }
         openList.insert(it, cell);
@@ -89,6 +89,7 @@ void AStar::add_neighbours(Cellule* cell){
                                 map->get_cell(x+1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x+1, y) == NULL)
             && (lookfor_cell(openList, x+1, y) == NULL)){
+        std::cerr << "Ajout voisin : ( " << x+1 << ", " << y << " )" << std::endl;
         //printf("\nAjout droit");
 //          if (map->get_cell(x+1,y) == FRONT) cost = 0.75  // essayer avec différentes valeurs
 //          else cost = 1
@@ -101,6 +102,7 @@ void AStar::add_neighbours(Cellule* cell){
                  map->get_cell(x-1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x-1, y) == NULL)
             && (lookfor_cell(openList, x-1, y) == NULL)){
+        std::cerr << "Ajout voisin : ( " << x-1 << ", " << y << " )" << std::endl;
         add_cell(new Cellule(x-1, y, 1, cell, begin));
     }
 
@@ -110,6 +112,7 @@ void AStar::add_neighbours(Cellule* cell){
                                 map->get_cell(x,y+1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y+1) == NULL)
             && (lookfor_cell(openList, x, y+1) == NULL)){
+        std::cerr << "Ajout voisin : ( " << x << ", " << y+1 << " )" << std::endl;
         add_cell(new Cellule(x, y+1, 1, cell, begin));
     }
 
@@ -119,6 +122,7 @@ void AStar::add_neighbours(Cellule* cell){
                  map->get_cell(x,y-1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y-1) == NULL)
             && (lookfor_cell(openList, x, y-1) == NULL)){
+        std::cerr << "Ajout voisin : ( " << x << ", " << y-1 << " )" << std::endl;
         add_cell(new Cellule(x, y-1, 1, cell, begin));
     }
     return;
@@ -131,10 +135,11 @@ void AStar::astar(){
 
     openList.push_front(end);
     Cellule* cell;
+    std::cerr << "############################## ASTSAR ##############################"<<std::endl;
     while(openList.empty() == false){
         // Récupération du plus petit element (donc la tete)
         cell = openList.front();
-        std::cerr << "Exploration de la case : ( " << cell->get_x() << ", " << cell->get_y() << " )" << std::endl;
+        std::cerr << "### Exploration de la case : ( " << cell->get_x() << ", " << cell->get_y() << " ) ###" << std::endl;
         closedList.push_front(cell);
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'

@@ -34,7 +34,7 @@ public:
     void set_heuristique(unsigned int h) { m_heuristique = h; }
 };
 
-int estimation_heuristique(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
+int estimation_heuristique(int x1, int y1, int x2, int y2);
 
 class AStar
 {
