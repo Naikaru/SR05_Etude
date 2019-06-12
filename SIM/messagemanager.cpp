@@ -51,7 +51,8 @@ bool MessageManager::addRobotSocket(QString adress)
 
 void MessageManager::sendMessage(int id, const Message &msg)
 {
-    sockets.at(id)->send(msg);
+    qDebug() << "sending " <<msg.getCompleteMessage();
+    sockets[id]->send(msg);
     t_displayMessage->setTextColor(Qt::blue);
     t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" >>  " +  msg.getCompleteMessage()));
 }
