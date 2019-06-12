@@ -42,7 +42,7 @@ void Message::parseMessage(QString message){
        if(tmp.size() == 2){
            couples.insert(tmp[0],tmp[1]);
        }else{
-           qDebug() << QString("ERROR - malformed message");
+           //qDebug() << QString("ERROR - malformed message");
        }
     }
 }
@@ -71,8 +71,8 @@ std::vector<int> Message::getOrderValue(const QString &order)
 
     QString currentString = order;
     startIndex = currentString.indexOf(sepOrderMnem);
-    qDebug() << "order : " << order << " sep :" << sepOrderMnem;
-    qDebug() << "startIndex = " << startIndex;
+    //qDebug() << "order : " << order << " sep :" << sepOrderMnem;
+    //qDebug() << "startIndex = " << startIndex;
 
     if(startIndex != -1)
         startIndex++;
@@ -81,12 +81,12 @@ std::vector<int> Message::getOrderValue(const QString &order)
         endIndex = order.indexOf(sepOrderValueMnem, startIndex);
         if(endIndex != -1){
             values.push_back(order.mid(startIndex, endIndex - (startIndex)).toInt());
-            qDebug() << "valeur ajoutée :" << values.back();
-            qDebug() << "index de fin :" <<endIndex;
+            //qDebug() << "valeur ajoutée :" << values.back();
+            //qDebug() << "index de fin :" <<endIndex;
             startIndex = endIndex + 1; // après la virgule
         } else{
             values.push_back(order.mid(startIndex).toInt());
-            qDebug() << "dernière valeur :" << values.back();
+            //qDebug() << "dernière valeur :" << values.back();
             startIndex = -1;
         }
 
@@ -100,11 +100,11 @@ QString Message::parseOrderValues(const QString &order, const std::vector<int> &
 {
     QString result = order + sepOrderMnem;
     for(int value : values){
-        qDebug() << "valeur : " << value;
+        //qDebug() << "valeur : " << value;
         result += QString::number(value) + sepOrderValueMnem;
     }
     result = result.mid(0,result.lastIndexOf(sepOrderValueMnem));
-    qDebug() << result;
+    //qDebug() << result;
     return result;
 
 }

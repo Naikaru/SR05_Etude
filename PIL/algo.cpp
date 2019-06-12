@@ -154,6 +154,10 @@ int Algo::getFrontierMinPosOpti()
 QStringList Algo::runMinPosOpti()
 {
     findFrontier();
+
+    if(frontiers.size() == 0)
+        return QStringList();
+
     sortFrontier(); //premier trie par la distance euclidienne
 
     int front = getFrontierMinPosOpti();

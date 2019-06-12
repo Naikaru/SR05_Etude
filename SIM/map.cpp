@@ -82,7 +82,7 @@ CellState Map::getState(unsigned int i, unsigned int j) const
 
 int Map::move(unsigned int id, int d){
 
-    qDebug() << "Move : going forward : " << d;
+    //qDebug() << "Move : going forward : " << d;
     unsigned int distanceTraveled = 0;
 
     Robot& robot = robots[id];
@@ -104,11 +104,13 @@ int Map::move(unsigned int id, int d){
     for(unsigned int i = 1; i <= d; ++i){
         Position destination;
 
+
         int x = (int)position.getX() + (abs(i * cos(angleInRad)) > 0.01 ? i*cos(angleInRad) : 0);
         //qDebug() << "i cos = " << i*cos(angleInRad);
         //qDebug() << "i sin = " << i*sin(angleInRad);
         int y = (int)position.getY() + i * sin(angleInRad);
         //qDebug() << "destination : " << i << "x : " << x << "y : " << y;
+
         destination.setX(x);
         destination.setY(y);
 
@@ -126,7 +128,7 @@ int Map::move(unsigned int id, int d){
             break;
         }
     }
-    qDebug() << "Postition " << cellTraveled.back().getX() << cellTraveled.back().getY();
+    //qDebug() << "Postition " << cellTraveled.back().getX() << cellTraveled.back().getY();
 
     robot.setPosition(cellTraveled.back());
     return distanceTraveled;
@@ -178,7 +180,7 @@ const Robot& Map::curr(unsigned int id) const{
 const Robot& Map::join(unsigned int id, int x, int y){
     Robot& robotToMove = robots[id];
     Position currentPosition = robotToMove.getPosition();
-    qDebug() << "Trying to get to " << x << "," << y << " from " << currentPosition.getX() << "," << currentPosition.getY();
+    //qDebug() << "Trying to get to " << x << "," << y << " from " << currentPosition.getX() << "," << currentPosition.getY();
     float angleToJoin;
     float diffX = (float)x - currentPosition.getX();
     float diffY = (float) y - currentPosition.getY();
@@ -201,22 +203,22 @@ const Robot& Map::join(unsigned int id, int x, int y){
         angleToJoin = 0;
 
     //we now have to make the robot turn to the given angle
-    qDebug() << "Trying to get to angle : " << angleToJoin << "from angle " << robotToMove.getHeading();
+    //qDebug() << "Trying to get to angle : " << angleToJoin << "from angle " << robotToMove.getHeading();
     float turningAngle = angleToJoin - robotToMove.getHeading();
     if(abs(turningAngle) > 180)
         turningAngle = (turningAngle > 0) ? turningAngle - 360 : turningAngle + 360;
     turningAngle = MathHelper::roundToNearestInt(turningAngle);
-    qDebug() << "Calling turn with angle = " << turningAngle;
+    //qDebug() << "Calling turn with angle = " << turningAngle;
 
     int updatedHeading = turn(id, turningAngle);
-    qDebug() << "New angle is : " << robotToMove.getHeading();
+    //qDebug() << "New angle is : " << robotToMove.getHeading();
     if(updatedHeading != turningAngle){ //the angle could not be reached
         return robotToMove;
     }
 
     int distanceToTravel = ceil(sqrt(pow(diffX,2) + pow(diffY,2))); //théorème de pythagore round to highest
-    qDebug() << "exact distance : " << sqrt(pow(diffX,2) + pow(diffY,2));
-    qDebug() << "Calling move with : " << distanceToTravel;
+    //qDebug() << "exact distance : " << sqrt(pow(diffX,2) + pow(diffY,2));
+    //qDebug() << "Calling move with : " << distanceToTravel;
     move(id, distanceToTravel);
 
     return robotToMove;

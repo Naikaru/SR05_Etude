@@ -181,7 +181,7 @@ void MapGui::addMessageInDisplay(const QString &msg, bool warning)
 
 void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
 {
-    qDebug() << "Updating Robot "<< id << " from position : " <<formerPosition.getX() << ":" << formerPosition.getY();
+    //qDebug() << "Updating Robot "<< id << " from position : " <<formerPosition.getX() << ":" << formerPosition.getY();
 
     unsigned int formerX = formerPosition.getX();
     unsigned int formerY = convert(formerPosition.getY(), dimY);
@@ -189,8 +189,8 @@ void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
     Position newPosition = map.getRobots().at(id).getPosition();
     unsigned int newX = newPosition.getX();
     unsigned int newY = convert(newPosition.getY(), dimY);
-    qDebug() << "FormerX : " << formerX << "FormerY" << formerY;
-    qDebug() << "newX : " << newX << " newY" << newY;
+    //qDebug() << "FormerX : " << formerX << "FormerY" << formerY;
+    //qDebug() << "newX : " << newX << " newY" << newY;
     if(grid->item(formerY,formerX)->text() == "R")
     {
         grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
@@ -211,7 +211,7 @@ Robot MapGui::init(int id, int x, int y, int heading){
         addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return Robot(heading,Position(x, y));
     }
-    qDebug() << "dans init mapGUI : x y heading " << x << y << heading;
+    //qDebug() << "dans init mapGUI : x y heading " << x << y << heading;
     //on considère que ca renvoie le bon
     map.init(id, x, y, heading);
     Position newPosition = map.getRobots().at(id).getPosition();
@@ -282,7 +282,7 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 
     Message ackMessage = messageManager->createMessage();
 
-    qDebug() <<msg.second.getCompleteMessage()<<endl;
+    //qDebug() <<msg.second.getCompleteMessage()<<endl;
 
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
@@ -325,7 +325,7 @@ void MapGui::handleMessageFromRobotTest()
     std::pair<int, Message> msg(1, Message("PILROBLCH/robord~init:10,10,90"));
     Message ackMessage = messageManager->createMessage();
 
-    qDebug() <<msg.second.getCompleteMessage()<<endl;
+    //qDebug() <<msg.second.getCompleteMessage()<<endl;
 
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
@@ -367,7 +367,7 @@ void MapGui::handleMessageFromRobotTestTurn()
     std::pair<int, Message> msg(1, Message("PILROBLCH/robord~turn:90"));
     Message ackMessage = messageManager->createMessage();
 
-    qDebug() <<msg.second.getCompleteMessage()<<endl;
+    //qDebug() <<msg.second.getCompleteMessage()<<endl;
 
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
@@ -410,7 +410,7 @@ void MapGui::handleMessageFromRobotTestMove()
     std::pair<int, Message> msg(1, Message("PILROBLCH/robord~move:1"));
     Message ackMessage = messageManager->createMessage();
 
-    qDebug() <<msg.second.getCompleteMessage()<<endl;
+    //qDebug() <<msg.second.getCompleteMessage()<<endl;
 
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
@@ -671,7 +671,7 @@ void MapGui::deleteRobot(int x, int y)
 
 void MapGui::synchronizeDimX(int newDim)
 {
-    //qDebug() << "Nouvelle dimension :" << newDim;
+    ////qDebug() << "Nouvelle dimension :" << newDim;
 
     //on garde la même largeur
     //on diminue la hauteur
@@ -679,12 +679,12 @@ void MapGui::synchronizeDimX(int newDim)
     {
         width = maxW;
         height = ((width) / ((float)newDim/(float)dimY));
-        //qDebug() << "w :" << width << " h:" << height;
+        ////qDebug() << "w :" << width << " h:" << height;
     }else if(dimY > newDim){
         height = maxH;
         width = (float)(height) / ((float)dimY/(float)newDim);
 
-        //qDebug() << "w :" << width << " h:" << height;
+        ////qDebug() << "w :" << width << " h:" << height;
     } else{
         width = maxW;
         height = maxH;
@@ -712,7 +712,7 @@ void MapGui::synchronizeDimX(int newDim)
 
 void MapGui::synchronizeDimY(int newDim)
 {
-    //qDebug() << "Nouvelle dimension " << newDim;
+    ////qDebug() << "Nouvelle dimension " << newDim;
 
     //on garde la même largeur
     //on diminue la hauteur
@@ -720,11 +720,11 @@ void MapGui::synchronizeDimY(int newDim)
     {
         width = maxW;
         height = ((float)(width) / ((float)dimX / (float)newDim));
-        //qDebug() << "w :" << width << " h:" << height;
+        ////qDebug() << "w :" << width << " h:" << height;
     }else if(dimX < newDim){
         height = maxH;
         width = (float)(height) / ((float)newDim / (float)dimX);
-        //qDebug() << "w :" << width << " h:" << height;
+        ////qDebug() << "w :" << width << " h:" << height;
     }else{
         width = maxW;
         height = maxH;
