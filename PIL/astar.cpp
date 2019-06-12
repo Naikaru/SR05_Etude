@@ -134,18 +134,17 @@ void AStar::astar(){
     while(openList.empty() == false){
         // Récupération du plus petit element (donc la tete)
         cell = openList.front();
+        std::cerr << "Exploration de la case : ( " << cell->get_x() << ", " << cell->get_y() << " )" << std::endl;
         closedList.push_front(cell);
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'
         if((cell->get_x() == begin->get_x()) && (cell->get_y() == begin->get_y())){
-            ////qDebug() << "FIN DU ASTAR" ;
+            //qDebug() << "FIN DU ASTAR" ;
             begin->set_cost(cell->get_cost());
             begin->set_heuristique(cell->get_heuristique());
             begin->set_xp(cell->get_xp());
             begin->set_yp(cell->get_yp());
 
-            //    for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
-            //        delete (*it);
             m_heuristique = cell->get_heuristique();
             compute_pathList();
             return;
@@ -158,10 +157,6 @@ void AStar::astar(){
         }
     }
     // End of loop : no path to reach end
-    // std::cout << std::endl << "*** Pas de chemin possible ***" << std::endl;
-
-//    for (std::list<Cellule*>::iterator it=openList.begin(); it!=openList.end(); ++it)
-//        delete (*it);
     compute_pathList();
     return;
     // return nullptr;
@@ -215,7 +210,7 @@ void AStar::compute_pathList() {
         if ((cell->get_xp() == -1 && cell->get_yp() == -1)) //|| (compute_angle(heading, x, y, cell->get_x(), cell->get_y()) != 0))
             pathList << QString("move:"+QString::number(dist));
     }
-    ////qDebug() << "FIN DU GET_PATH" ;
+    //qDebug() << "FIN DU GET_PATH" ;
     clear();
     return;
 }
