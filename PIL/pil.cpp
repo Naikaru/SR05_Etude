@@ -102,7 +102,6 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     QString tmp("127.0.0."); tmp+=QString::number(ident+1);
     client.connectToRobot(QHostAddress(tmp),4646);
-
     // initialisation du robot
     QString initAction("");
     initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
@@ -162,6 +161,13 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     connect(mnemonic, SIGNAL(returnPressed()), this, SLOT(parseMessage())); // parse message
     // Slot for notifier (reading)
     connect(notifier, SIGNAL(activated(int)), this, SLOT(readStdin()));
+    connect(&client, SIGNAL(receivedMessage(Message)), this, SLOT(rmtMessage(Message)));
+
+    while(!client.isHandshakeFinished())
+    {
+        int a(0);
+        QTest::qWait(50);
+    }
 
     if (nbRobotsInitialized == 0) {
         applyAction();
