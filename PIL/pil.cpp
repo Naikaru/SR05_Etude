@@ -165,11 +165,20 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     if (nbRobotsInitialized == 0) {
         applyAction();
+        sendingThread = new SendingThread();
+        sendingThread->setParam(this);
+        sendingThread->start();
+        runAlgo();
     }
 }
 
 
-Pil::~Pil() {}
+Pil::~Pil() {
+    if (sendingThread != nullptr) {
+        sendingThread->stopThread();
+        delete sendingThread;
+    }
+}
 
 //Message Format
 // /mnemo~value/mnemo~value
@@ -487,6 +496,9 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             nbActionsRobot[r] = std::max(numAction, (unsigned int)1);
             nbRobotsInitialized--;
             if (nbRobotsInitialized == 0) {
+                sendingThread = new SendingThread();
+                sendingThread->setParam(this);
+                sendingThread->start();
                 runAlgo();
             }
             qDebug() << "Robot " << r << " initialisé";
@@ -583,6 +595,13 @@ void Pil::rmtMessage(Message mess){
         applyAction();
 }
 
+
+void SendingThread::run() {
+    while (cont) {
+        pil->sendBufferToNet();
+        QTest::qWait(WAITING_TIME);
+    }
+}
 
 
 
