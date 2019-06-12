@@ -122,7 +122,7 @@ class Pil: public QWidget {
 
         bool reading_writing = false;
 
-        const unsigned int MAX_BUFFER = 200;
+        const unsigned int MAX_BUFFER = 50;
         const unsigned int DISTANCE_MAX = 100;
 
         QVector<QStringList> buffer;
@@ -149,7 +149,7 @@ class Pil: public QWidget {
         void applyBufferForRobot(unsigned int r, QVector<QStringList> buffer);
         void applyActionFromBuffer(int r, QStringList action);
         void moveMovementReceived(unsigned int, unsigned int);
-        void turnMovementReceived(unsigned int);
+        void turnMovementReceived(int);
 
         bool robotsTooFar(QPair<int, int> a, QPair<int, int> b);
 
@@ -195,7 +195,7 @@ class Pil: public QWidget {
 class SendingThread: public QThread {
     Q_OBJECT
     private:
-        const int WAITING_TIME = 2000;
+        const int WAITING_TIME = 3000;
         Pil* pil;
         bool cont = true;
 

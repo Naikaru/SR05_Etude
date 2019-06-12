@@ -94,7 +94,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
-    std::cerr << "PIL sazejfsqdfh " << ident << std::endl;
+//    std::cerr << "PIL " << ident << std::endl;
     nbRobotsInitialized = nbRobot - 1;
     // qDebug() << "PIL ident = " << ident;
 
@@ -108,7 +108,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     QString initAction("");
     initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
     currentActionToDo << initAction;
-    currentIndexOfAction =0;
+    currentIndexOfAction = 0;
 
     // todo : à virer après vérif
     //addInitInBufferAndSend();
@@ -295,6 +295,7 @@ void Pil::readStdin() {
     fcntl(STDIN_FILENO, F_SETFL, flags);
     while(c != EOF) {
         std::getline(std::cin, message);
+//        std::cerr << "Caca  ident : " << ident << std::endl;
         //si le message vient du robot ou de la simu
         if(message.substr(0,3) == "ROB")
         {
@@ -338,7 +339,7 @@ void Pil::moveMovementReceived(unsigned int realDistance, unsigned int expectedD
     addMovementInBuffer(nbActionsRobot[ident], mnemoMove, distance, finalPosition);
 }
 
-void Pil::turnMovementReceived(unsigned int t) {
+void Pil::turnMovementReceived(int t) {
     QString turn = QString(QString::number(t) + "," + QString::number(t));
     Robot rob = map->robots[ident];
     QString finalPosition = QString(
@@ -353,6 +354,8 @@ void Pil::addMovementInBuffer(unsigned int nbAction, QString movement, QString d
     if (buffer.length() >= MAX_BUFFER) {
         buffer.pop_front();
     }
+
+    std::cerr << "PIL " << ident << " adding buffer movement " << nbAction << std::endl;
     // nbAction = nb of actions of robot : compteur local à chaque robot
     // movement = action ("move", "turn")
         // movement format: move
@@ -463,7 +466,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
     int y_final = finalPosition.split(",")[1].toInt();
     int heading_final = finalPosition.split(",")[2].toInt();
 
-//    qDebug() << "PIL " << ident << " nbactionrobot " << r << " = " << nbActionsRobot[r];
+    std::cerr << "(PIL " << ident << ") nbactionrobot " << r << " = " << nbActionsRobot[r] << std::endl;
     // On vérifie que le robot ait été initialisé
     if (nbActionsRobot[r] == 0) {
         if (movement == mnemoInit) {
@@ -485,7 +488,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             std::cerr << "Robot " << r << " initialisé";
 
         } else {
-            qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+            std::cerr << "Le robot " << r << " n'a jamais été initialisé";
         }
     } else if (movement == mnemoMove) {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;
@@ -522,7 +525,6 @@ void Pil::applyAction()
         client.send(m);
         currentIndexOfAction++;
     }
-
     return;
 }
 
@@ -565,7 +567,7 @@ void Pil::reach_nearestRob()
 // Slot to handle the message from the robot OR the simu
 void Pil::rmtMessage(Message mess){
     //reception d'une réponse de la simu
-    QStringList tmp= currentActionToDo[currentIndexOfAction-1].split(":");
+    QStringList tmp = currentActionToDo[currentIndexOfAction-1].split(":");
     QString action = tmp[0];
     QString order= mess.getValue(mnemoRobotAck);
     bool obs = false;
@@ -576,8 +578,10 @@ void Pil::rmtMessage(Message mess){
         val = Message::getOrderValue(order);
 
         obs = tmp[1].toInt() != val[0];
+        QTest::qWait(100);
         map->move(ident,val[0],obs);
         nbActionsRobot[ident]++;
+//        std::cerr << "PIL " << ident << " Action received from sim " << nbActionsRobot[ident] << std::endl;
         moveMovementReceived(val[0], tmp[1].toUInt());
         //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
 
@@ -597,9 +601,10 @@ void Pil::rmtMessage(Message mess){
     }
     else if (action == mnemoInit)
     {
-        std::cerr << "PIL " << ident << " s'est initialise" << std::endl;
+//        std::cerr << "PIL " << ident << " s'est initialise" << std::endl;
         val = Message::getOrderValue(order);
         map->initRobot(ident,val[0],val[1],val[2]);
+        nbActionsRobot[ident]++;
         addInitInBufferAndSend();
     }
 

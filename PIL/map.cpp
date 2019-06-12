@@ -126,7 +126,7 @@ void Map::move(int id,int d, bool obstacle)
             setObstacle(id);
         }
     }
-    QTest::qWait(1000);
+//    QTest::qWait(1000);
     map->update();
     map->repaint();
     return;
