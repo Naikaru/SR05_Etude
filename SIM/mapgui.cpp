@@ -198,7 +198,7 @@ Robot MapGui::init(int id, int x, int y, int heading){
         addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return Robot(heading,Position(x, y));
     }
-
+    qDebug() << "dans init mapGUI : x y heading " << x << y << heading;
     //on considère que ca renvoie le bon
     map.init(id, x, y, heading);
     Position newPosition = map.getRobots().at(id).getPosition();
@@ -417,7 +417,7 @@ void MapGui::initRobot()
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
     Position pos = Position(x, y);
-    pos = map.getCoordinatesFromPosition(pos);
+    //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
 
