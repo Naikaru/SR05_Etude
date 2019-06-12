@@ -86,6 +86,7 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     listRobotColor->horizontalHeader()->setDefaultSectionSize(20);
     listRobotColor->verticalHeader()->setDefaultSectionSize(20);
 
+    QObject::connect(listRobotColor, SIGNAL(cellActivated(int,int)), this, SLOT(deleteRobot(int, int)));
     robotColors = std::map<int, Qt::GlobalColor>();
 
 
@@ -321,7 +322,7 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 void MapGui::handleMessageFromRobotTest()
 {
 
-    std::pair<int, Message> msg(1, Message("PILROBLCH/robord~init:3,3,0"));
+    std::pair<int, Message> msg(1, Message("PILROBLCH/robord~init:10,10,90"));
     Message ackMessage = messageManager->createMessage();
 
     qDebug() <<msg.second.getCompleteMessage()<<endl;
@@ -610,27 +611,18 @@ void MapGui::cellSelection()
         lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(convert(cell->row(), dimY)));
         if(cell->text()=="R")
         {
+            /*
            std::map<int,Robot> robots = map.getRobots();
                    for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
                    {
                        Position robotPosition = it->second.getPosition();
                        if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimY))
                        {
-                          if(map.getRobots().size() == 1)
-                          {
-                              listRobotColor->removeColumn(0);
-                              listRobotColor->setFixedSize(0*20, 0*20);
-                          }
-                          else{
-                          listRobotColor->removeColumn(it->first);
-                          listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
-                          }
-                          map.deleteRobot(it->first);
-                          cell->setText("");
-                          cell->setBackgroundColor(cellEmptyColor);
-                          cell->setTextColor(cellEmptyColor);
+
                        }
                    }
+                   */
+            addMessageInDisplay(QString("Impossible de modifier cette case, un robot est présent dessus"), true);
         }
         else
         {
@@ -655,6 +647,26 @@ void MapGui::cellSelection()
             cell->setSelected(false);
         }
     }
+}
+
+void MapGui::deleteRobot(int x, int y)
+{
+    int id = listRobotColor->item(x, y)->text().toInt();
+/*
+    if(map.getRobots().size() == 1)
+    {
+        listRobotColor->removeColumn(0);
+        listRobotColor->setFixedSize(0*20, 0*20);
+    }
+    else{
+    listRobotColor->removeColumn(it->first);
+    listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
+    }
+    map.deleteRobot(it->first);
+    cell->setText("");
+    cell->setBackgroundColor(cellEmptyColor);
+    cell->setTextColor(cellEmptyColor);
+*/
 }
 
 void MapGui::synchronizeDimX(int newDim)

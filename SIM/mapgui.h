@@ -117,6 +117,7 @@ private slots:
 
     void cellActivation(const QModelIndex& index);
     void cellSelection();
+    void deleteRobot(int x, int y);
 
     void synchronizeDimX(int newDim);
     void synchronizeDimY(int newDim);
