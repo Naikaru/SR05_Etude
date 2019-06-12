@@ -89,7 +89,6 @@ void AStar::add_neighbours(Cellule* cell){
                                 map->get_cell(x+1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x+1, y) == NULL)
             && (lookfor_cell(openList, x+1, y) == NULL)){
-        std::cerr << "Ajout voisin : ( " << x+1 << ", " << y << " )" << std::endl;
         //printf("\nAjout droit");
 //          if (map->get_cell(x+1,y) == FRONT) cost = 0.75  // essayer avec différentes valeurs
 //          else cost = 1
@@ -102,7 +101,6 @@ void AStar::add_neighbours(Cellule* cell){
                  map->get_cell(x-1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x-1, y) == NULL)
             && (lookfor_cell(openList, x-1, y) == NULL)){
-        std::cerr << "Ajout voisin : ( " << x-1 << ", " << y << " )" << std::endl;
         add_cell(new Cellule(x-1, y, 1, cell, begin));
     }
 
@@ -112,7 +110,6 @@ void AStar::add_neighbours(Cellule* cell){
                                 map->get_cell(x,y+1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y+1) == NULL)
             && (lookfor_cell(openList, x, y+1) == NULL)){
-        std::cerr << "Ajout voisin : ( " << x << ", " << y+1 << " )" << std::endl;
         add_cell(new Cellule(x, y+1, 1, cell, begin));
     }
 
@@ -122,7 +119,6 @@ void AStar::add_neighbours(Cellule* cell){
                  map->get_cell(x,y-1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y-1) == NULL)
             && (lookfor_cell(openList, x, y-1) == NULL)){
-        std::cerr << "Ajout voisin : ( " << x << ", " << y-1 << " )" << std::endl;
         add_cell(new Cellule(x, y-1, 1, cell, begin));
     }
     return;
@@ -135,11 +131,9 @@ void AStar::astar(){
 
     openList.push_front(end);
     Cellule* cell;
-    std::cerr << "############################## ASTSAR ##############################"<<std::endl;
     while(openList.empty() == false){
         // Récupération du plus petit element (donc la tete)
         cell = openList.front();
-        std::cerr << "### Exploration de la case : ( " << cell->get_x() << ", " << cell->get_y() << " ) ###" << std::endl;
         closedList.push_front(cell);
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'
