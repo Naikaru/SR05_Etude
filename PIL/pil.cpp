@@ -377,12 +377,14 @@ void Pil::sendBufferToNet() {
     QString payload = bufferPayload;
     QVector<QStringList> buf = getBuffer();
     // qDebug() << "ici";
-    for (QVector<QStringList>::iterator it = buf.begin(); it != buf.end(); it++) {
-        payload += "|" + (*it)[0] + ":" + (*it)[1] + ":" + (*it)[2] + ":" + (*it)[3];
+    if (buf.size() > 0) {
+        for (QVector<QStringList>::iterator it = buf.begin(); it != buf.end(); it++) {
+            payload += "|" + (*it)[0] + ":" + (*it)[1] + ":" + (*it)[2] + ":" + (*it)[3];
+        }
+        // payload format:
+        // @buffer|numAction:move:realMovement,expectedMovement:x_final, y_final, heading_final
+        sendBuffer(payload);
     }
-    // payload format:
-    // @buffer|numAction:move:realMovement,expectedMovement:x_final, y_final, heading_final
-    sendBuffer(payload);
 }
 
 
