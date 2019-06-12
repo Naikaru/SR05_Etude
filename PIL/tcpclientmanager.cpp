@@ -13,13 +13,16 @@ void TcpClientManager::connectToRobot(QHostAddress addr, int port){
 
 }
 
-void TcpClientManager::send(QString message){
+bool TcpClientManager::send(QString message){
     if (sock.isOpen() && handshakeState == 3){
-        sock.write(message.toStdString().c_str());
+        if (sock.write(message.toStdString().c_str()) >= 0){
+            return true;
+        }
     }
+    return false;
 }
-void TcpClientManager::send(Message message){
-    this->send(message.getCompleteMessage());
+bool TcpClientManager::send(Message message){
+    return this->send(message.getCompleteMessage());
 }
 
 // Slots

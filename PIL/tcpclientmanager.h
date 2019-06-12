@@ -49,8 +49,8 @@ public:
 
     explicit TcpClientManager(QObject *parent = 0, QString app_name = "PIL");
     void connectToRobot(QHostAddress addr, int port);
-    void send(QString message);
-    void send(Message message);
+    bool send(QString message);
+    bool send(Message message);
 
 
 signals:
