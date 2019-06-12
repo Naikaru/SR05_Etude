@@ -123,6 +123,7 @@ class Pil: public QWidget {
         bool reading_writing = false;
 
         const unsigned int MAX_BUFFER = 50;
+
         const unsigned int DISTANCE_MAX = 100;
 
         QVector<QStringList> buffer;
