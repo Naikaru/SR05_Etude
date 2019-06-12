@@ -564,7 +564,7 @@ void MapGui::run()
 
     for(unsigned int x = 0; x< this->dimX; ++x){
         for(unsigned int y=0; y < this->dimY; ++y){
-            if(grid->item(y,x)->backgroundColor() == cellEmptyColor)
+            if(grid->item(convert(y, dimY),x)->backgroundColor() != cellFullColor)
             {
                 map.changeState(x,y, CellState::empty);
             }
