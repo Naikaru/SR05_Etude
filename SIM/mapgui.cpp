@@ -411,13 +411,22 @@ unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 
 }
 
+void MapGui::convertBis(int* x, int* y)
+{
+    int tmp =*y;
+    *y = *x;
+    *x = (dimX-1-tmp);
+}
 
 void MapGui::initRobot()
 {
     QString adress = t_adress->text();
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
-    Position pos = Position(x, convert(y, dimY));
+    //Position pos = Position(x, convert(y, dimY));
+    convertBis(&x,&y);
+    Position pos = Position(x, y);
+
     //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added

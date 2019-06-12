@@ -101,7 +101,7 @@ public:
 
 private :
     unsigned int convert(unsigned int coord, unsigned int dim);
-
+    void convertBis(int* x, int* y);
 
 public slots:
     void handleMessageFromRobot(const std::pair<int, Message> &msg);

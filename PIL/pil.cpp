@@ -158,12 +158,13 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
         int a(0);
         QTest::qWait(50);
     }
+    QTest::qWait(50);
 
     if (nbRobotsInitialized == 0) {
         applyAction();
-        sendingThread = new SendingThread();
-        sendingThread->setParam(this);
-        sendingThread->start();
+//        sendingThread = new SendingThread();
+//        sendingThread->setParam(this);
+//        sendingThread->start();
     }
 }
 
@@ -269,14 +270,14 @@ void Pil::initialization(int argc, char* argv[])
 void Pil::sendMessage() {
     info_nseq->setText(QString::number(++nseq));
     // sending message to NET
-    std::cout << getFormatedMessage().toStdString() << std::endl;
+    //std::cout << getFormatedMessage().toStdString() << std::endl;
 }
 
 // Click to send the message
 void Pil::sendBuffer(QString pay) {
     info_nseq->setText(QString::number(++nseq));
     // sending message to NET
-    std::cout << getFormatedMessage(pay, "-1").toStdString() << std::endl;
+    //std::cout << getFormatedMessage(pay, "-1").toStdString() << std::endl;
 }
 
 // Slot to read from stdin, signal received because a message arrived on stdin
