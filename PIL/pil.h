@@ -39,7 +39,7 @@ class WritingThread;
 class ReadingThread;
 */
 class CustomLineEdit;
-
+class SendingThread;
 
 class Pil: public QWidget {
     Q_OBJECT
@@ -138,6 +138,7 @@ class Pil: public QWidget {
 
         // list of frontiers coords
 
+        SendingThread* sendingThread = nullptr;
         // Functions
 
         QString getFormatedMessage(QString payload = "",QString desti="");
@@ -180,6 +181,22 @@ class Pil: public QWidget {
     public slots:
         void rmtMessage(Message mess);
 };
+
+class SendingThread: public QThread {
+    Q_OBJECT
+    private:
+        const int WAITING_TIME = 2000;
+        Pil* pil;
+        bool cont = true;
+
+        void run();
+
+    public:
+        void stopThread() {cont = false; }
+        void startThread() {cont = true; }
+        void setParam(Pil* p) {this->pil = p; }
+};
+
 
 
 #endif // PIL_H
