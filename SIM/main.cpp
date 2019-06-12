@@ -20,13 +20,13 @@ int main(int argc, char* argv[]) {
 //    Position milieu(5, 5);
 //    Map m(1, 10, 10);
 //    Robot robot(0, milieu);
-    QString message("WHEROBLCH/mnemo~value3/mnemo1~value2");
-    Message manager(message);
-    qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
-    qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
-    qDebug() << manager.getCompleteMessage();
-    socket sockServ(QHostAddress("127.0.0.1"), 4646);
-    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
+//    QString message("WHEROBLCH/mnemo~value3/mnemo1~value2");
+//    Message manager(message);
+//    qDebug() << manager.getAPP() << manager.getWHE() << manager.getWHO();
+//    qDebug() << manager.getValue("mnemo") << manager.getValue("mnemo1");
+//    qDebug() << manager.getCompleteMessage();
+//    socket sockServ(QHostAddress("127.0.0.1"), 4646);
+//    socket sockServ2(QHostAddress("127.0.0.2"), 4646);
 //    std::cout << "Coordonées : " << robot.getPosition().getX() << "," << robot.getPosition().getY() << std::endl;
 
 //    robot.setHeading(230);
