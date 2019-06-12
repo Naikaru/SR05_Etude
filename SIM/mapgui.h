@@ -84,7 +84,7 @@ public:
 
     void setWalls();
 
-    void addMessageInDisplay(const QString& msg);
+    void addMessageInDisplay(const QString& msg, bool warning = false);
 
 
     void updateRobotOnGrid(const Position& formerPosition, const Position& newPosition);
@@ -107,6 +107,7 @@ public slots:
 private slots:
 
     void saveConfig();
+    void loadConfig();
     void run();
 
     void cellActivation(const QModelIndex& index);
@@ -117,6 +118,7 @@ private slots:
     void synchronizeMaxW(int newMax);
     void synchronizeMaxH(int newMax);
     void initRobot();
+
 
 };
 

@@ -136,6 +136,7 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_config->addWidget(bt_configLoad);
 
     QObject::connect(bt_configSave, SIGNAL(clicked()), this, SLOT(saveConfig()));
+    QObject::connect(bt_configLoad, SIGNAL(clicked()), this, SLOT(loadConfig()));
     l_mapGui->addLayout(l_config);
 
     this->setLayout(l_mapGui);
@@ -155,8 +156,12 @@ void MapGui::setWalls()
         }
     }
 }
-void MapGui::addMessageInDisplay(const QString &msg)
+void MapGui::addMessageInDisplay(const QString &msg, bool warning)
 {
+    if(warning)
+        t_display->setTextColor(Qt::red);
+    else
+        t_display->setTextColor(Qt::black);
     t_display->append(QDateTime::currentDateTime().time().toString() + QString(" : ") + msg);
 }
 
@@ -184,14 +189,16 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
 Robot MapGui::init(int id, int x, int y, int heading){
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return Robot(heading,Position(x, y));
     }
-    Position robotBeforeMove = map.getRobots().at(id).getPosition();
+
     //on considère que ca renvoie le bon
     map.init(id, x, y, heading);
     Position newPosition = map.getRobots().at(id).getPosition();
-    updateRobotOnGrid(robotBeforeMove, newPosition);
+    grid->item(newPosition.getY(), newPosition.getX())->setText("R");
+    grid->item(newPosition.getY(), newPosition.getX())->setBackgroundColor(robotColors[id]);
+    grid->item(newPosition.getY(), newPosition.getX())->setTextColor(robotColors[id]);
     return map.getRobots().at(id);
 
 }
@@ -201,7 +208,7 @@ int MapGui::move(int id, int d)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Move : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Move : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return 0;
     }
 
@@ -216,7 +223,7 @@ int MapGui::turn(unsigned int id, int angle)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Turn : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Turn : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         return 0;
     }
     return map.turn(id, angle);
@@ -226,7 +233,7 @@ Robot MapGui::curr(unsigned int id)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Curr : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Curr : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         throw QString("Id non reconnu");
     }
     return map.curr(id);
@@ -236,7 +243,7 @@ Robot MapGui::join(unsigned int id, int x, int y)
 {
     if(map.getRobots().find(id) == map.getRobots().end())
     {
-        addMessageInDisplay(QString("Join : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"));
+        addMessageInDisplay(QString("Join : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
         throw QString("Id non reconnu");
     }
 
@@ -289,35 +296,61 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
 
 void MapGui::saveConfig()
 {
-    std::vector<char> gridToSave = std::vector<char>();
-    gridToSave.resize(dimX * dimY);
+
+    QString gridToSave = QString("");
+
     for(unsigned int i = 0; i < dimX; ++i){
         for(unsigned int j=0; j < dimY; ++j){
-            gridToSave.push_back( (grid->item(j,i)->backgroundColor() == MapGui::cellEmptyColor) ? '0' : '1');
+            gridToSave += QString((grid->item(j,i)->backgroundColor() == MapGui::cellEmptyColor) ? "0" : "1");
         }
     }
     QString filename = QFileDialog::getSaveFileName(this);
-    if(filename.isEmpty()){
+    if(filename.isNull()){
         return;
     }
     QFile file(filename);
-    if(!file.open(QIODevice::WriteOnly)){
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
         QMessageBox::information(this,"Information", "Erreur lors de l'ouverture du fichier");
         return;
     }
 
-    QDataStream out(&file);
-    out << dimX << "\n";
-    out << dimY << "\n";
-    for(int cell : gridToSave){
-        out << cell;
-    }
-
+    QTextStream out(&file);
+    out << QString::number(dimX) << "\n";
+    out << QString::number(dimY) << "\n";
+    out << gridToSave;
 
     QMessageBox::information(this,"Information", "Sauvegarde réussie");
 
-
 }
+
+void MapGui::loadConfig(){
+    QString filename = QFileDialog::getOpenFileName(this);
+    if(filename.isNull()){
+        return;
+    }
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::information(this,"Information", "Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    QTextStream in(&file);
+
+    sb_selectX->setValue(in.readLine().toInt());
+    synchronizeDimX(sb_selectX->value());
+    sb_selectY->setValue(in.readLine().toInt());
+    synchronizeDimY(sb_selectY->value());
+    QString gridToLoad = in.readLine();
+    for(unsigned int i = 0; i<dimX; i++){
+        for(unsigned int j = 0; j<dimY; j++){
+            grid->item(j,i)->setBackgroundColor( (gridToLoad.left(1).toInt() == 0) ? MapGui::cellEmptyColor : MapGui::cellFullColor);
+            gridToLoad = gridToLoad.mid(1);
+        }
+    }
+
+    QMessageBox::information(this, "Information", "Map chargée avec succès");
+}
+
 unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 {
     return dim - coord -1;
@@ -327,14 +360,17 @@ unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 void MapGui::initRobot()
 {
     QString adress = t_adress->text();
-    int x = 1, y = 4, heading = 3, id = 1;
+    int id = adress.right(1).toInt();
+    int x = 0, y = 0, heading = 0;
     Position pos = Position(x, convert(y, dimY));
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
+
             robotColors[id] = colorList[robotColors.size()];
-            grid->item(pos.getY(), pos.getX())->setBackgroundColor(robotColors[id]);
-            grid->item(pos.getY(), pos.getX())->setTextColor(robotColors[id]);
-            grid->item(pos.getY(), pos.getX())->setText("R");
+            //            grid->item(pos.getY(), pos.getX())->setBackgroundColor(robotColors[id]);
+            //            grid->item(pos.getY(), pos.getX())->setTextColor(robotColors[id]);
+            //            grid->item(pos.getY(), pos.getX())->setText("R");
+
 
             listRobotColor->insertColumn(listRobotColor->columnCount());
             listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
@@ -345,15 +381,16 @@ void MapGui::initRobot()
 
             //createSocket
             if(!messageManager->addRobotSocket(adress))
-                addMessageInDisplay(QString("The robot of id ") + adress + QString(" could not open a tcp socket") );
-
+                addMessageInDisplay(QString("The robot of id ") + adress + QString(" could not open a tcp socket"), true );
+            else
+                addMessageInDisplay(QString("Le robot d'id ") + QString::number(id) + QString(" a bien été ajouté : en attente d'instructions sur la socket :") + adress);
 
         } else{
-            addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") );
+            addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" could not be added") , true);
 
         }
     }else{
-        addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString("was already initialized") );
+        addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" was already initialized"), true );
         //map.init(id, x, y, heading);
     }
     map.printMap();
