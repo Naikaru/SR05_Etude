@@ -158,12 +158,13 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
         int a(0);
         QTest::qWait(50);
     }
+    QTest::qWait(50);
 
     if (nbRobotsInitialized == 0) {
         applyAction();
-        sendingThread = new SendingThread();
-        sendingThread->setParam(this);
-        sendingThread->start();
+//        sendingThread = new SendingThread();
+//        sendingThread->setParam(this);
+//        sendingThread->start();
     }
 }
 
@@ -269,14 +270,14 @@ void Pil::initialization(int argc, char* argv[])
 void Pil::sendMessage() {
     info_nseq->setText(QString::number(++nseq));
     // sending message to NET
-    std::cout << getFormatedMessage().toStdString() << std::endl;
+    //std::cout << getFormatedMessage().toStdString() << std::endl;
 }
 
 // Click to send the message
 void Pil::sendBuffer(QString pay) {
     info_nseq->setText(QString::number(++nseq));
     // sending message to NET
-    std::cout << getFormatedMessage(pay, "-1").toStdString() << std::endl;
+    //std::cout << getFormatedMessage(pay, "-1").toStdString() << std::endl;
 }
 
 // Slot to read from stdin, signal received because a message arrived on stdin
@@ -296,9 +297,6 @@ void Pil::readStdin() {
             QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
             if (payload.startsWith(bufferPayload)){
                 applyBufferFromMessage(QString::fromStdString(message));
-            }
-            else {
-                // Recepted message is for a BAS app
                 reception_fullmessage->setText(QString::fromStdString(message));
                 reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
                 reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
@@ -467,10 +465,11 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
                 sendingThread = new SendingThread();
                 sendingThread->setParam(this);
                 sendingThread->start();                
-                if (get_connected() > 0)
+                if (is_connected())
                     runAlgo();
                 else
-                    reach_nearestRob();            }
+                    reach_nearestRob();
+            }
             qDebug() << "Robot " << r << " initialisé";
         } else {
             qDebug() << "Le robot " << r << " n'a jamais été initialisé";
@@ -496,7 +495,7 @@ void Pil::applyAction()
 {
     //si on a fini les actions
     if(currentIndexOfAction == currentActionToDo.size()){
-        if (get_connected() > 0)
+        if (is_connected())
             runAlgo();
         else
             reach_nearestRob();
@@ -580,7 +579,7 @@ void Pil::rmtMessage(Message mess){
     }
 
     if(obs) {
-        if (get_connected() > 0)
+        if (is_connected())
             runAlgo();
         else
             reach_nearestRob();

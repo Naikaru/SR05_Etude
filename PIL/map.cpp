@@ -93,6 +93,8 @@ void Map::initRobot(int id,int x, int y,int heading)
             setFrontier(robots[id].x,robots[id].y);
         }
     }
+    map->update();
+    map->repaint();
 }
 
 //déplacement uniquement suivant une grille
@@ -124,8 +126,8 @@ void Map::move(int id,int d, bool obstacle)
             setObstacle(id);
         }
     }
-    this->repaint();
-
+    map->update();
+    map->repaint();
     return;
 }
 

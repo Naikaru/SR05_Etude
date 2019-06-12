@@ -296,6 +296,7 @@ void MapGui::handleMessageFromRobot(const std::pair<int, Message> &msg)
         parameters.push_back(newPosition.getPosition().getY());
         parameters.push_back(newPosition.getHeading());
         ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
+        addMessageInDisplay(QString("Robot bien initialisé, envoi du message : ") + ackMessage.getCompleteMessage());
     }
     else{
         //ordre non reconnu
@@ -312,10 +313,11 @@ void MapGui::handleMessageFromRobotTest()
     std::pair<int, Message> msg(1, Message("PILROBLCH/robord~init:3,3,0"));
     Message ackMessage = messageManager->createMessage();
 
+    qDebug() <<msg.second.getCompleteMessage()<<endl;
+
     QString order = msg.second.getValue(Message::mnemoRobotOrder);
     std::vector<int> parameters = std::vector<int>();
     if(order.startsWith("move")) {
-        qDebug() << "move";
         int distanceToTravel = Message::getOrderValue(order)[0];
         int distanceTravelled = this->move(msg.first, distanceToTravel);
         parameters.push_back(distanceTravelled);
@@ -328,18 +330,16 @@ void MapGui::handleMessageFromRobotTest()
         ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
     }
     else if(order.startsWith("init")){
-
         std::vector<int> inputParameters = Message::getOrderValue(order);
-        qDebug() << inputParameters.size();
         int x = inputParameters[0];
         int y = inputParameters[1];
         int heading = inputParameters[2];
-        qDebug() << "x : " << x << "y : " << y << "heading " << heading;
         Robot newPosition = this->init(msg.first, x, y, heading);
         parameters.push_back(newPosition.getPosition().getX());
         parameters.push_back(newPosition.getPosition().getY());
         parameters.push_back(newPosition.getHeading());
         ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
+        addMessageInDisplay(QString("Robot bien initialisé, envoi du message : ") + ackMessage.getCompleteMessage());
     }
     else{
         //ordre non reconnu
@@ -413,13 +413,26 @@ unsigned int MapGui::convert(unsigned int coord, unsigned int dim)
 
 }
 
+void MapGui::convertBis(int* x, int* y)
+{
+    int tmp =*y;
+    *y = *x;
+    *x = (dimX-1-tmp);
+}
 
 void MapGui::initRobot()
 {
     QString adress = t_adress->text();
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
+
     Position pos(x,y);
+
+    //Position pos = Position(x, convert(y, dimY));
+    //convertBis(&x,&y);
+    //Position pos = Position(x, y);
+
+    //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
 

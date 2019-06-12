@@ -94,6 +94,7 @@ int main(int argc, char* argv[]) {
 
 
 
+
     Message msg(QString("APPWHOWHE/robord~join:90"));
     QString order = msg.getValue(Message::mnemoRobotOrder);
     std::vector<int> valeurs = Message::getOrderValue(order);
@@ -102,6 +103,16 @@ int main(int argc, char* argv[]) {
     }
 return 0;
 */
+
+//    Message msg(QString("APPWHOWHE/robord~join:90"));
+//    QString order = msg.getValue(Message::mnemoRobotOrder);
+//    std::vector<int> valeurs = Message::getOrderValue(order);
+//    for(int val : valeurs){
+//        qDebug() << val;
+//    }
+//return 0;
+
+
     MapGui mapGui(nullptr);
     mapGui.show();
     return app.exec();
