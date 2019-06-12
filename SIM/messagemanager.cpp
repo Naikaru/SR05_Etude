@@ -27,6 +27,7 @@ void MessageManager::handleMessage(const Message &msg)
     socket *socketSender = (socket * ) sender();
     socketSender->getRobotId();
 
+    qDebug()<<"reception message : "<<msg.getCompleteMessage();
     std::pair<int,Message> message(socketSender->getRobotId(), msg);
     addMessageInDisplay(msg);
     emit receivedMessageFromRobot(message);
