@@ -86,7 +86,7 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     listRobotColor->horizontalHeader()->setDefaultSectionSize(20);
     listRobotColor->verticalHeader()->setDefaultSectionSize(20);
 
-    QObject::connect(listRobotColor, SIGNAL(cellActivated(int,int)), this, SLOT(deleteRobot(int, int)));
+    QObject::connect(listRobotColor, SIGNAL(cellClicked(int,int)), this, SLOT(deleteRobot(int, int)));
     robotColors = std::map<int, Qt::GlobalColor>();
 
 
@@ -528,7 +528,7 @@ void MapGui::initRobot()
     //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
-
+            //qDebug() << "size : " << robotColors.size();
             robotColors[id] = colorList[robotColors.size()];
 
             listRobotColor->insertColumn(listRobotColor->columnCount());
@@ -651,22 +651,40 @@ void MapGui::cellSelection()
 
 void MapGui::deleteRobot(int x, int y)
 {
+
     int id = listRobotColor->item(x, y)->text().toInt();
-/*
+
     if(map.getRobots().size() == 1)
     {
         listRobotColor->removeColumn(0);
         listRobotColor->setFixedSize(0*20, 0*20);
     }
     else{
-    listRobotColor->removeColumn(it->first);
-    listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
+
+        listRobotColor->removeColumn(y);
+        listRobotColor->setFixedSize(listRobotColor->columnCount() * 20 ,20);
     }
-    map.deleteRobot(it->first);
-    cell->setText("");
-    cell->setBackgroundColor(cellEmptyColor);
-    cell->setTextColor(cellEmptyColor);
-*/
+
+    Robot robotToDelete = map.getRobots().at(id);
+    int xRobotOnGrid = robotToDelete.getPosition().getX();
+    int yRobotOnGrid = convert(robotToDelete.getPosition().getY(), dimY);
+
+    grid->item(yRobotOnGrid, xRobotOnGrid)->setText("");
+    grid->item(yRobotOnGrid, xRobotOnGrid)->setBackgroundColor(cellEmptyColor);
+    grid->item(yRobotOnGrid, xRobotOnGrid)->setTextColor(cellEmptyColor);
+    map.deleteRobot(id);
+    robotColors.erase(id);
+    for(unsigned int i = 0; i< listRobotColor->columnCount(); ++i){
+
+        int idRobot = listRobotColor->item(0,i)->text().toInt();
+
+        robotColors[idRobot] = colorList[i];
+        listRobotColor->item(0, i)->setBackgroundColor(robotColors[idRobot]);
+        grid->item(convert(map.getRobots().at(idRobot).getPosition().getY(), dimY), map.getRobots().at(idRobot).getPosition().getX())->setBackgroundColor(robotColors[idRobot]);
+    }
+
+    messageManager->removeRobotSocket(id);
+
 }
 
 void MapGui::synchronizeDimX(int newDim)

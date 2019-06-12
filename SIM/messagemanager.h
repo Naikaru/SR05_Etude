@@ -36,6 +36,7 @@ public:
 
     ~MessageManager();
     bool addRobotSocket(QString adress);
+    bool removeRobotSocket(int id);
     Message createMessage() const {return Message(APP, WHO, WHE);}
     void sendMessage(int id, const Message& msg);
 

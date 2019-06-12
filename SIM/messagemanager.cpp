@@ -50,6 +50,14 @@ bool MessageManager::addRobotSocket(QString adress)
     return true;
 }
 
+bool MessageManager::removeRobotSocket(int id)
+{
+    if(sockets.find(id) == sockets.end())
+        return false;
+    sockets.erase(id);
+    return true;
+}
+
 void MessageManager::sendMessage(int id, const Message &msg)
 {
     //qDebug() << "sending " <<msg.getCompleteMessage();
