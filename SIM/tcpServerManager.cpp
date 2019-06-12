@@ -46,7 +46,7 @@ void socket::handleConnect(){
 void socket::handleMessage()
 {
     while (sock->bytesAvailable()>0){
-        QString message = QString(sock->readLine(2048));
+        QString message = QString(sock->readLine(2048)).simplified();;
         qDebug() << message << QString(std::to_string(handshakeState).c_str());
         if (handshakeState < 4){
             if (handshakeState == 3 && message == handshakeMessages[handshakeState++]){
