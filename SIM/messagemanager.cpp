@@ -27,7 +27,7 @@ void MessageManager::handleMessage(const Message &msg)
     socket *socketSender = (socket * ) sender();
     socketSender->getRobotId();
 
-    qDebug()<<"reception message : "<<msg.getCompleteMessage();
+    //qDebug()<<"reception message : "<<msg.getCompleteMessage();
     std::pair<int,Message> message(socketSender->getRobotId(), msg);
     addMessageInDisplay(msg);
     emit receivedMessageFromRobot(message);
@@ -52,7 +52,7 @@ bool MessageManager::addRobotSocket(QString adress)
 
 void MessageManager::sendMessage(int id, const Message &msg)
 {
-    qDebug() << "sending " <<msg.getCompleteMessage();
+    //qDebug() << "sending " <<msg.getCompleteMessage();
     sockets[id]->send(msg);
     t_displayMessage->setTextColor(Qt::blue);
     t_displayMessage->append(QDateTime::currentDateTime().time().toString() + QString(" >>  " +  msg.getCompleteMessage()));

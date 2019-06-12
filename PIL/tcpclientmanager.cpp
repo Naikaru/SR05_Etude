@@ -30,7 +30,7 @@ bool TcpClientManager::send(Message message){
 void TcpClientManager::handleMessage(){
     while (sock.bytesAvailable()>0){
         QString message = QString(sock.readLine(2048)).simplified();
-        qDebug() << message;
+        //qDebug() << message;
         if (message == "") {
             return;
         } else {
@@ -40,7 +40,7 @@ void TcpClientManager::handleMessage(){
                 QStringList params = message.split(" ");
                 if (params.length() < 8){
                     sock.close();
-                    qDebug() << QString("Error : wrong number of parameters");
+                    //qDebug() << QString("Error : wrong number of parameters");
                     handshakeState = 0;
                     return;
                 }
@@ -60,7 +60,7 @@ void TcpClientManager::handleMessage(){
             }
             case 2: {
                 filtre = message.split(" ");
-                qDebug()<<filtre;
+                //qDebug()<<filtre;
                 send(delim+mnemobegair+equal+APP);
                 handshakeState = 3;
                 emit handshakeFinished();
@@ -70,7 +70,7 @@ void TcpClientManager::handleMessage(){
                 emit receivedMessage(Message(message));
                 break;
             default:
-                qDebug()<<QString("Error ! unknown state");
+                //qDebug()<<QString("Error ! unknown state");
                 break;
             }
         }
@@ -78,7 +78,7 @@ void TcpClientManager::handleMessage(){
 }
 
 void TcpClientManager::handleErrors(QAbstractSocket::SocketError){
-    qDebug() << "error : " + sock.errorString();
+    //qDebug() << "error : " + sock.errorString();
 }
 
 

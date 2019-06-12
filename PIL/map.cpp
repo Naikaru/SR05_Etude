@@ -201,20 +201,20 @@ void Map::setObstacle(int id) {
             y += 1;
             break;
         case 90:        //haut
-            x += 1;
+            x -= 1;
             break;
         case 180:       //gauche
             y -= 1;
             break;
         case 270:       //bas
-            x -= 1;
+            x += 1;
             break;
         default:
             break;
 
     }
     // Mise à jour de la carte avec les bons indices
-    // qDebug() << "setobstacle, x=" << x << "y=" << y;
+    // //qDebug() << "setobstacle, x=" << x << "y=" << y;
     map->item(x,y)->setBackgroundColor(OBSTA);
 }
 

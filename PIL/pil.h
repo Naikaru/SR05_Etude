@@ -202,6 +202,7 @@ class SendingThread: public QThread {
         void run();
 
     public:
+        ~SendingThread() { delete pil; }
         void stopThread() {cont = false; }
         void startThread() {cont = true; }
         void setParam(Pil* p) {this->pil = p; }

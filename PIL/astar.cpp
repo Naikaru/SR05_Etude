@@ -90,6 +90,8 @@ void AStar::add_neighbours(Cellule* cell){
             && (lookfor_cell(closedList, x+1, y) == NULL)
             && (lookfor_cell(openList, x+1, y) == NULL)){
         //printf("\nAjout droit");
+//          if (map->get_cell(x+1,y) == FRONT) cost = 0.75  // essayer avec différentes valeurs
+//          else cost = 1
         add_cell(new Cellule(x+1, y, 1, cell, begin));
     }
 
@@ -136,7 +138,7 @@ void AStar::astar(){
         openList.pop_front();
         // Suppression de ce premier element, dit 'exploré'
         if((cell->get_x() == begin->get_x()) && (cell->get_y() == begin->get_y())){
-            //qDebug() << "FIN DU ASTAR" ;
+            ////qDebug() << "FIN DU ASTAR" ;
             begin->set_cost(cell->get_cost());
             begin->set_heuristique(cell->get_heuristique());
             begin->set_xp(cell->get_xp());
@@ -213,7 +215,7 @@ void AStar::compute_pathList() {
         if ((cell->get_xp() == -1 && cell->get_yp() == -1)) //|| (compute_angle(heading, x, y, cell->get_x(), cell->get_y()) != 0))
             pathList << QString("move:"+QString::number(dist));
     }
-    //qDebug() << "FIN DU GET_PATH" ;
+    ////qDebug() << "FIN DU GET_PATH" ;
     clear();
     return;
 }
