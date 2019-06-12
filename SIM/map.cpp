@@ -98,17 +98,17 @@ int Map::move(unsigned int id, int d){
         //manage if did not turn
         d = - d;
     }
-    qDebug() << "angle deg :" << robot.getHeading();
-    qDebug() << "angle rad : " << MathHelper::fromDegToRad(robot.getHeading());
+    //qDebug() << "angle deg :" << robot.getHeading();
+    //qDebug() << "angle rad : " << MathHelper::fromDegToRad(robot.getHeading());
     double angleInRad = MathHelper::fromDegToRad(robot.getHeading());
     for(unsigned int i = 1; i <= d; ++i){
         Position destination;
 
         int x = (int)position.getX() + (abs(i * cos(angleInRad)) > 0.01 ? i*cos(angleInRad) : 0);
-        qDebug() << "i cos = " << i*cos(angleInRad);
-        qDebug() << "i sin = " << i*sin(angleInRad);
+        //qDebug() << "i cos = " << i*cos(angleInRad);
+        //qDebug() << "i sin = " << i*sin(angleInRad);
         int y = (int)position.getY() + i * sin(angleInRad);
-        qDebug() << "destination : " << i << "x : " << x << "y : " << y;
+        //qDebug() << "destination : " << i << "x : " << x << "y : " << y;
         destination.setX(x);
         destination.setY(y);
 
@@ -122,7 +122,7 @@ int Map::move(unsigned int id, int d){
             //obstacle = destination;
 
             distanceTraveled = i - 1;
-            qDebug() << "obstacle rencontré en " << i;
+            //qDebug() << "obstacle rencontré en " << i;
             break;
         }
     }
