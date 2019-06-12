@@ -40,11 +40,14 @@ private:
      */
     void sortFrontier();
 
-    float euclidDist(Pos a, Pos b);
-
-    static bool cmp(const QPair<QPair<int,int>, float>& a,const QPair<QPair<int,int>, float>& b){
+    static bool cmp_frontiers(const QPair<QPair<int,int>, float>& a,const QPair<QPair<int,int>, float>& b){
         return a.second < b.second;
     }
+
+    static bool cmp_robots(const QPair<int, float>& a,const QPair<int, float>& b){
+        return a.second < b.second;
+    }
+
     
     int getFrontierMinPosOpti();
 
@@ -58,10 +61,11 @@ public:
     QStringList runMinPos();
 
     QStringList runMinPosOpti();
+    QStringList runMinRobots();
 
 };
 
-
+float euclidean_dist(QPair<int, int> a, QPair<int, int> b);
 
 
 #endif // ALGO_H

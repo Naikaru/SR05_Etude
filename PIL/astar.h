@@ -43,8 +43,8 @@ private:
     std::list<Cellule*> closedList;
     Cellule* begin;
     Cellule* end;
-    Map* map;
     unsigned int ident;
+    Map* map;
     QStringList pathList;
     unsigned int m_heuristique;
 
@@ -72,6 +72,7 @@ public:
 
     unsigned int get_heuristique(){ return m_heuristique; }
     Cellule* get_begin() { return begin; }
+    Cellule* get_end() { return end; }
     std::list<Cellule*> get_closedList(){ return closedList ; }
 
     void init(Cellule* b, Cellule* e, unsigned int id, Map* m){

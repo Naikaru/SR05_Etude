@@ -107,31 +107,21 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
     currentActionToDo<<initAction;
     currentIndexOfAction =0;
+    addInitInBufferAndSend();
+
+    // to test
+    // map->initRobot(ident,xInit,yInit,0);
+//    map->move(0,5);
+//    map->turn(0,90);
+//    map->move(0,5);
+//    map->turn(0,-90);
+//    map->move(0,5);
 
     map->show();
 
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
 
-//    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
-//    std::cout << "ident : " << ident << "x : " << map->getRobotPosition(ident).x << "y : " << map->getRobotPosition(ident).y << std::endl;
-//    std::cout << "ident : " << ident << "x : " << map->robots[ident].x << "y : " << map->robots[ident].y << std::endl;
-//    std::list<Cellule*> closedList;
-//    Cellule begin(map->robots[ident].x, map->robots[ident].y);
-//    Cellule frontier(49,0);
-//    Cellule* path;
-//    frontier.m_cost = 0;
-//    frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, 49, 0);
-//    frontier.m_xp = -1;
-//    frontier.m_yp = -1;
-//    path = aStar(closedList, map, &begin, &frontier);
-//    if(path != NULL){
-//        qDebug() << "\nPoint de depart du chemin : (" << path->m_x << "," << path->m_y << ")";
-//        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
-//            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
-//            path = lookfor_cell(closedList, path->m_xp, path->m_yp);
-//        }
-//    }
 
 //    Cellule* begin =  new Cellule(map->robots[ident].x,map->robots[ident].y);
 //    std::cout << "ident : " << ident << "x : " << begin->get_x() << "y : " << begin->get_y() << std::endl;
@@ -141,7 +131,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 //    AStar astar(begin, frontier, ident, map);
 //    astar.astar();
 
-//    Cellule* path = astar.get_begin();
+//    Cellule* path = astar.get_path();
 //    if(path != NULL){
 //        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
 //            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
@@ -174,7 +164,6 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
         sendingThread = new SendingThread();
         sendingThread->setParam(this);
         sendingThread->start();
-        runAlgo();
     }
 }
 
@@ -393,34 +382,6 @@ void Pil::sendBufferToNet() {
     sendBuffer(payload);
 }
 
-QPair<unsigned int, unsigned int> Pil::chooseFrontier(std::list<Cellule*> closedList) {
-    bool first = true;
-    unsigned int minDist;
-    Cellule* path;
-    QPair<unsigned int, unsigned int> chosenFrontier;
-    for(QVector<QPair<unsigned int, unsigned int>>::iterator it=frontiers.begin(); it!=frontiers.end(); ++it) {
-        Cellule begin(map->robots[ident].x, map->robots[ident].y);
-        Cellule frontier(it->first, it->second);
-        frontier.m_cost = 0;
-        frontier.m_heuristique = estimation_heuristique(begin.m_x, begin.m_y, it->first, it->second);
-        frontier.m_xp = -1;
-        frontier.m_yp = -1;
-
-        // Liste containing element of the path
-        //path = aStar(closedList, map, &begin, &frontier);
-        if(first) {
-            minDist = closedList.size();
-            first = false;
-        } else {
-            if (closedList.size() < minDist) {
-                chosenFrontier = QPair<unsigned int, unsigned int>(it->first, it->second);
-                minDist = closedList.size();
-            }
-        }
-    }
-    return QPair<unsigned int, unsigned int>(path->m_x, path->m_y);
-    // Pas encore fonctionnel
-}
 
 QVector<QStringList> Pil::parseBuffer(QString payload) {
     // message: @buffer|numAction:move:realMovement,expectedMovement:x_final, y_final, heading_final
@@ -448,11 +409,12 @@ void Pil::applyBufferFromMessage(QString message){
 //        qDebug() << "identRobot" << identRobot << " payload = " << payload;
         QVector<QStringList> buffer = parseBuffer(payload);
 //        qDebug() << "length vector buffer" << buffer.length();
-        Pos myPos = map->getRobotPosition(ident);
+        QPair<unsigned int, unsigned int> myPos = map->getRobotPosition(ident);
 
         QString finalPosition = buffer.last()[3];
-        Pos otherPos = Pos(finalPosition.split(",")[0].toInt(), finalPosition.split(",")[1].toInt());
+        QPair<unsigned int, unsigned int> otherPos(finalPosition.split(",")[0].toInt(), finalPosition.split(",")[1].toInt());
         if (!robotsTooFar(myPos, otherPos)) {
+            reset_connected();
             applyBufferForRobot(identRobot.toUInt(), buffer);
         } else {
             qDebug() << "Robots too far, message not received";
@@ -504,9 +466,11 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             if (nbRobotsInitialized == 0) {
                 sendingThread = new SendingThread();
                 sendingThread->setParam(this);
-                sendingThread->start();
-                runAlgo();
-            }
+                sendingThread->start();                
+                if (get_connected() > 0)
+                    runAlgo();
+                else
+                    reach_nearestRob();            }
             qDebug() << "Robot " << r << " initialisé";
         } else {
             qDebug() << "Le robot " << r << " n'a jamais été initialisé";
@@ -524,15 +488,18 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
 }
 
 
-bool Pil::robotsTooFar(Pos a, Pos b) {
-    return sqrt(pow((b.x - a.x), 2) - pow((b.y - a.y),2)) > DISTANCE_MAX;
+bool Pil::robotsTooFar(QPair<int, int> a, QPair<int, int> b) {
+    return euclidean_dist(a, b) > DISTANCE_MAX;
 }
 
 void Pil::applyAction()
 {
     //si on a fini les actions
     if(currentIndexOfAction == currentActionToDo.size()){
-        runAlgo();
+        if (get_connected() > 0)
+            runAlgo();
+        else
+            reach_nearestRob();
     }
     //sinon on applique les actions en l'envoyant au robot ou à la simu
     else
@@ -550,10 +517,27 @@ void Pil::applyAction()
 void Pil::runAlgo()
 {
     currentActionToDo = algo->runMinPosOpti();
+//    for (QStringList::const_iterator it=currentActionToDo.constBegin(); it!=currentActionToDo.constEnd(); ++it) {
+//        //std::cout << (*it).toLocal8Bit().constData() << std::endl;
+//        QString message = (*it).mid(0,4);
+//        // std::cout << message.toStdString() << std::endl;
+//        if (message == "turn")
+//            map->turn(0,((*it).mid(5)).toInt());
+//        else if (message == "move")
+//            map->move(0,((*it).mid(5)).toUInt());
+//    }
+
     currentIndexOfAction = 0;
     applyAction();
 }
 
+
+void Pil::reach_nearestRob()
+{
+    currentActionToDo = algo->runMinRobots();
+    currentIndexOfAction = 0;
+    applyAction();
+}
 
 // Slot to handle the message from the robot OR the simu
 void Pil::rmtMessage(Message mess){
@@ -595,8 +579,12 @@ void Pil::rmtMessage(Message mess){
         addInitInBufferAndSend();
     }
 
-    if(obs)
-        runAlgo();
+    if(obs) {
+        if (get_connected() > 0)
+            runAlgo();
+        else
+            reach_nearestRob();
+    }
     else
         applyAction();
 }
@@ -604,6 +592,7 @@ void Pil::rmtMessage(Message mess){
 
 void SendingThread::run() {
     while (cont) {
+        pil->decr_connected();
         pil->sendBufferToNet();
         QTest::qWait(WAITING_TIME);
     }
