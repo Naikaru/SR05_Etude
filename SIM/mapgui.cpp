@@ -193,6 +193,7 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
 }
 
 Robot MapGui::init(int id, int x, int y, int heading){
+    y = convert(y, dimY);
     if(map.getRobots().find(id) == map.getRobots().end())
     {
         addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
