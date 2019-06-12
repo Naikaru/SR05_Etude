@@ -193,7 +193,7 @@ void MapGui::updateRobotOnGrid(const Position &formerPosition, const Position &n
 }
 
 Robot MapGui::init(int id, int x, int y, int heading){
-    y = convert(y, dimY);
+
     if(map.getRobots().find(id) == map.getRobots().end())
     {
         addMessageInDisplay(QString("Init : Le robot d'id ") + QString::number(id) + QString(" n'est pas reconnu"), true);
@@ -203,9 +203,11 @@ Robot MapGui::init(int id, int x, int y, int heading){
     //on considère que ca renvoie le bon
     map.init(id, x, y, heading);
     Position newPosition = map.getRobots().at(id).getPosition();
-    grid->item(newPosition.getY(), newPosition.getX())->setText("R");
-    grid->item(newPosition.getY(), newPosition.getX())->setBackgroundColor(robotColors[id]);
-    grid->item(newPosition.getY(), newPosition.getX())->setTextColor(robotColors[id]);
+    y = convert(newPosition.getY(), dimY);
+    x = newPosition.getX();
+    grid->item(y, x)->setText("R");
+    grid->item(y, x)->setBackgroundColor(robotColors[id]);
+    grid->item(y, x)->setTextColor(robotColors[id]);
     addMessageInDisplay(QString("Le robot d'id ") + QString::number(id) + QString(" a bien été positionné"));
     return map.getRobots().at(id);
 
@@ -417,17 +419,12 @@ void MapGui::initRobot()
     QString adress = t_adress->text();
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
-    Position pos = Position(x, convert(y, dimY));
-    //pos = map.getCoordinatesFromPosition(pos);
+
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
 
             robotColors[id] = colorList[robotColors.size()];
-            /*
-                grid->item(convert(pos.getY(), dimY), pos.getX())->setBackgroundColor(robotColors[id]);
-                grid->item(convert(pos.getY(), dimY), pos.getX())->setTextColor(robotColors[id]);
-                grid->item(convert(pos.getY(), dimY), pos.getX())->setText("R");
-            */
+
             listRobotColor->insertColumn(listRobotColor->columnCount());
             listRobotColor->setItem(0,listRobotColor->columnCount() - 1, new QTableWidgetItem(QString::number(id)));
             listRobotColor->item(0, listRobotColor->columnCount() - 1)->setTextColor("white");
@@ -504,14 +501,14 @@ void MapGui::cellSelection()
 {
     QList<QTableWidgetItem *> itemsSelected = grid->selectedItems();
     for(QTableWidgetItem *cell : itemsSelected){
-        lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(convert(cell->row(), dimX)));
+        lb_coord->setText("X: "+ QString::number(cell->column())+" | Y : " + QString::number(convert(cell->row(), dimY)));
         if(cell->text()=="R")
         {
            std::map<int,Robot> robots = map.getRobots();
                    for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
                    {
                        Position robotPosition = it->second.getPosition();
-                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == cell->row())
+                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimY))
                        {
                           if(map.getRobots().size() == 1)
                           {

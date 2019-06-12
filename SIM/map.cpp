@@ -106,7 +106,7 @@ int Map::move(unsigned int id, int d){
         int y = position.getY() + i * sin(angleInRad);
         qDebug() << "distance " << i << "x : " << x << "y : " << y;
         destination.setX(x);
-        destination.setY(convert(y, this->nbRows));
+        destination.setY(y);
 
 
         Position gridCoordinates = getCoordinatesFromPosition(destination);
