@@ -162,9 +162,9 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     if (nbRobotsInitialized == 0) {
         applyAction();
-//        sendingThread = new SendingThread();
-//        sendingThread->setParam(this);
-//        sendingThread->start();
+//      sendingThread = new SendingThread();
+//      sendingThread->setParam(this);
+//      sendingThread->start();
     }
 }
 
@@ -538,9 +538,15 @@ void Pil::runAlgo()
 //    }
 
     currentIndexOfAction = 0;
+
+
     //si il est vide -> plus de frontières -> on a fini l'exploration !
     if(!currentActionToDo.isEmpty())
         applyAction();
+    //FIN FIN FIN
+    else{
+        QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+    }
 }
 
 
