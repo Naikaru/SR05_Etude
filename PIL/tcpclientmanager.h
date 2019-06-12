@@ -51,10 +51,12 @@ public:
     void connectToRobot(QHostAddress addr, int port);
     bool send(QString message);
     bool send(Message message);
+    bool isHandshakeFinished(){ return (handshakeState == 3); }
 
 
 signals:
     void receivedMessage(Message message);
+    void handshakeFinished();
 private slots:
     void handleErrors(QAbstractSocket::SocketError);
     void handleMessage();

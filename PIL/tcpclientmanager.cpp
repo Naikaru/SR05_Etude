@@ -25,6 +25,7 @@ bool TcpClientManager::send(Message message){
     return this->send(message.getCompleteMessage());
 }
 
+
 // Slots
 void TcpClientManager::handleMessage(){
     while (sock.bytesAvailable()>0){
@@ -60,8 +61,9 @@ void TcpClientManager::handleMessage(){
             case 2: {
                 filtre = message.split(" ");
                 qDebug()<<filtre;
-                handshakeState = 3;
                 send(delim+mnemobegair+equal+APP);
+                handshakeState = 3;
+                emit handshakeFinished();
                 break;
             }
             case 3:
