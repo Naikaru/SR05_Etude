@@ -429,7 +429,7 @@ void Pil::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
 //     qDebug() << "action number" << buffer.first()[0];
 
     QVector<QStringList>::iterator it = buffer.begin();
-    while ((*it)[0].toUInt() < nbActions && it != buffer.end()) {
+    while (it != buffer.end() && (*it)[0].toUInt() <= nbActions) {
         // qDebug() << "action number" << (*it)[0];
         it++;
     }
