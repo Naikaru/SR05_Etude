@@ -444,7 +444,7 @@ void MapGui::initRobot()
         addMessageInDisplay(QString("The robot of id ") + QString::number(id) + QString(" was already initialized"), true );
         //map.init(id, x, y, heading);
     }
-    map.printMap();
+    //map.printMap();
 }
 
 
@@ -474,7 +474,7 @@ void MapGui::run()
     sb_selectY->setEnabled(false);
     bt_addRobot->setEnabled(true);
     t_adress->setEnabled(true);
-    map.printMap();
+    //map.printMap();
 }
 
 void MapGui::cellActivation(const QModelIndex &index){
@@ -548,7 +548,7 @@ void MapGui::cellSelection()
             cell->setSelected(false);
         }
     }
-    map.printMap();
+    //map.printMap();
 }
 
 void MapGui::synchronizeDimX(int newDim)
