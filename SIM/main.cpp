@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
     std::cout << "colision en 3 3: " << m.getRobots().at(1) << std::endl;
     printMap(m);
 
-    */
+
 
     Message msg(QString("APPWHOWHE/robord~join:90"));
     QString order = msg.getValue(Message::mnemoRobotOrder);
@@ -101,8 +101,8 @@ int main(int argc, char* argv[]) {
         qDebug() << val;
     }
 return 0;
-
-//    MapGui mapGui(nullptr);
-//    mapGui.show();
-//    return app.exec();
+*/
+    MapGui mapGui(nullptr);
+    mapGui.show();
+    return app.exec();
 }

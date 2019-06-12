@@ -419,7 +419,7 @@ void MapGui::initRobot()
     QString adress = t_adress->text();
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
-
+    Position pos(x,y);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
 
