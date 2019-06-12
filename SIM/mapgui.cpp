@@ -428,9 +428,6 @@ void MapGui::initRobot()
 
     Position pos(x,y);
 
-    //Position pos = Position(x, convert(y, dimY));
-    //convertBis(&x,&y);
-    //Position pos = Position(x, y);
 
     //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists

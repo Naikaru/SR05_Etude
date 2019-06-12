@@ -371,7 +371,7 @@ void Pil::addInitInBufferAndSend() {
 void Pil::sendBufferToNet() {
     QString payload = bufferPayload;
     QVector<QStringList> buf = getBuffer();
-    qDebug() << "ici";
+    //qDebug() << "ici";
     for (QVector<QStringList>::iterator it = buf.begin(); it != buf.end(); it++) {
         payload += "|" + (*it)[0] + ":" + (*it)[1] + ":" + (*it)[2] + ":" + (*it)[3];
     }
@@ -471,8 +471,9 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
                     reach_nearestRob();
             }
             qDebug() << "Robot " << r << " initialisé";
+
         } else {
-            qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+            //qDebug() << "Le robot " << r << " n'a jamais été initialisé";
         }
     } else if (movement == mnemoMove) {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;
@@ -544,7 +545,6 @@ void Pil::rmtMessage(Message mess){
     QStringList tmp= currentActionToDo[currentIndexOfAction-1].split(":");
     QString action = tmp[0];
     QString order= mess.getValue(mnemoRobotAck);
-    qDebug() << order;
     bool obs = false;
     std::vector<int> val;
     //si c'est un move
@@ -562,6 +562,7 @@ void Pil::rmtMessage(Message mess){
     //sinon si c'est un turn
     else if (action == mnemoTurn)
     {
+
         val = Message::getOrderValue(order);
 
         obs = tmp[1].toInt() != val[0];
@@ -577,6 +578,7 @@ void Pil::rmtMessage(Message mess){
         map->initRobot(ident,val[0],val[1],val[2]);
         addInitInBufferAndSend();
     }
+    qDebug() << order<<"\n";
 
     if(obs) {
         if (is_connected())

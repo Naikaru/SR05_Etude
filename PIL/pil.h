@@ -177,6 +177,7 @@ class Pil: public QWidget {
         // check connection to other robots
         int get_connected() { return map->connected; }
         int is_connected() { return (map->connected > 0 || nbRobot == 1); }
+
         void reset_connected() { map->connected = 2; }
         void decr_connected() { map->connected--; }
 
