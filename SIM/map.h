@@ -41,6 +41,9 @@ private:
     public:
     Position getCoordinatesFromPosition(const Position &position) const;
     Position getPositionFromCoordinates(const Position &coordinates) const;
+
+    unsigned int convert(unsigned int coord, unsigned int dim);
+
         //ctor
         Map();
         Map(unsigned int nbRobotMax, unsigned int nbCols, unsigned int nbRows);

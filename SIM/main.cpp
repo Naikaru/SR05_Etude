@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
     }
 return 0;
 
-    //MapGui mapGui(nullptr);
-    //mapGui.show();
-    //return app.exec();
+//    MapGui mapGui(nullptr);
+//    mapGui.show();
+//    return app.exec();
 }

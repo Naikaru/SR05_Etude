@@ -416,7 +416,7 @@ void MapGui::initRobot()
     QString adress = t_adress->text();
     int id = adress.right(1).toInt();
     int x = 0, y = 0, heading = 0;
-    Position pos = Position(x, y);
+    Position pos = Position(x, convert(y, dimY));
     //pos = map.getCoordinatesFromPosition(pos);
     if(map.getRobots().find(id) == map.getRobots().end()){ //robot do not exists
         if(map.addRobot(id, Robot(heading, pos))){ //robot was added
@@ -461,11 +461,11 @@ void MapGui::run()
         for(unsigned int y=0; y < this->dimY; ++y){
             if(grid->item(y,x)->text() == "")
             {
-                map.changeState(x,convert(y, dimY), CellState::empty);
+                map.changeState(x,y, CellState::empty);
             }
             else
             {
-                map.changeState(x,convert(y, dimY), CellState::full);
+                map.changeState(x,y, CellState::full);
             }
         }
     }
@@ -510,7 +510,7 @@ void MapGui::cellSelection()
                    for (std::map<int,Robot>::iterator it=robots.begin(); it!=robots.end(); ++it)
                    {
                        Position robotPosition = it->second.getPosition();
-                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == convert(cell->row(), dimX))
+                       if(robotPosition.getX() == cell->column() && robotPosition.getY() == cell->row())
                        {
                           if(map.getRobots().size() == 1)
                           {

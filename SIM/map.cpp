@@ -106,7 +106,7 @@ int Map::move(unsigned int id, int d){
         int y = position.getY() + i * sin(angleInRad);
         qDebug() << "distance " << i << "x : " << x << "y : " << y;
         destination.setX(x);
-        destination.setY(y);
+        destination.setY(convert(y, this->nbRows));
 
 
         Position gridCoordinates = getCoordinatesFromPosition(destination);
@@ -246,6 +246,12 @@ Position Map::getPositionFromCoordinates(const Position& coordinates) const
 
 }
 
+unsigned int Map::convert(unsigned int coord, unsigned int dim)
+{
+    return dim - coord -1;
+
+}
+
 Map::Map()
 {
 
@@ -295,7 +301,7 @@ void Map::printMap(){
             if(isRobot == false)
             {
 
-                std::cout << ((this->getState(x,y) == CellState::empty) ? "_" : "X");
+                std::cout << ((this->getState(x, convert(y, this->getNbRows())) == CellState::empty) ? "_" : "X");
             }
         }
         std::cout << std::endl;
