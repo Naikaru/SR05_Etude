@@ -141,7 +141,7 @@ int Map::turn(unsigned int id, int angle){
     newAngle = (newAngle < 0) ? 360 + newAngle : newAngle%360;
 
     robots[id].setHeading(newAngle);
-    return angle;
+    return newAngle;
 }
 
 /*
