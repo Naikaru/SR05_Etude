@@ -297,9 +297,6 @@ void Pil::readStdin() {
             QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
             if (payload.startsWith(bufferPayload)){
                 applyBufferFromMessage(QString::fromStdString(message));
-            }
-            else {
-                // Recepted message is for a BAS app
                 reception_fullmessage->setText(QString::fromStdString(message));
                 reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
                 reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
@@ -468,10 +465,11 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
                 sendingThread = new SendingThread();
                 sendingThread->setParam(this);
                 sendingThread->start();                
-                if (get_connected() > 0)
+                if (is_connected())
                     runAlgo();
                 else
-                    reach_nearestRob();            }
+                    reach_nearestRob();
+            }
             qDebug() << "Robot " << r << " initialisé";
         } else {
             qDebug() << "Le robot " << r << " n'a jamais été initialisé";
@@ -497,7 +495,7 @@ void Pil::applyAction()
 {
     //si on a fini les actions
     if(currentIndexOfAction == currentActionToDo.size()){
-        if (get_connected() > 0)
+        if (is_connected())
             runAlgo();
         else
             reach_nearestRob();
@@ -581,7 +579,7 @@ void Pil::rmtMessage(Message mess){
     }
 
     if(obs) {
-        if (get_connected() > 0)
+        if (is_connected())
             runAlgo();
         else
             reach_nearestRob();
