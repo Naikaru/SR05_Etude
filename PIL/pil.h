@@ -123,7 +123,7 @@ class Pil: public QWidget {
         bool reading_writing = false;
 
         const unsigned int MAX_BUFFER = 20;
-        const unsigned int DISTANCE_MAX = 10;
+        const unsigned int DISTANCE_MAX = 30;
 
         QVector<QStringList> buffer;
 
@@ -145,14 +145,13 @@ class Pil: public QWidget {
         Options getOption(QString arg);
         void initialization(int argc, char* argv[]);
 
-        QPair<unsigned int, unsigned int> chooseFrontier(std::list<Cellule*> closedList);
         QVector<QStringList> parseBuffer(QString payload);
         void applyBufferForRobot(unsigned int r, QVector<QStringList> buffer);
         void applyActionFromBuffer(int r, QStringList action);
         void moveMovementReceived(unsigned int, unsigned int);
         void turnMovementReceived(unsigned int);
 
-        bool robotsTooFar(Pos, Pos);
+        bool robotsTooFar(QPair<int, int> a, QPair<int, int> b);
 
     public:
         void applyBufferFromMessage(QString);
@@ -166,11 +165,20 @@ class Pil: public QWidget {
         void addInitInBufferAndSend();
         void sendBufferToNet();
 
-        //lance l'algorithme
+        // lance l'algorithme
         void runAlgo();
+
+        // When lost contact, try to reach a rob
+        void reach_nearestRob();
 
         //applique l'action courante en l'envoyant au robot ou à la simu
         void applyAction();
+
+        // check connection to other robots
+        int get_connected() { return map->connected; }
+        void reset_connected() { map->connected = 2; }
+        void decr_connected() { map->connected--; }
+
 
     protected slots:
         void sendMessage();

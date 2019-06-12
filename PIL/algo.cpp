@@ -1,5 +1,8 @@
 #include "algo.h"
 
+float euclidean_dist(QPair<int, int> a, QPair<int, int> b){
+    return sqrt(pow((b.first - a.first), 2) + pow((b.second - a.second),2));
+}
 
 void Algo::findFrontier()
 {
@@ -7,7 +10,8 @@ void Algo::findFrontier()
     for(int i =0; i<map->get_nbL();i++){
         for(int j =0; j<map->get_nbC();j++){
             if(map->get_cell(i,j) == FRONT){
-                QPair<QPair<int,int>,float> p(QPair<int,int>(i,j),euclidDist(Pos(map->robots[id].x,map->robots[id].y),Pos(i,j)));
+                QPair<QPair<int,int>,float> p(QPair<int,int>(i,j), euclidean_dist(QPair<int, int>(map->robots[id].x, map->robots[id].y),
+                                                                                  QPair<int, int>(i,j)));
                 frontiers.push_back(p);
             }
         }
@@ -83,12 +87,9 @@ QStringList Algo::runMinPos()
  * Toujours la même complexité mais plus de chance de s'arrêter avant !
  */
 
-float Algo::euclidDist(Pos a, Pos b){
-    return sqrt( pow((b.x - a.x),2)+pow((b.y - a.y),2) );
-}
 
 void Algo::sortFrontier(){
-    std::sort(frontiers.begin(),frontiers.end(), Algo::cmp);
+    std::sort(frontiers.begin(),frontiers.end(), Algo::cmp_frontiers);
 }
 
 /*
@@ -157,4 +158,25 @@ QStringList Algo::runMinPosOpti()
 
     int front = getFrontierMinPosOpti();
     return cost[id][front].get_path();
+}
+
+QStringList Algo::runMinRobots() {
+    QVector<QPair<int, float>> robots_dist(nbRobot);
+    for(int i=0; i<nbRobot; ++i) {
+        if (i != id)
+            robots_dist[i] = qMakePair(i, euclidean_dist(QPair<int, int>(map->robots[id].x, map->robots[id].y),
+                                                         QPair<int, int>(map->robots[i].x, map->robots[i].y)));
+        else
+            robots_dist[i] = qMakePair(id, std::numeric_limits<int>::max());
+    }
+    std::sort(robots_dist.begin(),robots_dist.end(), Algo::cmp_robots);
+    //premier tri par la distance euclidienne
+
+    // Position du robot courant
+    Cellule* c1 = new Cellule(map->robots[id].x,map->robots[id].y);
+    // Position du robot à atteindre
+    Cellule* c2 = new Cellule(robots_dist.first().first,robots_dist.first().second);
+    //on initialise le AStar
+    AStar a(c1, c2, id, map);
+    return a.get_path();
 }

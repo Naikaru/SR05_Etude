@@ -70,10 +70,10 @@ class Map : public QWidget {
     friend class Pil;
     friend class Algo;
 
-    unsigned int nbC;       //nb de colonne
-    unsigned int nbL;       //nb de ligne
     unsigned int width;     //largeur
     unsigned int height;    //hauteur
+    unsigned int nbC;       //nb de colonne
+    unsigned int nbL;       //nb de ligne
     unsigned int dCell;     //hauteur et largeur d'une cellule
 
     std::vector<QString> colors;    //défini les couleurs que peuvent prendre les robots sur la map
@@ -82,6 +82,11 @@ class Map : public QWidget {
     QTableWidget* map;
     QGridLayout* legend;
     QVBoxLayout* mainLayout;
+
+    // To know when we are loosing connection
+    // decremented regularly and incremented when receiving a message
+    int connected = 2;
+
 public :
 
     Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
@@ -104,7 +109,7 @@ public :
      */
     void move(int id,int d, bool setObstacle = false);
 
-    Pos getRobotPosition(int id) { return Pos(robots[id].x, robots[id].y); }
+    QPair<unsigned int, unsigned int> getRobotPosition(int id) { return QPair<unsigned int, unsigned int>(robots[id].x, robots[id].y); }
 
     /*
      * Permet de tourner le robot d'un certain angle
@@ -126,6 +131,7 @@ public :
     QColor get_cell(unsigned int x, unsigned int y) { return map->item(x, y)->backgroundColor(); }
     QColor get_color(unsigned int id) { return robots[id].color; }
     int get_heading(unsigned int id) { return robots[id].heading; }
+    int get_connected() { return connected; }
 
 private:
 

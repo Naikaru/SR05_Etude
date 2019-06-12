@@ -81,7 +81,7 @@ void AStar::add_neighbours(Cellule* cell){
     int x = cell->get_x();
     int y = cell->get_y();
     // Access to element (x,y)
-    std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
+    // std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
 
     // right neighbour:
     if(x+1 < map->get_nbL() && (map->get_cell(x+1,y) == EXPLO ||
@@ -189,7 +189,7 @@ void AStar::compute_pathList() {
     while((cell != nullptr) && (cell->get_xp() != -1) && (cell->get_yp() != -1)) {
         x = cell->get_x();
         y = cell->get_y();
-        std::cout << "Next move : (xp, yp) = (" << cell->get_xp() << "," << cell->get_yp() << ")" << std::endl;
+        //std::cout << "Next move : (xp, yp) = (" << cell->get_xp() << "," << cell->get_yp() << ")" << std::endl;
         cell = lookfor_cell(closedList, cell->get_xp(), cell->get_yp());
         if (cell == nullptr)
             break;
@@ -213,7 +213,7 @@ void AStar::compute_pathList() {
         if ((cell->get_xp() == -1 && cell->get_yp() == -1)) //|| (compute_angle(heading, x, y, cell->get_x(), cell->get_y()) != 0))
             pathList << QString("move:"+QString::number(dist));
     }
-    qDebug() << "FIN DU GET_PATH" ;
+    //qDebug() << "FIN DU GET_PATH" ;
     clear();
     return;
 }
