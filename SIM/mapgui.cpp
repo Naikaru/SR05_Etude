@@ -143,6 +143,13 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_mapGui->addWidget(bt_test);
     QObject::connect(bt_test, SIGNAL(clicked()), this, SLOT(handleMessageFromRobotTest()));
 
+    bt_move = new QPushButton("move");
+    QObject::connect(bt_move, SIGNAL(clicked(bool)), this, SLOT(handleMessageFromRobotTestMove()));
+    bt_turn = new QPushButton("turn");
+    QObject::connect(bt_turn, SIGNAL(clicked(bool)), this, SLOT(handleMessageFromRobotTestTurn()));
+    l_mapGui->addWidget(bt_move);
+    l_mapGui->addWidget(bt_turn);
+
     this->setLayout(l_mapGui);
 
 
@@ -181,16 +188,17 @@ void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
     Position newPosition = map.getRobots().at(id).getPosition();
     unsigned int newX = newPosition.getX();
     unsigned int newY = convert(newPosition.getY(), dimY);
-
+    qDebug() << "FormerX : " << formerX << "FormerY" << formerY;
+    qDebug() << "newX : " << newX << " newY" << newY;
     if(grid->item(formerY,formerX)->text() == "R")
     {
+        grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
+        grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
+        grid->item(formerY, formerX)->setText("");
+
         grid->item(newY, newX)->setText("R");
         grid->item(newY, newX)->setBackgroundColor(robotColors[id]);
         grid->item(newY, newX)->setTextColor(robotColors[id]);
-
-        grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
-        grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
-        grid->item(newY, newX)->setText("");
     }
 
 }
@@ -227,7 +235,7 @@ int MapGui::move(int id, int d)
 
     Position robotBeforeMove = map.getRobots().at(id).getPosition();
     int distanceTravelled = map.move(id, d);
-    Position newPosition = map.getRobots().at(id).getPosition();
+
     updateRobotOnGrid(id, robotBeforeMove);
     return distanceTravelled;
 }
@@ -348,9 +356,93 @@ void MapGui::handleMessageFromRobotTest()
         //ordre non reconnu
         ackMessage.setValue(Message::mnemoRobotAck, Message::mnemoAckError + QString(":ignoredbadarg"));
     }
+    addMessageInDisplay(QString("Message : ") + ackMessage.getCompleteMessage());
+    //messageManager->sendMessage(msg.first, ackMessage);
 
-    messageManager->sendMessage(msg.first, ackMessage);
+}
 
+void MapGui::handleMessageFromRobotTestTurn()
+{
+    std::pair<int, Message> msg(1, Message("PILROBLCH/robord~turn:90"));
+    Message ackMessage = messageManager->createMessage();
+
+    qDebug() <<msg.second.getCompleteMessage()<<endl;
+
+    QString order = msg.second.getValue(Message::mnemoRobotOrder);
+    std::vector<int> parameters = std::vector<int>();
+    if(order.startsWith("move")) {
+        int distanceToTravel = Message::getOrderValue(order)[0];
+        int distanceTravelled = this->move(msg.first, distanceToTravel);
+        parameters.push_back(distanceTravelled);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckMove, parameters));
+    }
+    else if(order.startsWith("turn")){
+        int angleToTurn = Message::getOrderValue(order)[0];
+        int angleTurned = this->turn(msg.first, angleToTurn);
+        parameters.push_back(angleTurned);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
+    }
+    else if(order.startsWith("init")){
+        std::vector<int> inputParameters = Message::getOrderValue(order);
+        int x = inputParameters[0];
+        int y = inputParameters[1];
+        int heading = inputParameters[2];
+        Robot newPosition = this->init(msg.first, x, y, heading);
+        parameters.push_back(newPosition.getPosition().getX());
+        parameters.push_back(newPosition.getPosition().getY());
+        parameters.push_back(newPosition.getHeading());
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
+        addMessageInDisplay(QString("Robot bien initialisé, envoi du message : ") + ackMessage.getCompleteMessage());
+    }
+    else{
+        //ordre non reconnu
+        ackMessage.setValue(Message::mnemoRobotAck, Message::mnemoAckError + QString(":ignoredbadarg"));
+    }
+
+    addMessageInDisplay(QString("Message : ") + ackMessage.getCompleteMessage());
+    //messageManager->sendMessage(msg.first, ackMessage);
+    map.printMap();
+}
+
+void MapGui::handleMessageFromRobotTestMove()
+{
+    std::pair<int, Message> msg(1, Message("PILROBLCH/robord~move:1"));
+    Message ackMessage = messageManager->createMessage();
+
+    qDebug() <<msg.second.getCompleteMessage()<<endl;
+
+    QString order = msg.second.getValue(Message::mnemoRobotOrder);
+    std::vector<int> parameters = std::vector<int>();
+    if(order.startsWith("move")) {
+        int distanceToTravel = Message::getOrderValue(order)[0];
+        int distanceTravelled = this->move(msg.first, distanceToTravel);
+        parameters.push_back(distanceTravelled);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckMove, parameters));
+    }
+    else if(order.startsWith("turn")){
+        int angleToTurn = Message::getOrderValue(order)[0];
+        int angleTurned = this->turn(msg.first, angleToTurn);
+        parameters.push_back(angleTurned);
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckTurn, parameters));
+    }
+    else if(order.startsWith("init")){
+        std::vector<int> inputParameters = Message::getOrderValue(order);
+        int x = inputParameters[0];
+        int y = inputParameters[1];
+        int heading = inputParameters[2];
+        Robot newPosition = this->init(msg.first, x, y, heading);
+        parameters.push_back(newPosition.getPosition().getX());
+        parameters.push_back(newPosition.getPosition().getY());
+        parameters.push_back(newPosition.getHeading());
+        ackMessage.setValue(Message::mnemoRobotAck, Message::parseOrderValues(Message::mnemoAckInit, parameters));
+        addMessageInDisplay(QString("Robot bien initialisé, envoi du message : ") + ackMessage.getCompleteMessage());
+    }
+    else{
+        //ordre non reconnu
+        ackMessage.setValue(Message::mnemoRobotAck, Message::mnemoAckError + QString(":ignoredbadarg"));
+    }
+    addMessageInDisplay(QString("Message : ") + ackMessage.getCompleteMessage());
+    //messageManager->sendMessage(msg.first, ackMessage);
 }
 
 void MapGui::saveConfig()
@@ -468,9 +560,10 @@ void MapGui::initRobot()
 void MapGui::run()
 {
     map = Map(100, dimX, dimY);
+
     for(unsigned int x = 0; x< this->dimX; ++x){
         for(unsigned int y=0; y < this->dimY; ++y){
-            if(grid->item(y,x)->text() == "")
+            if(grid->item(y,x)->backgroundColor() == cellEmptyColor)
             {
                 map.changeState(x,y, CellState::empty);
             }
@@ -494,7 +587,7 @@ void MapGui::run()
 void MapGui::cellActivation(const QModelIndex &index){
 
     grid->item(index.row(),index.column())->setSelected(false);
-    if(grid->item(index.row(),index.column())->text() == "")
+    if(grid->item(index.row(),index.column())->backgroundColor() == cellEmptyColor)
     {
         grid->item(index.row(),index.column())->setText("_");
         grid->item(index.row(),index.column())->setBackgroundColor(cellFullColor);

@@ -109,13 +109,14 @@ int Map::move(unsigned int id, int d){
         destination.setY(y);
 
 
-        Position gridCoordinates = getCoordinatesFromPosition(destination);
-        if(this->getState(gridCoordinates.getX(), gridCoordinates.getY()) == empty)
+        Position gridCoordinates = destination;
+        if(this->getState(gridCoordinates.getX(), gridCoordinates.getY()) == CellState::empty)
         {
             distanceTraveled++;
             cellTraveled.push_back(destination);
         } else {
             //obstacle = destination;
+
             distanceTraveled = i - 1;
             qDebug() << "obstacle rencontré en " << i;
             break;
@@ -141,7 +142,7 @@ int Map::turn(unsigned int id, int angle){
     newAngle = (newAngle < 0) ? 360 + newAngle : newAngle%360;
 
     robots[id].setHeading(newAngle);
-    return newAngle;
+    return angle;
 }
 
 /*

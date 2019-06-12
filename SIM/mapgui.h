@@ -30,8 +30,8 @@ class MapGui : QWidget
 
     QTableWidget* grid;
 
-    unsigned int dimX = 10; //nb de lignes
-    unsigned int dimY = 10; //nb de colonne
+    unsigned int dimX = 50; //nb de lignes
+    unsigned int dimY = 50; //nb de colonne
     unsigned int maxW = 300;
     unsigned int maxH = 300;
     unsigned int width = 300;     //largeur
@@ -75,7 +75,8 @@ class MapGui : QWidget
     QHBoxLayout * l_config;
 
     QPushButton * bt_test;
-
+    QPushButton * bt_move;
+    QPushButton * bt_turn;
 public:
     MapGui(QWidget *parent);
     void show()
@@ -106,6 +107,8 @@ private :
 public slots:
     void handleMessageFromRobot(const std::pair<int, Message> &msg);
     void handleMessageFromRobotTest();
+    void handleMessageFromRobotTestTurn();
+    void handleMessageFromRobotTestMove();
 private slots:
 
     void saveConfig();
