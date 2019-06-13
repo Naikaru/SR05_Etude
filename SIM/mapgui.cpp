@@ -14,6 +14,9 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     grid->setFixedSize(width, height);
     grid->horizontalHeader()->setVisible(false);
     grid->verticalHeader()->setVisible(false);
+    // allow for smaller lines and column
+    grid->verticalHeader()->setMinimumSectionSize(2);
+    grid->horizontalHeader()->setMinimumSectionSize(2);
     grid->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     grid->horizontalHeader()->setDefaultSectionSize(width/dimX);

@@ -49,7 +49,10 @@ void Map::init()
     colors.insert(colors.begin(),c, c+12);
     //on prend le minimum pour être sur que ça entre
     dCell = std::min(width/nbC,height/nbL);
-
+    // Set the minimal size for column and rows to 2,
+    // to make them fit
+    map->verticalHeader()->setMinimumSectionSize(2);
+    map->horizontalHeader()->setMinimumSectionSize(2);
     map->setColumnCount(nbC);
     map->setRowCount(nbL);
     map->setShowGrid(true);
