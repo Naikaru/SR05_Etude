@@ -82,6 +82,9 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     l_mapGui->addWidget(listRobotColor);
     listRobotColor->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listRobotColor->setFixedSize(0*20, 0*20);
+    // allow for smaller lines and column
+    listRobotColor->verticalHeader()->setMinimumSectionSize(2);
+    listRobotColor->horizontalHeader()->setMinimumSectionSize(2);
     listRobotColor->horizontalHeader()->setVisible(false);
     listRobotColor->verticalHeader()->setVisible(false);
     listRobotColor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -687,8 +690,10 @@ void MapGui::deleteRobot(int x, int y)
         grid->item(convert(map.getRobots().at(idRobot).getPosition().getY(), dimY), map.getRobots().at(idRobot).getPosition().getX())->setBackgroundColor(robotColors[idRobot]);
     }
 
-    messageManager->removeRobotSocket(id);
-    addMessageInDisplay(QString("Le robot a été supprimé avec succès"));
+    if (messageManager->removeRobotSocket(id)){
+        addMessageInDisplay(QString("Le robot a été supprimé avec succès"));
+    }
+
 
 }
 

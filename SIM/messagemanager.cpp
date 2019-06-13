@@ -54,8 +54,13 @@ bool MessageManager::removeRobotSocket(int id)
 {
     if(sockets.find(id) == sockets.end())
         return false;
-    sockets.erase(id);
-    return true;
+    // actually close the server, to allow running an other one on top of it
+    delete sockets[id];
+    if (sockets.erase(id) == 1){
+        return true;
+    }
+    return false;
+
 }
 
 void MessageManager::sendMessage(int id, const Message &msg)

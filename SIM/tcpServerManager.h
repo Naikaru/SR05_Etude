@@ -23,6 +23,7 @@ const QString handshakeMessages[4] = {QString("^ ~ app beglch begair endlch enda
 int robotId;
 public:
     socket(QHostAddress address, int port = 4646);
+    ~socket();
     void send(QString message) const;
     void send(Message message) const;
     int getRobotId() const;

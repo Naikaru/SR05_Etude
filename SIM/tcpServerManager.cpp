@@ -16,6 +16,13 @@ socket::socket(QHostAddress address , int port):server()
     }
     QObject::connect(&server, SIGNAL(newConnection()), this, SLOT(handleConnect()));
 }
+socket::~socket(){
+    if (sock != nullptr){
+        sock->close();
+        delete sock;
+    }
+    server.close();
+}
 
 void socket::send(QString message) const{
     if (sock == nullptr || !sock->isOpen()){
