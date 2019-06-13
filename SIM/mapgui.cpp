@@ -191,8 +191,8 @@ void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
     unsigned int newY = convert(newPosition.getY(), dimY);
     //qDebug() << "FormerX : " << formerX << "FormerY" << formerY;
     //qDebug() << "newX : " << newX << " newY" << newY;
-    if(grid->item(formerY,formerX)->text() == "R")
-    {
+    //if(grid->item(formerY,formerX)->text() == "R")
+    //{
         grid->item(formerY,formerX)->setBackgroundColor(cellEmptyColor);
         grid->item(formerY,formerX)->setTextColor(cellEmptyColor);
         grid->item(formerY, formerX)->setText("");
@@ -200,7 +200,7 @@ void MapGui::updateRobotOnGrid(int id, const Position &formerPosition)
         grid->item(newY, newX)->setText("R");
         grid->item(newY, newX)->setBackgroundColor(robotColors[id]);
         grid->item(newY, newX)->setTextColor(robotColors[id]);
-    }
+    //}
 
 }
 
