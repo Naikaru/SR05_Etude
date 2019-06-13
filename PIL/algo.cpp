@@ -144,7 +144,7 @@ int Algo::getFrontierMinPosOpti()
         if( classment[j] == 1)
             return j;
     }
-    QMessageBox::information(map,"INFO","CRASH!!!!");
+    //QMessageBox::information(map,"INFO","CRASH!!!!");
     int min = *std::min_element(classment.constBegin(), classment.constEnd());  //recherche du score minimum
     int front = classment.indexOf(min);     //regarde pour quelle frontier on a obtenu ce score minimum
 
