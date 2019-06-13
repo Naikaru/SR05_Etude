@@ -262,7 +262,11 @@ void Net::readStdin() {
     notifier->setEnabled(false);
     char c;
 
-    do {
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    c = ungetc(std::getc(stdin), stdin);
+    fcntl(STDIN_FILENO, F_SETFL, flags);
+    while(c != EOF) {
         std::getline(std::cin, tmp);
         message = QString::fromStdString(tmp);
         // passage dans le routeur
@@ -320,7 +324,7 @@ void Net::readStdin() {
         c = ungetc(std::getc(stdin), stdin);
         fcntl(STDIN_FILENO, F_SETFL, flags);
 
-    } while (c!= EOF);
+    }
     notifier->setEnabled(true);
 }
 
