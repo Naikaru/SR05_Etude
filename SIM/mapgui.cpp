@@ -97,6 +97,7 @@ MapGui::MapGui(QWidget * parent) : QWidget(parent)
     bt_addRobot->setEnabled(false);
     lb_adress = new QLabel("Adresse TCP : ");
     t_adress = new QLineEdit();
+    t_adress->setText("127.0.0.1");
     t_adress->setPlaceholderText("127.0.0.1");
     t_adress->setEnabled("false");
 

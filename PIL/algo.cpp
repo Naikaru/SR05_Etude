@@ -144,6 +144,7 @@ int Algo::getFrontierMinPosOpti()
         if( classment[j] == 1)
             return j;
     }
+    //QMessageBox::information(map,"INFO","CRASH!!!!");
     int min = *std::min_element(classment.constBegin(), classment.constEnd());  //recherche du score minimum
     int front = classment.indexOf(min);     //regarde pour quelle frontier on a obtenu ce score minimum
 
@@ -156,7 +157,7 @@ QStringList Algo::runMinPosOpti()
     findFrontier();
 
     if(frontiers.size() == 0)
-        return QStringList();
+        return (QStringList()<<QString("FIN"));
 
     sortFrontier(); //premier trie par la distance euclidienne
 

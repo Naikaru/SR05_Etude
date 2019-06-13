@@ -9,7 +9,6 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     main = new QVBoxLayout();
     nseq = 0;
     init = false;
-    map = new Map();
 
     // Top bar with 2 buttons: Envoyer - Quitter
     button_area = new QHBoxLayout();
@@ -94,12 +93,12 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
-    std::cerr << "PIL sazejfsqdfh " << ident << std::endl;
+    map = new Map(ident);
     nbRobotsInitialized = nbRobot - 1;
-    // qDebug() << "PIL ident = " << ident;
 
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
+    map->setWindowTitle(QString("MAP ")+ QString::number(ident) );
 
     QString tmp("127.0.0."); tmp+=QString::number(ident+1);
     client.connectToRobot(QHostAddress(tmp),4646);
@@ -107,7 +106,7 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     QString initAction("");
     initAction += mnemoInit +":" + QString::number(xInit)+","+QString::number(yInit)+","+QString::number(0);
     currentActionToDo << initAction;
-    currentIndexOfAction =0;
+    currentIndexOfAction = 0;
 
     // todo : à virer après vérif
     //addInitInBufferAndSend();
@@ -125,28 +124,6 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
 
-
-//    Cellule* begin =  new Cellule(map->robots[ident].x,map->robots[ident].y);
-//    std::cout << "ident : " << ident << "x : " << begin->get_x() << "y : " << begin->get_y() << std::endl;
-//    Cellule* frontier = new Cellule(49,0);
-//    frontier->set_cost(0);
-//    frontier->set_heuristique(estimation_heuristique(begin->get_x(), begin->get_y(), 49, 0));
-//    AStar astar(begin, frontier, ident, map);
-//    astar.astar();
-
-//    Cellule* path = astar.get_path();
-//    if(path != NULL){
-//        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
-//            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
-//            path = astar.lookfor_cell(astar.get_closedList(), path->m_xp, path->m_yp);
-//        }
-//    }
-
-//    QStringList path = astar.get_path();
-//    for (QStringList::const_iterator it=path.constBegin(); it!=path.constEnd(); ++it)
-//        std::cout << (*it).toLocal8Bit().constData() << std::endl;
-
-
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
     connect(send, SIGNAL(clicked()), this, SLOT(sendMessage())); // Send message
@@ -158,15 +135,12 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     while(!client.isHandshakeFinished())
     {
-        //int a(0);
         QTest::qWait(50);
     }
     QTest::qWait(50);
 
     applyAction();
-//        sendingThread = new SendingThread();
-//        sendingThread->setParam(this);
-//        sendingThread->start();
+
 }
 
 
@@ -303,8 +277,8 @@ void Pil::readStdin() {
             QString payload = parseMessage(payloadMnemo, QString::fromStdString(message));
             if (payload.startsWith(bufferPayload)){
                 applyBufferFromMessage(QString::fromStdString(message));
-                reception_fullmessage->setText(QString::fromStdString(message));
-                reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
+                //reception_fullmessage->setText(QString::fromStdString(message));
+                //reception_message_received->setText(parseMessage(payloadMnemo, QString::fromStdString(message)));
                 reception_nseq->setText(parseMessage(nseqMnemo, QString::fromStdString(message)));
                 reception_sender->setText(parseMessage(senderMnemo, QString::fromStdString(message)));
                 reception_dest->setText(parseMessage(destMnemo, QString::fromStdString(message)));
@@ -337,7 +311,7 @@ void Pil::moveMovementReceived(unsigned int realDistance, unsigned int expectedD
     addMovementInBuffer(nbActionsRobot[ident], mnemoMove, distance, finalPosition);
 }
 
-void Pil::turnMovementReceived(unsigned int t) {
+void Pil::turnMovementReceived(int t) {
     QString turn = QString(QString::number(t) + "," + QString::number(t));
     Robot rob = map->robots[ident];
     QString finalPosition = QString(
@@ -352,6 +326,8 @@ void Pil::addMovementInBuffer(unsigned int nbAction, QString movement, QString d
     if (buffer.length() >= MAX_BUFFER) {
         buffer.pop_front();
     }
+
+    std::cerr << "PIL " << ident << " adding buffer movement " << nbAction << std::endl;
     // nbAction = nb of actions of robot : compteur local à chaque robot
     // movement = action ("move", "turn")
         // movement format: move
@@ -408,21 +384,23 @@ QVector<QStringList> Pil::parseBuffer(QString payload) {
 
 void Pil::applyBufferFromMessage(QString message){
     QString identRobot = parseMessage(senderMnemo, message);
-    QString payload = parseMessage(payloadMnemo, message);
-//    qDebug() << "before, nbrobot=" << nbRobot << "ident=" << identRobot;
-    if (identRobot.toInt() < nbRobot) {
-//        qDebug() << "identRobot" << identRobot << " payload = " << payload;
-        QVector<QStringList> buffer = parseBuffer(payload);
-//        qDebug() << "length vector buffer" << buffer.length();
-        QPair<unsigned int, unsigned int> myPos = map->getRobotPosition(ident);
+    if(identRobot != ident){
+        QString payload = parseMessage(payloadMnemo, message);
+    //    qDebug() << "before, nbrobot=" << nbRobot << "ident=" << identRobot;
+        if (identRobot.toInt() < nbRobot) {
+    //        qDebug() << "identRobot" << identRobot << " payload = " << payload;
+            QVector<QStringList> buffer = parseBuffer(payload);
+    //        qDebug() << "length vector buffer" << buffer.length();
+            QPair<unsigned int, unsigned int> myPos = map->getRobotPosition(ident);
 
-        QString finalPosition = buffer.last()[3];
-        QPair<unsigned int, unsigned int> otherPos(finalPosition.split(",")[0].toInt(), finalPosition.split(",")[1].toInt());
-        if (!robotsTooFar(myPos, otherPos)) {
-            reset_connected();
-            applyBufferForRobot(identRobot.toUInt(), buffer);
-        } else {
-            std::cerr << "Robots too far, message not received\n";
+            QString finalPosition = buffer.last()[3];
+            QPair<unsigned int, unsigned int> otherPos(finalPosition.split(",")[0].toInt(), finalPosition.split(",")[1].toInt());
+            if (!robotsTooFar(myPos, otherPos)) {
+                reset_connected();
+                applyBufferForRobot(identRobot.toUInt(), buffer);
+            } else {
+                std::cerr << "Robots too far, message not received\n";
+            }
         }
     }
 }
@@ -441,10 +419,9 @@ void Pil::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
         it++;
     }
 
-//     qDebug() << "fin 1er while";
-
     // On est arrivé aux actions à appliquer pour le robot
     while (it != buffer.end()) {
+        // std::cerr<<"BUFFER Pour:"<<ident<< " De: "<<r<<" Compteur: "<<(*it)[0].toUInt()<<std::endl;
         applyActionFromBuffer(r, (*it));
         it++;
     }
@@ -462,25 +439,22 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
     int y_final = finalPosition.split(",")[1].toInt();
     int heading_final = finalPosition.split(",")[2].toInt();
 
-//    qDebug() << "PIL " << ident << " nbactionrobot " << r << " = " << nbActionsRobot[r];
+    std::cerr << "(PIL " << ident << ") nbactionrobot " << r << " = " << nbActionsRobot[r] << std::endl;
+
     // On vérifie que le robot ait été initialisé
     if (nbActionsRobot[r] == 0) {
         if (movement == mnemoInit) {
             map->initRobot(r, x_final, y_final, heading_final);
-//            qDebug() << "caca";
             nbActionsRobot[r] = std::max(numAction, (unsigned int)1);
-//            qDebug() << "prout";
             nbRobotsInitialized--;
             if (nbRobotsInitialized == 0) {
 //                qDebug() << "avant thread";
+                QTest::qWait(1000);
                 sendingThread = new SendingThread();
                 sendingThread->setParam(this);
                 sendingThread->start();
                 if (is_connected()) {
-
-//                    qDebug() << "avant algo";
-//                    runAlgo();
-//                    qDebug() << "après algo";
+                      runAlgo();
                 }
                 else
                     reach_nearestRob();
@@ -489,7 +463,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             std::cerr << "Robot " << r << " initialisé";
 
         } else {
-            //qDebug() << "Le robot " << r << " n'a jamais été initialisé";
+            std::cerr << "Le robot " << r << " n'a jamais été initialisé";
         }
     } else if (movement == mnemoMove) {
         // qDebug() << "move, realDestination=" << realDestination << "expected=" << expectedDestination << "set obstacle" << realDestination != expectedDestination;
@@ -526,7 +500,6 @@ void Pil::applyAction()
         client.send(m);
         currentIndexOfAction++;
     }
-
     return;
 }
 
@@ -535,25 +508,21 @@ void Pil::runAlgo()
 {
     if (nbRobotsInitialized == 0) {
         currentActionToDo = algo->runMinPosOpti();
-    //    for (QStringList::const_iterator it=currentActionToDo.constBegin(); it!=currentActionToDo.constEnd(); ++it) {
-    //        //std::cout << (*it).toLocal8Bit().constData() << std::endl;
-    //        QString message = (*it).mid(0,4);
-    //        // std::cout << message.toStdString() << std::endl;
-    //        if (message == "turn")
-    //            map->turn(0,((*it).mid(5)).toInt());
-    //        else if (message == "move")
-    //            map->move(0,((*it).mid(5)).toUInt());
-    //    }
 
         currentIndexOfAction = 0;
 
 
         //si il est vide -> plus de frontières -> on a fini l'exploration !
-        if(!currentActionToDo.isEmpty())
-            applyAction();
-        //FIN FIN FIN
-        else{
+        if(!currentActionToDo.isEmpty() && currentActionToDo[0] == "FIN")
             QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+            //FIN FIN FIN
+        else if (!currentActionToDo.isEmpty()){
+            applyAction();
+        }
+        else {
+            currentActionToDo.clear();
+            currentIndexOfAction = 0;
+             applyAction();
         }
     }
 }
@@ -569,7 +538,7 @@ void Pil::reach_nearestRob()
 // Slot to handle the message from the robot OR the simu
 void Pil::rmtMessage(Message mess){
     //reception d'une réponse de la simu
-    QStringList tmp= currentActionToDo[currentIndexOfAction-1].split(":");
+    QStringList tmp = currentActionToDo[currentIndexOfAction-1].split(":");
     QString action = tmp[0];
     QString order= mess.getValue(mnemoRobotAck);
     bool obs = false;
@@ -580,8 +549,10 @@ void Pil::rmtMessage(Message mess){
         val = Message::getOrderValue(order);
 
         obs = tmp[1].toInt() != val[0];
+        QTest::qWait(100);
         map->move(ident,val[0],obs);
         nbActionsRobot[ident]++;
+//        std::cerr << "PIL " << ident << " Action received from sim " << nbActionsRobot[ident] << std::endl;
         moveMovementReceived(val[0], tmp[1].toUInt());
         //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
 
@@ -601,9 +572,10 @@ void Pil::rmtMessage(Message mess){
     }
     else if (action == mnemoInit)
     {
-        std::cerr << "PIL " << ident << " s'est initialise" << std::endl;
+//        std::cerr << "PIL " << ident << " s'est initialise" << std::endl;
         val = Message::getOrderValue(order);
         map->initRobot(ident,val[0],val[1],val[2]);
+        nbActionsRobot[ident]++;
         addInitInBufferAndSend();
     }
 

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <regex>
 #include <fstream>
+#include <QtTest/QtTest>
 
 #define FRONT "green"
 #define EXPLO "white"
@@ -86,10 +87,13 @@ class Map : public QWidget {
     // To know when we are loosing connection
     // decremented regularly and incremented when receiving a message
     int connected = 2;
+    int id;
+    QString colorMe;
+    QString colorOther;
 
 public :
 
-    Map(unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
+    Map(int id,unsigned int w=500,unsigned int h=500,unsigned int c=50,unsigned int l=50, QWidget* parent = NULL);
 
     //initialise la map avec les dimensions du constructeur.
     void init();

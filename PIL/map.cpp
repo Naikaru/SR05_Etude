@@ -1,14 +1,14 @@
 #include "map.h"
 
 
-Map::Map(unsigned int w,unsigned int h,unsigned int c,unsigned int l, QWidget* parent ):
-    QWidget(parent), width(w),height(h),nbC(c),nbL(l)
+Map::Map(int id,unsigned int w,unsigned int h,unsigned int c,unsigned int l, QWidget* parent ):
+    QWidget(parent), width(w),height(h),nbC(c),nbL(l),id(id)
 {
     map = new QTableWidget();
     init();
-
+    colorMe = "red";
+    colorOther = "blue";
     legend = new QGridLayout();
-    //QString col[4]={"background-color: white;","background-color: green;","background-color: gray;","background-color: black;"};
     QString col[4]={"","","",""};
     col[0] = QString("background-color: ") + QString(EXPLO)+QString(";");
     col[1] = QString("background-color: ") + QString(FRONT)+QString(";");
@@ -80,18 +80,22 @@ void Map::initRobot(int id,int x, int y,int heading)
     convert(&x,&y);
     if(robots.find(id) == robots.end())
     {
-        if(colors.size()==0){
-            std::cerr<< "Il est impossible d'ajouter un nouveau Robot !\n"<< std::endl;
-        }
-        else{
+//        if(colors.size()==0){
+//            std::cerr<< "Il est impossible d'ajouter un nouveau Robot !\n"<< std::endl;
+//        }
+//        else{
+
             std::cerr << "Initialisation robot " << id << std::endl;
             robots[id].x = x; robots[id].y = y;
             robots[id].heading = heading;
-            robots[id].color = colors.at(colors.size()-1);
-            colors.pop_back();
+            if(this->id == id )
+                robots[id].color = colorMe;
+            else
+                robots[id].color = colorOther;
+            //colors.pop_back();
             map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
             setFrontier(robots[id].x,robots[id].y);
-        }
+//        }
     }
     map->update();
     map->repaint();
@@ -103,6 +107,8 @@ void Map::move(int id,int d, bool obstacle)
     if(robots.find(id) != robots.end())
     {
 
+        //int tmpX = robots[id].x;
+        //int tmpY = robots[id].y;
         switch (robots[id].heading){
             case 0:         //droite
                 moveRight(id,d);
@@ -119,13 +125,14 @@ void Map::move(int id,int d, bool obstacle)
             default:
                 return;
         }
-
+       // map->item(tmpX,tmpY)->setBackgroundColor(EXPLO);
         map->item(robots[id].x,robots[id].y)->setBackgroundColor(robots[id].color);
         setFrontier(robots[id].x,robots[id].y);
         if (obstacle) {
             setObstacle(id);
         }
     }
+
     map->update();
     map->repaint();
     return;
@@ -135,7 +142,9 @@ void Map::move(int id,int d, bool obstacle)
 void Map::moveTop(int id,int d)
 {
     for(int i = std::min(robots[id].x-d,robots[id].x); i<=std::max(robots[id].x-d,robots[id].x); ++i){
-        map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
+        //QColor c = map->item(i,robots[id].y)->backgroundColor();
+        //if( c!= QColor(colorMe) && c != QColor(colorOther))
+            map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
         setFrontier(i,robots[id].y);
     }
     robots[id].x -= d;
@@ -144,7 +153,9 @@ void Map::moveTop(int id,int d)
 void Map::moveBottom(int id,int d)
 {
     for(int i = std::min(robots[id].x+d,robots[id].x); i<=std::max(robots[id].x+d,robots[id].x); ++i){
-        map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
+        //QColor c = map->item(i,robots[id].y)->backgroundColor();
+        //if( c!= QColor(colorMe) && c != QColor(colorOther))
+            map->item(i,robots[id].y)->setBackgroundColor(EXPLO);
         setFrontier(i,robots[id].y);
     }
     robots[id].x += d;
@@ -154,7 +165,9 @@ void Map::moveRight(int id,int d)
 {
     for(int i = std::min(robots[id].y+d,robots[id].y); i<=std::max(robots[id].y+d,robots[id].y); ++i)
     {
-        map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
+        //QColor c = map->item(robots[id].x,i)->backgroundColor();
+        //if( c!= QColor(colorMe) && c != QColor(colorOther))
+            map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
         setFrontier(robots[id].x,i);
     }
      robots[id].y += d;
@@ -164,7 +177,9 @@ void Map::moveLeft(int id,int d)
 {
     for(int i = std::min(robots[id].y-d,robots[id].y); i<=std::max(robots[id].y-d,robots[id].y); ++i)
     {
-        map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
+        //QColor c = map->item(robots[id].x,i)->backgroundColor();
+        //if( c!= QColor(colorMe) && c != QColor(colorOther))
+            map->item(robots[id].x,i)->setBackgroundColor(EXPLO);
         setFrontier(robots[id].x,i);
     }
      robots[id].y -= d;

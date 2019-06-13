@@ -218,7 +218,7 @@ void Net::payloadAction(QString message) {
 
 void Net::displayMessage(QString message)
 {
-    reception_message_received->setText(parseMessage(payloadMnemo, message));
+    //reception_message_received->setText(parseMessage(payloadMnemo, message));
     reception_dest->setText(parseMessage(destMnemo, message));
     reception_sender->setText(parseMessage(senderMnemo, message));
     reception_nseq->setText(parseMessage(nseqMnemo, message));
