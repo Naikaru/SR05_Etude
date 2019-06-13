@@ -24,7 +24,7 @@ then
     do
       mkfifo /tmp/inBas$i /tmp/outBas$i
       mkfifo /tmp/inNet$i /tmp/outNet$i
-      let "X = i + 10 * i + 1"
+      let "X = 5 * i + 1"
       ./$BAS --ident=$i --nbNode=$N --x=$X --y=1 < /tmp/inBas$i > /tmp/outBas$i &
       ./$NET --ident=$i --nbNode=$N < /tmp/inNet$i > /tmp/outNet$i &
 

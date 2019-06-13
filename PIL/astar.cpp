@@ -82,44 +82,50 @@ void AStar::add_neighbours(Cellule* cell){
     int y = cell->get_y();
     // Access to element (x,y)
     // std::cout << "Recherche des voisins autour de (x,y) = (" << x << "," << y << ")" << std::endl;
-
+    int cost(1);
     // right neighbour:
     if(x+1 < map->get_nbL() && (map->get_cell(x+1,y) == EXPLO ||
-                                //map->get_cell(x+1,y) == FRONT ||
+                                map->get_cell(x+1,y) == FRONT ||
                                 map->get_cell(x+1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x+1, y) == NULL)
             && (lookfor_cell(openList, x+1, y) == NULL)){
         //printf("\nAjout droit");
-//          if (map->get_cell(x+1,y) == FRONT) cost = 0.75  // essayer avec différentes valeurs
-//          else cost = 1
-        add_cell(new Cellule(x+1, y, 1, cell, begin));
+          if (map->get_cell(x+1,y) == FRONT) cost = 0.30;  // essayer avec différentes valeurs
+          else cost = 1;
+        add_cell(new Cellule(x+1, y, cost, cell, begin));
     }
 
     // voisin gauche :
     if(x > 0 && (map->get_cell(x-1,y) == EXPLO ||
-                 //map->get_cell(x-1,y) == FRONT ||
+                 map->get_cell(x-1,y) == FRONT ||
                  map->get_cell(x-1,y) == map->get_color(ident))
             && (lookfor_cell(closedList, x-1, y) == NULL)
             && (lookfor_cell(openList, x-1, y) == NULL)){
-        add_cell(new Cellule(x-1, y, 1, cell, begin));
+        if (map->get_cell(x-1,y) == FRONT) cost = 0.30;  // essayer avec différentes valeurs
+        else cost = 1;
+        add_cell(new Cellule(x-1, y, cost, cell, begin));
     }
 
     // voisin haut :
     if(y+1 < map->get_nbC() && (map->get_cell(x,y+1) == EXPLO ||
-                                //map->get_cell(x,y+1) == FRONT ||
+                                map->get_cell(x,y+1) == FRONT ||
                                 map->get_cell(x,y+1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y+1) == NULL)
             && (lookfor_cell(openList, x, y+1) == NULL)){
-        add_cell(new Cellule(x, y+1, 1, cell, begin));
+        if (map->get_cell(x,y+1) == FRONT) cost = 0.30;  // essayer avec différentes valeurs
+        else cost = 1;
+        add_cell(new Cellule(x, y+1, cost, cell, begin));
     }
 
     // voisin bas :
     if(y > 0 && (map->get_cell(x,y-1) == EXPLO ||
-                 //map->get_cell(x,y-1) == FRONT ||
+                 map->get_cell(x,y-1) == FRONT ||
                  map->get_cell(x,y-1) == map->get_color(ident))
             && (lookfor_cell(closedList, x, y-1) == NULL)
             && (lookfor_cell(openList, x, y-1) == NULL)){
-        add_cell(new Cellule(x, y-1, 1, cell, begin));
+        if (map->get_cell(x,y-1) == FRONT) cost = 0.30;  // essayer avec différentes valeurs
+        else cost = 1;
+        add_cell(new Cellule(x, y-1, cost, cell, begin));
     }
     return;
 }

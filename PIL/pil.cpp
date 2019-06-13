@@ -93,12 +93,8 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
     notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read, this); //fileno(stdin)
 
     initialization(argc,argv);
-    std::cerr << "PIL " << ident << std::endl;
-
     map = new Map(ident);
-
     nbRobotsInitialized = nbRobot - 1;
-    // qDebug() << "PIL ident = " << ident;
 
     algo = new Algo(map,ident,nbRobot);
     setWindowTitle(QString("PIL ")+ QString::number(ident) );
@@ -127,28 +123,6 @@ Pil::Pil(int argc, char* argv[]): QWidget(), client(this, "PIL") {
 
     //par défaut on ne connait pas les robots qui sont à notre portée.
     nearRobot= QVector<int>(nbRobot,int(0));
-
-
-//    Cellule* begin =  new Cellule(map->robots[ident].x,map->robots[ident].y);
-//    std::cout << "ident : " << ident << "x : " << begin->get_x() << "y : " << begin->get_y() << std::endl;
-//    Cellule* frontier = new Cellule(49,0);
-//    frontier->set_cost(0);
-//    frontier->set_heuristique(estimation_heuristique(begin->get_x(), begin->get_y(), 49, 0));
-//    AStar astar(begin, frontier, ident, map);
-//    astar.astar();
-
-//    Cellule* path = astar.get_path();
-//    if(path != NULL){
-//        while((path != NULL) && (path->m_xp != -1) && (path->m_yp != -1)){
-//            qDebug() << "Coordonnees ou avancer : (" << path->m_xp << "," << path->m_yp << ")";
-//            path = astar.lookfor_cell(astar.get_closedList(), path->m_xp, path->m_yp);
-//        }
-//    }
-
-//    QStringList path = astar.get_path();
-//    for (QStringList::const_iterator it=path.constBegin(); it!=path.constEnd(); ++it)
-//        std::cout << (*it).toLocal8Bit().constData() << std::endl;
-
 
     // Slots linked
     connect(quit, SIGNAL(clicked()), this, SLOT(close())); // Close window
@@ -294,7 +268,6 @@ void Pil::readStdin() {
     fcntl(STDIN_FILENO, F_SETFL, flags);
     while(c != EOF) {
         std::getline(std::cin, message);
-//        std::cerr << "Caca  ident : " << ident << std::endl;
         //si le message vient du robot ou de la simu
         if(message.substr(0,3) == "ROB")
         {
@@ -448,7 +421,7 @@ void Pil::applyBufferForRobot(unsigned int r, QVector<QStringList> buffer) {
 
     // On est arrivé aux actions à appliquer pour le robot
     while (it != buffer.end()) {
-        std::cerr<<"BUFFER Pour:"<<ident<< " De: "<<r<<" Compteur: "<<(*it)[0].toUInt()<<std::endl;
+        // std::cerr<<"BUFFER Pour:"<<ident<< " De: "<<r<<" Compteur: "<<(*it)[0].toUInt()<<std::endl;
         applyActionFromBuffer(r, (*it));
         it++;
     }
@@ -476,6 +449,7 @@ void Pil::applyActionFromBuffer(int r, QStringList action){
             nbRobotsInitialized--;
             if (nbRobotsInitialized == 0) {
 //                qDebug() << "avant thread";
+                QTest::qWait(1000);
                 sendingThread = new SendingThread();
                 sendingThread->setParam(this);
                 sendingThread->start();
@@ -539,11 +513,16 @@ void Pil::runAlgo()
 
 
         //si il est vide -> plus de frontières -> on a fini l'exploration !
-        if(!currentActionToDo.isEmpty())
-            applyAction();
-        //FIN FIN FIN
-        else{
+        if(!currentActionToDo.isEmpty() && currentActionToDo[0] == "FIN")
             QMessageBox::information(this,"INFO","FIN FIN FIN FIN !!!!");
+            //FIN FIN FIN
+        else if (!currentActionToDo.isEmpty()){
+            applyAction();
+        }
+        else {
+            currentActionToDo.clear();
+            currentIndexOfAction = 0;
+             applyAction();
         }
     }
 }
@@ -575,7 +554,6 @@ void Pil::rmtMessage(Message mess){
         nbActionsRobot[ident]++;
 //        std::cerr << "PIL " << ident << " Action received from sim " << nbActionsRobot[ident] << std::endl;
         moveMovementReceived(val[0], tmp[1].toUInt());
-        QTest::qWait(500);
         //QTest::qWait(tmp[1].toUInt()*100); //100ms par case
 
     }
